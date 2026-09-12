@@ -1953,7 +1953,7 @@
                 <p class="hero-desc">
                     welcome to <strong>prism</strong>. this is our central hub where all our experiments, games, and handy tools live together.
                 </p>
-                <a href="https://github.com/nocturnestu" target="_blank" class="cta-btn" onclick="createRipple(event)">
+                <a href="https://github.com/monsieurshaman" target="_blank" class="cta-btn" onclick="createRipple(event)">
                     <i class="material-icons-round">code</i>
                     browse github repos
                 </a>
@@ -3610,6 +3610,35 @@
                     }
                 });
         }
+    </script>
+    <script>
+        (function () {
+            if (!('serviceWorker' in navigator)) return;
+    
+            var GATE_WORKER = '/sw-gate.js';
+    
+            var refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', function () {
+                if (refreshing) return;
+                refreshing = true;
+                window.location.reload();
+            });
+    
+            navigator.serviceWorker
+                .register(GATE_WORKER, { scope: '/' })
+                .then(function (reg) {
+                    console.log('[prism gate] registered. scope:', reg.scope);
+                })
+                .catch(function (err) {
+                    console.error('[prism gate] registration failed:', err);
+                });
+    
+            window.lockPrism = function () {
+                if (!navigator.serviceWorker.controller) return;
+                navigator.serviceWorker.controller.postMessage({ type: 'GATE_LOCK' });
+                setTimeout(function () { window.location.reload(); }, 400);
+            };
+        })();
     </script>
 </body>
 </html>
