@@ -4,14 +4,16 @@
 <head>
     <link rel="manifest" href="/manifest.json">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="NOCTURNE Studios - An All-in-One Hub for Everyone">
-    <meta property="og:description" content="Games, Apps & Utilities, and Tools — all in one hub. Built by NOCTURNE Studios.">
-    <meta property="og:image" content="https://nocturnestu.pages.dev/nocturneassets/og-image.png">
-    <meta property="og:url" content="https://nocturnestu.pages.dev/">
+    <meta property="og:title" content="project prism">
+    <meta property="og:description" content="a hub full of passion projects">
+    <meta property="og:image" content="https://proprism.pages.dev/project-assets/og-image.png">
+    <meta property="og:url" content="https://proprism.pages.dev/">
     <meta property="og:site_name" content="Prism">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOCTURNE Studios - An All-in-One Hub for Everyone</title>
+    <meta name="color-scheme" content="light">
+
+    <title>project prism</title>
     <meta name="theme-color" content="#0a0a14">
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
@@ -52,6 +54,7 @@
             --r-pill: 100px;
             --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
             --ease-out: cubic-bezier(0.2, 0, 0, 1);
+            color-scheme: light;
         }
 
         *,
@@ -323,6 +326,111 @@
             color: var(--primary);
             letter-spacing: 2px;
             text-transform: uppercase;
+        }
+
+        @media (max-width: 1023px) {
+            .mobile-layout {
+                padding-top: 76px;
+                padding-bottom: 88px;
+            }
+
+            .topbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 700;
+                margin-bottom: 0;
+                padding: 14px 16px;
+                background: rgba(7, 7, 15, 0.75);
+                backdrop-filter: var(--blur-md);
+                -webkit-backdrop-filter: var(--blur-md);
+                border-bottom: 1px solid var(--border);
+            }
+
+            .topbar-expand-btn {
+                background: var(--surface-1);
+                border: 1px solid var(--border);
+                color: var(--text-sub);
+                padding: 8px;
+                border-radius: 12px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                transition: all 0.2s ease;
+            }
+            .topbar-expand-btn:hover { background: var(--surface-hover); color: var(--text); }
+            .topbar-expand-btn .material-icons-round {
+                transition: transform 0.3s var(--spring);
+            }
+            .topbar.expanded .topbar-expand-btn .material-icons-round {
+                transform: rotate(180deg);
+            }
+
+            .topbar-accordion {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.35s var(--spring);
+            }
+            .topbar.expanded .topbar-accordion {
+                max-height: 160px;
+            }
+
+            .topbar-accordion-inner {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding-top: 14px;
+            }
+
+            .bottombar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                padding: 12px 16px;
+                background: rgba(7, 7, 15, 0.75);
+                backdrop-filter: var(--blur-md);
+                -webkit-backdrop-filter: var(--blur-md);
+                border-top: 1px solid var(--border);
+            }
+
+            .bottombar-item {
+                width: 42px;
+                height: 42px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--text-sub);
+                background: var(--surface-1);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                text-decoration: none;
+                cursor: pointer;
+                transition: background 0.2s ease, color 0.2s ease, transform 0.25s var(--spring);
+            }
+            .bottombar-item:hover {
+                background: var(--surface-hover);
+                color: var(--primary);
+                transform: translateY(-2px);
+            }
+            .bottombar-item:active {
+                transform: translateY(0) scale(0.95);
+            }
+
+            .hero-card-lite {
+                background: var(--surface-0);
+                border: 1px solid var(--border);
+                border-radius: var(--r-xl);
+                backdrop-filter: var(--blur-md);
+                padding: 20px 22px;
+                margin-bottom: 14px;
+            }
         }
 
         .hero-card {
@@ -698,6 +806,15 @@
         
         .app-library-page.open {
             transform: translateX(0);
+        }
+
+        @media (min-width: 1024px) {
+            .app-library-page {
+                left: auto;
+                width: 480px;
+                max-width: 85vw;
+                box-shadow: -8px 0 40px rgba(0, 0, 0, 0.5);
+            }
         }
 
         .library-container {
@@ -1127,43 +1244,45 @@
             }
         }
 
-        html.prism-installed #pwa-status {
-            position: fixed;
-            bottom: 90px;
-            right: 24px;
-            z-index: 1100;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            padding: 7px 13px;
-            border-radius: var(--r-pill);
-            background: var(--surface-1);
-            border: 1px solid var(--border);
-            backdrop-filter: var(--blur-sm);
-            -webkit-backdrop-filter: var(--blur-sm);
-            font-family: 'DM Sans', sans-serif;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-sub);
-            pointer-events: none;
-            opacity: 0;
-            transform: translateY(6px) scale(0.95);
-            transition: opacity 0.3s var(--ease-out), transform 0.3s var(--spring);
+        @media (display-mode: standalone) {
+            #pwa-status {
+                position: fixed;
+                bottom: 90px;
+                right: 24px;
+                z-index: 1100;
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                padding: 7px 13px;
+                border-radius: var(--r-pill);
+                background: var(--surface-1);
+                border: 1px solid var(--border);
+                backdrop-filter: var(--blur-sm);
+                -webkit-backdrop-filter: var(--blur-sm);
+                font-family: 'DM Sans', sans-serif;
+                font-size: 12px;
+                font-weight: 500;
+                color: var(--text-sub);
+                pointer-events: none;
+                opacity: 0;
+                transform: translateY(6px) scale(0.95);
+                transition: opacity 0.3s var(--ease-out), transform 0.3s var(--spring);
+            }
+            #pwa-status.visible {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            #pwa-status-dot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                flex-shrink: 0;
+                transition: background 0.4s ease;
+            }
+            #pwa-status.online #pwa-status-dot  { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.55); }
+            #pwa-status.offline #pwa-status-dot { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.55); }
         }
-        html.prism-installed #pwa-status.visible {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-        html.prism-installed #pwa-status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            transition: background 0.4s ease;
-        }
-        html.prism-installed #pwa-status.online #pwa-status-dot  { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.55); }
-        html.prism-installed #pwa-status.offline #pwa-status-dot { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.55); }
-
+        
         @media (max-width: 1023px) {
             .list-item-disabled {
                 opacity: 0.38;
@@ -1266,6 +1385,14 @@
             box-shadow: -2px 0 20px rgba(0, 0, 0, 0.5);
         }
 
+        @media (min-width: 1024px) {
+            #settings-page {
+                left: auto;
+                width: 480px;
+                max-width: 85vw;
+            }
+        }
+
         .back-btn {
             display: flex;
             align-items: center;
@@ -1335,6 +1462,15 @@
         }
         #download-page.open {
             transform: translateX(0);
+        }
+
+        @media (min-width: 1024px) {
+            #download-page {
+                left: auto;
+                width: 480px;
+                max-width: 85vw;
+                box-shadow: -8px 0 40px rgba(0, 0, 0, 0.5);
+            }
         }
         .dl-icon-wrap {
             position: absolute;
@@ -1519,17 +1655,9 @@
             font-size: 20px;
         }
 
-        @media (max-width: 599px) {
+        @media (max-width: 1023px) {
             .shaman-socials-bar {
-                bottom: 20px !important;
-                right: 20px !important;
-            }
-            .shaman-social-item {
-                width: 34px;
-                height: 34px;
-            }
-            .shaman-social-item .material-icons-round {
-                font-size: 18px;
+                display: none !important;
             }
         }
 
@@ -1539,10 +1667,12 @@
             }
         }
 
-        html:not(.prism-installed) #recache-btn,
-        html:not(.prism-installed) .storage-heading,
-        html:not(.prism-installed) .developer-heading {
-            display: none !important;
+        @media not (display-mode: standalone) {
+            #recache-btn,
+            .storage-heading,
+            .developer-heading {
+                display: none !important;
+            }
         }
 
         @keyframes enter-down {
@@ -1619,8 +1749,10 @@
             text-shadow: 0 0 6px var(--primary-glow);
         }
 
-        html:not(.prism-installed) #recache-game-toggle {
-            display: none !important;
+        @media not (display-mode: standalone) {
+            #recache-game-toggle {
+                display: none !important;
+            }
         }
 
         .changelog-trigger {
@@ -1683,7 +1815,9 @@
         }
 
         #dev-preview-toggle { display: none; }
-        html.prism-installed #dev-preview-toggle { display: flex; }
+        @media (display-mode: standalone) {
+            #dev-preview-toggle { display: flex; }
+        }
 
     </style>
 </head>
@@ -1699,11 +1833,11 @@
         <div class="loader-ring-wrap" id="loader-ring">
             <div class="loader-ring"></div>
             <div class="loader-ring-2"></div>
-            <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo.png" alt="..." class="loader-logo">
+            <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="..." class="loader-logo">
         </div>
         <div class="loader-wordmark" id="loader-wordmark">
-            <div class="loader-wordmark-name">NOCTURNE</div>
-            <div class="loader-wordmark-sub">Studios</div>
+            <div class="loader-wordmark-name">project</div>
+            <div class="loader-wordmark-sub">prism</div>
         </div>
         <div class="loader-bar-wrap" id="loader-bar-wrap">
             <div class="loader-bar" id="loader-bar"></div>
@@ -1714,7 +1848,7 @@
             font-size: 10px;
             font-weight: 600;
             letter-spacing: 3px;
-            text-transform: uppercase;
+            text-transform: lowercase;
             color: rgba(200,202,228,0.38);
             opacity: 0;
             transition: opacity 0.5s ease;
@@ -1729,50 +1863,64 @@
         <div class="mobile-layout">
             <div class="topbar">
                 <a href="#" class="topbar-brand">
-                    <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png" alt="..." class="topbar-logo">
-                    <span class="topbar-name">PRISM</span>
+                    <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo2.png" alt="..." class="topbar-logo">
+                    <span class="topbar-name" style="text-transform: lowercase;">prism</span>
                 </a>
-                <div class="topbar-badge">Main</div>
+                <div class="topbar-badge" style="text-transform: lowercase;">home base</div>
             </div>
 
-            <div class="hero-card">
-                <div class="hero-card-glow"></div>
-                <div class="hero-header">
-                    <div class="hero-avatar-wrap">
-                        <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo.png" alt="..." class="hero-avatar">
-                    </div>
-                    <div class="hero-text">
-                        <h1 class="hero-title">NOCTURNE Studios</h1>
-                        <div class="hero-status">
-                            <span class="status-dot"></span>
-                            Active Development
+            <div class="topbar">
+                <a href="#" class="topbar-brand">
+                    <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo2.png" alt="..." class="topbar-logo">
+                    <span class="topbar-name" style="text-transform: lowercase;">prism</span>
+                </a>
+                <div class="topbar-expand-btn" onclick="toggleTopbarAccordion()">
+                    <i class="material-icons-round">expand_more</i>
+                </div>
+                <div class="topbar-accordion" id="topbar-accordion">
+                    <div class="topbar-accordion-inner">
+                        <div class="hero-avatar-wrap">
+                            <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="..." class="hero-avatar">
+                        </div>
+                        <div class="hero-text">
+                            <h1 class="hero-title" style="text-transform: lowercase;">project prism</h1>
+                            <div class="hero-status">
+                                <span class="status-dot"></span>
+                                cooking up stuff
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="hero-divider"></div>
-                <p class="hero-desc">
-                    NOCTURNE's <strong>Prism</strong>, an all-in-one hub for every projects made for everyone.
+            </div>
+
+            <div class="hero-card-lite">
+                <p class="hero-desc" style="margin-bottom: 16px;">
+                    welcome to <strong>prism</strong>. this is our central hub where all our experiments, games, and handy tools live together.
                 </p>
                 <a href="https://github.com/nocturnestu" target="_blank" class="cta-btn" onclick="createRipple(event)">
                     <i class="material-icons-round">code</i>
-                    Our GitHub Repositories
+                    browse github repos
                 </a>
-                <button class="install-btn" id="pwa-install-btn-mobile" onclick="triggerPWAInstall(); createRipple(event)" style="display:none;">
-                    <i class="material-icons-round">download</i>
-                    Install Prism App
-                </button>
-                <a href="#" class="changelog-trigger" id="changelog-trigger-mobile"
-                    onclick="openModal('modal-changelog'); createRipple(event); return false;" style="display:none; margin-top:12px;">
-                    <i class="material-icons-round">new_releases</i>
-                    <span>See what's new to Prism</span>
-                </a>
-                <div class="settings-trigger" onclick="toggleSettings()" style="top: 10px; right: 10px;">
+            </div>
+
+            <div class="bottombar">
+                <div class="bottombar-item" onclick="toggleSettings()" title="settings">
                     <i class="material-icons-round">settings</i>
                 </div>
+                <button class="bottombar-item" id="pwa-install-btn-mobile" onclick="triggerPWAInstall(); createRipple(event)" style="display:none;" title="grab the app">
+                    <i class="material-icons-round">download</i>
+                </button>
+                <a href="#" class="bottombar-item" id="changelog-trigger-mobile"
+                    onclick="openModal('modal-changelog'); createRipple(event); return false;" style="display:none;" title="what's fresh?">
+                    <i class="material-icons-round">new_releases</i>
+                </a>
+                <a href="https://www.instagram.com/da.real.mastershaman?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="bottombar-item" title="master shaman instagram">
+                    <i class="material-icons-round">construction</i>
+                </a>
             </div>
 
             <div class="section-header">
-                <span class="section-label">Projects</span>
+                <span class="section-label" style="text-transform: lowercase;">the stash</span>
                 <span class="section-line"></span>
             </div>
 
@@ -1782,8 +1930,8 @@
                         <i class="material-icons-round">view_in_ar</i>
                     </div>
                     <div class="card-body">
-                        <div class="card-title">Games</div>
-                        <div class="card-desc">Fun Interactive Worlds</div>
+                        <div class="card-title">games</div>
+                        <div class="card-desc">interactive playgrounds & worlds</div>
                     </div>
                     <i class="material-icons-round card-arrow">chevron_right</i>
                 </div>
@@ -1792,8 +1940,8 @@
                         <i class="material-icons-round">widgets</i>
                     </div>
                     <div class="card-body">
-                        <div class="card-title">Apps & Utilities</div>
-                        <div class="card-desc">Other NOCTURNE Works</div>
+                        <div class="card-title">apps & oddities</div>
+                        <div class="card-desc">fun web experiments and side builds</div>
                     </div>
                     <i class="material-icons-round card-arrow">chevron_right</i>
                 </div>
@@ -1802,61 +1950,61 @@
                         <i class="material-icons-round">build</i>
                     </div>
                     <div class="card-body">
-                        <div class="card-title">Tools</div>
-                        <div class="card-desc">Essentials</div>
+                        <div class="card-title">tools</div>
+                        <div class="card-desc">actual handy utilities</div>
                     </div>
                     <i class="material-icons-round card-arrow">chevron_right</i>
                 </div>
             </div>
 
-            <div class="fs-footer">NOCTURNE Studios // Project Prism</div>
+            <div class="fs-footer" style="text-transform: lowercase;">project prism // Master Shaman</div>
         </div>
 
         <div class="desktop-layout">
             <div class="desktop-left">
                 <div class="dt-topbar">
                     <a href="#" class="dt-brand">
-                        <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png" alt="..." class="dt-logo">
-                        <span class="dt-brand-name">PRISM</span>
+                        <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo2.png" alt="..." class="dt-logo">
+                        <span class="dt-brand-name" style="text-transform: lowercase;">prism</span>
                     </a>
-                    <div class="dt-badge">Main</div>
+                    <div class="dt-badge" style="text-transform: lowercase;">home base</div>
                 </div>
 
                 <div class="dt-hero-avatar-wrap">
-                    <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo.png" alt="..." class="dt-hero-avatar">
+                    <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="..." class="dt-hero-avatar">
                 </div>
 
-                <h1 class="dt-hero-title">NOCTURNE Studios</h1>
+                <h1 class="dt-hero-title" style="text-transform: lowercase;">project prism</h1>
                 <div class="dt-hero-status">
                     <span class="status-dot"></span>
-                    Active Development
+                    cooking up stuff
                 </div>
                 <div class="dt-divider"></div>
                 <p class="dt-hero-desc">
-                    NOCTURNE's <strong>Prism</strong>, an all-in-one hub for every projects made for everyone.
+                    welcome to <strong>prism</strong>. this is our central hub where all our experiments, games, and handy tools live together.
                 </p>
                 <a href="https://github.com/nocturnestu" target="_blank" class="cta-btn" onclick="createRipple(event)">
                     <i class="material-icons-round">code</i>
-                    Our GitHub Repositories
+                    browse github repos
                 </a>
                 <button class="install-btn" id="pwa-install-btn-desktop" onclick="triggerPWAInstall(); createRipple(event)" style="display:none;">
                     <i class="material-icons-round">download</i>
-                    Install Prism App
+                    grab the app
                 </button>
                 <a href="#" class="changelog-trigger" id="changelog-trigger-desktop"
                     onclick="openModal('modal-changelog'); createRipple(event); return false;" style="display:none; margin-top:20px;">
                     <i class="material-icons-round">new_releases</i>
-                    <span>See what's new to Prism</span>
+                    <span>what's fresh?</span>
                 </a>
                 <div class="settings-trigger" onclick="toggleSettings()" style="top: 40px; right: 40px;">
                     <i class="material-icons-round">settings</i>
                 </div>
-                <div class="dt-footer">NOCTURNE Studios // Project Prism</div>
+                <div class="dt-footer" style="text-transform: lowercase;">project prism</div>
             </div>
 
             <div class="desktop-right">
                 <div class="dt-section-header">
-                    <span class="dt-section-label">Projects</span>
+                    <span class="dt-section-label" style="text-transform: lowercase;">the stash</span>
                     <span class="dt-section-line"></span>
                 </div>
 
@@ -1866,8 +2014,8 @@
                             <i class="material-icons-round">videogame_asset</i>
                         </div>
                         <div class="card-body">
-                            <div class="card-title">Games</div>
-                            <div class="card-desc">Fun Interactive Worlds</div>
+                            <div class="card-title">games</div>
+                            <div class="card-desc">interactive playgrounds & worlds</div>
                         </div>
                         <i class="material-icons-round card-arrow">chevron_right</i>
                     </div>
@@ -1876,8 +2024,8 @@
                             <i class="material-icons-round">widgets</i>
                         </div>
                         <div class="card-body">
-                            <div class="card-title">Apps & Utilities</div>
-                            <div class="card-desc">Experimental Web Pages</div>
+                            <div class="card-title">apps & oddities</div>
+                            <div class="card-desc">fun web experiments and side builds</div>
                         </div>
                         <i class="material-icons-round card-arrow">chevron_right</i>
                     </div>
@@ -1886,8 +2034,8 @@
                             <i class="material-icons-round">build</i>
                         </div>
                         <div class="card-body">
-                            <div class="card-title">Tools</div>
-                            <div class="card-desc">Essentials</div>
+                            <div class="card-title">tools</div>
+                            <div class="card-desc">actual handy utilities</div>
                         </div>
                         <i class="material-icons-round card-arrow">chevron_right</i>
                     </div>
@@ -1896,11 +2044,8 @@
         </div>
 
         <div class="shaman-socials-bar">
-            <a href="https://www.instagram.com/da.real.mastershaman?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="shaman-social-item" title="Master Shaman (Instagram)">
+            <a href="https://www.instagram.com/da.real.mastershaman?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="shaman-social-item" title="master shaman instagram">
                 <span class="material-icons-round">construction</span>
-            </a>
-            <a href="https://www.instagram.com/nocturne.stu?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="shaman-social-item" title="NOCTURNE Studios (Instagram)">
-                <span class="material-icons-round">hub</span>
             </a>
         </div>
 
@@ -1909,19 +2054,19 @@
     <div id="modal-3d" class="app-library-page">
         <div class="library-container">
             <div class="back-btn" onclick="closeAllModals()">
-                <i class="material-icons-round">arrow_back</i> Back
+                <i class="material-icons-round">arrow_back</i> back
             </div>
             <div class="library-header-wrap">
-                <h2 class="library-title">Games</h2>
+                <h2 class="library-title">games</h2>
             </div>
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">Our main stars of NOCTURNE, heavily maintained to be stable just for you.</p>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">the flagship stuff we keep polished just for you.</p>
     
             <div class="library-grid">
                 <a href="./SandBox3D/sb3d_page" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">view_in_ar</i>
                     <div class="item-content">
-                        <div class="item-title">Sand Box 3D</div>
-                        <div class="item-subtitle">Interactive 3D Physics Sandbox</div>
+                        <div class="item-title">sand box 3d</div>
+                        <div class="item-subtitle">mess around with 3d physics</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
@@ -1929,8 +2074,8 @@
                     onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">track_changes</i>
                     <div class="item-content">
-                        <div class="item-title">Rift Runners 2D</div>
-                        <div class="item-subtitle">Top-down 2D Survival Game (PC Only)</div>
+                        <div class="item-title">rift runners 2d</div>
+                        <div class="item-subtitle">top-down survival mayhem (pc only)</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
@@ -1941,16 +2086,16 @@
     <div id="modal-changelog" class="app-library-page">
         <div class="library-container">
             <div class="back-btn" onclick="closeAllModals()">
-                <i class="material-icons-round">arrow_back</i> Back
+                <i class="material-icons-round">arrow_back</i> back
             </div>
             <div class="library-header-wrap">
-                <h2 class="library-title">Prism Changelogs</h2>
+                <h2 class="library-title">prism updates</h2>
             </div>
             <div class="changelog-modal-body">
-                <div class="changelog-version-badge" id="cl-modal-version">Thinking...</div>
-                <h3 class="changelog-modal-title" id="cl-modal-title">Thinking...</h3>
+                <div class="changelog-version-badge" id="cl-modal-version">checking...</div>
+                <h3 class="changelog-modal-title" id="cl-modal-title">checking...</h3>
                 <p class="changelog-modal-text" id="cl-modal-msg">
-                    Thinking...
+                    checking...
                 </p>
             </div>
         </div>
@@ -1959,68 +2104,68 @@
     <div id="modal-other" class="app-library-page">
         <div class="library-container">
             <div class="back-btn" onclick="closeAllModals()">
-                <i class="material-icons-round">arrow_back</i> Back
+                <i class="material-icons-round">arrow_back</i> back
             </div>
             <div class="library-header-wrap">
-                <h2 class="library-title">Apps & Utilities</h2>
+                <h2 class="library-title">apps & oddities</h2>
             </div>
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">Experimental apps.</p>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">random, fun web experiments.</p>
     
             <div class="library-grid">
                 <a href="./Other/ismycompteureron" class="list-item"
                     onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">web_asset</i>
                     <div class="item-content">
-                        <div class="item-title">Is My Compooper On?</div>
-                        <div class="item-subtitle">Checks whether your 'Compooper' is ON or nah</div>
+                        <div class="item-title">is my compooper on?</div>
+                        <div class="item-subtitle">a quick sanity check for your setup</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
                 <a href="./Other/devcheck" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">web_asset</i>
                     <div class="item-content">
-                        <div class="item-title">Device Checker</div>
-                        <div class="item-subtitle">See your user-agent in stats</div>
+                        <div class="item-title">device checker</div>
+                        <div class="item-subtitle">see what your user-agent says about you</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
                 <a href="./Other/notmoving" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">web_asset</i>
                     <div class="item-content">
-                        <div class="item-title">Objects Move or Nah</div>
-                        <div class="item-subtitle">ThreeJS Simulation (just cubes)</div>
+                        <div class="item-title">do cubes move or nah?</div>
+                        <div class="item-subtitle">just a simple three.js cube test</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
                 <a href="./Other/gifview" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">web_asset</i>
                     <div class="item-content">
-                        <div class="item-title">GIF Viewer</div>
-                        <div class="item-subtitle">View GIFs by their links</div>
+                        <div class="item-title">gif viewer</div>
+                        <div class="item-subtitle">inspect gifs directly via link</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
                 <a href="./Other/mathlol" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">web_asset</i>
                     <div class="item-content">
-                        <div class="item-title">Math or DIE</div>
-                        <div class="item-subtitle">Random Math Generator</div>
+                        <div class="item-title">math or die</div>
+                        <div class="item-subtitle">rapid-fire math problem generator</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
                 <a href="./Other/coinsort" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">web_asset</i>
                     <div class="item-content">
-                        <div class="item-title">Coin Sort</div>
-                        <div class="item-subtitle">Coin Sorting Game</div>
+                        <div class="item-title">coin sort</div>
+                        <div class="item-subtitle">a simple coin sorting game</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
                 <a href="./Other/websend" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">web_asset</i>
                     <div class="item-content">
-                        <div class="item-title">Webhook Transit</div>
-                        <div class="item-subtitle">A transit for Discord webhooks</div>
+                        <div class="item-title">webhook transit</div>
+                        <div class="item-subtitle">quick discord webhook messenger</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
@@ -2031,19 +2176,19 @@
     <div id="modal-tools" class="app-library-page">
         <div class="library-container">
             <div class="back-btn" onclick="closeAllModals()">
-                <i class="material-icons-round">arrow_back</i> Back
+                <i class="material-icons-round">arrow_back</i> back
             </div>
             <div class="library-header-wrap">
-                <h2 class="library-title">Tools</h2>
+                <h2 class="library-title">tools</h2>
             </div>
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">Essential tools tailored for you.</p>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">handy utilities built to make stuff easier.</p>
     
             <div class="library-grid">
                 <a href="./Tools/lapscan" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">build</i>
                     <div class="item-content">
-                        <div class="item-title">LAPSCAN</div>
-                        <div class="item-subtitle">Variance of Laplacian Scanner</div>
+                        <div class="item-title">lapscan</div>
+                        <div class="item-subtitle">variance of laplacian image scanner</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
@@ -2051,8 +2196,8 @@
                 <a href="./Tools/pixelpeek" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">build</i>
                     <div class="item-content">
-                        <div class="item-title">PixelPeek</div>
-                        <div class="item-subtitle">Image Metadata Inspector</div>
+                        <div class="item-title">pixelpeek</div>
+                        <div class="item-subtitle">image metadata inspector</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
@@ -2068,19 +2213,19 @@
 
     <div id="settings-page">
         <div class="back-btn" onclick="toggleSettings()">
-            <i class="material-icons-round">arrow_back</i> Back
+            <i class="material-icons-round">arrow_back</i> back
         </div>
-        <h1 style="font-family: 'Space Grotesk';">Settings</h1>
-        <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Prism's settings, tweak whatever you want. All changes take effect before you even notice it.</p>
+        <h1 style="font-family: 'Space Grotesk';">settings</h1>
+        <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">tweak whatever you want. changes kick in right away.</p>
 
         <div style="margin-top: 24px;">
-            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">Visuals</h3>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">visuals</h3>
             <div class="list-item" id="gif-toggle-container" style="cursor: pointer; justify-content: space-between;" onclick="if(navigator.onLine) toggleGifBackground()">
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <i class="material-icons-round item-icon">wallpaper</i>
                     <div class="item-content">
-                        <div class="item-title">Background GIF</div>
-                        <div class="item-subtitle" id="bg-status">Enabled</div>
+                        <div class="item-title">background gif</div>
+                        <div class="item-subtitle" id="bg-status">enabled</div>
                     </div>
                 </div>
                 <i class="material-icons-round" id="toggle-icon">toggle_on</i>
@@ -2091,57 +2236,57 @@
                 <div style="display: flex; align-items: center; gap: 14px; width: 100%;">
                     <i class="material-icons-round item-icon">video_settings</i>
                     <div class="item-content">
-                        <div class="item-title">Custom Video Background</div>
-                        <div class="item-subtitle">Upload video file to cache as background</div>
+                        <div class="item-title">custom video background</div>
+                        <div class="item-subtitle">cache a video file for your background</div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <input type="file" id="video-bg-file-input" accept="video/*" style="display: none;" onclick="this.value = null"
                         onchange="PrismVideoBg.handleUpload(this.files[0])">
                     <button class="setting-select" style="margin-top: 0; flex: 1; text-align: center;"
-                        onclick="document.getElementById('video-bg-file-input').click()">Choose Video</button>
+                        onclick="document.getElementById('video-bg-file-input').click()">pick video</button>
                     <button class="setting-select" id="refresh-video-bg-btn"
                         style="margin-top: 0; width: auto; display: none;"
-                        onclick="PrismVideoBg.refreshVideo()">↻ Refresh</button>
+                        onclick="PrismVideoBg.refreshVideo()">↻ reload</button>
                     <button class="setting-select" id="clear-video-bg-btn"
                         style="margin-top: 0; width: auto; display: none; color: #f87171;"
-                        onclick="PrismVideoBg.removeVideo()">Clear</button>
+                        onclick="PrismVideoBg.removeVideo()">clear</button>
                 </div>
             </div>
 
-            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 20px; margin-bottom: 8px;">GIF Presets</h3>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 20px; margin-bottom: 8px;">gif presets</h3>
             <select id="gif-selector" class="setting-select" onchange="handleGifSelect(this.value)">
-                <option value="gif1">Default GIF</option>
-                <option value="gif2">GIF 1</option>
-                <option value="gif3">GIF 2</option>
-                <option value="gif4">GIF 3</option>
-                <option value="gif5">GIF 4</option>
-                <option value="gif6">GIF 5</option>
-                <option value="custom">"I'll add the link myself" (GIPHY Recommended)</option>
+                <option value="gif1">default gif</option>
+                <option value="gif2">gif 1</option>
+                <option value="gif3">gif 2</option>
+                <option value="gif4">gif 3</option>
+                <option value="gif5">gif 4</option>
+                <option value="gif6">gif 6</option>
+                <option value="custom">custom gif link (giphy recommended)</option>
             </select>
             <div id="gif-custom-url-wrap">
                 <input id="gif-custom-url-input" type="url" placeholder="https://media.giphy.com/..." />
-                <button id="gif-custom-url-apply" onclick="applyCustomGifUrl()">Apply</button>
+                <button id="gif-custom-url-apply" onclick="applyCustomGifUrl()">apply</button>
             </div>
         </div>
 
-        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 8px;">Theme Presets</h3>
+        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 8px;">color themes</h3>
         <select id="theme-selector" class="setting-select" onchange="changeTheme(this.value)">
-            <option value="blurple">Good Vibes (Default)</option>
-            <option value="amber">Bright Amber</option>
-            <option value="emerald">Emerald</option>
-            <option value="ruby">Vibrant Ruby</option>
-            <option value="mono">Nostalgia</option>
+            <option value="blurple">good vibes (default)</option>
+            <option value="amber">bright amber</option>
+            <option value="emerald">emerald</option>
+            <option value="ruby">vibrant ruby</option>
+            <option value="mono">nostalgia</option>
         </select>
 
-        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Performance</h3>
+        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">performance</h3>
         <div class="list-group">
             <div class="list-item" style="cursor: pointer; justify-content: space-between;"
                 onclick="toggleSetting('reduce-blur')">
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <i class="material-icons-round item-icon">blur_off</i>
                     <div class="item-content">
-                        <div class="item-title">Reduce Blur effects</div>
+                        <div class="item-title">reduce blur effects</div>
                     </div>
                 </div>
                 <i class="material-icons-round" id="icon-reduce-blur">toggle_off</i>
@@ -2150,39 +2295,39 @@
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <i class="material-icons-round item-icon">motion_photos_off</i>
                     <div class="item-content">
-                        <div class="item-title">Reduced motion</div>
+                        <div class="item-title">reduced motion</div>
                     </div>
                 </div>
                 <i class="material-icons-round" id="icon-no-anim">toggle_off</i>
             </div>
         </div>
         
-        <h3 class="storage-heading" style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">Storage</h3>
+        <h3 class="storage-heading" style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">storage</h3>
         <button id="recache-btn" class="list-item" style="width: 100%; border: none; cursor: pointer;"
             onclick="confirmAndRecache()">
             <i class="material-icons-round item-icon">refresh</i>
             <div class="item-content">
-                <div class="item-title">Update or Reinstall Prism</div>
-                <div class="item-subtitle">Updates Prism to the latest build, or reinstall it</div>
+                <div class="item-title">update or reinstall prism</div>
+                <div class="item-subtitle">pulls the newest build or gives prism a fresh start</div>
             </div>
         </button>
 
         <div id="recache-game-toggle" onclick="toggleIncludeGames()">
             <i class="material-icons-round" id="icon-include-games">toggle_off</i>
             <div class="item-content">
-                <div class="item-title">Include Additional Assets</div>
-                <div class="item-subtitle">Enabling this allows Prism to update other assets, may consume more data.</div>
+                <div class="item-title">include extra game assets</div>
+                <div class="item-subtitle">caches additional game files (uses more data)</div>
             </div>
         </div>
 
-        <h3 class="developer-heading" style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Developer</h3>
+        <h3 class="developer-heading" style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">developer</h3>
         <div class="list-item" id="dev-preview-toggle" style="cursor: pointer; justify-content: space-between;"
             onclick="toggleDevPreviewMode()">
             <div style="display: flex; align-items: center; gap: 14px;">
                 <i class="material-icons-round item-icon">code</i>
                 <div class="item-content">
-                    <div class="item-title">Developer Preview Mode</div>
-                    <div class="item-subtitle">For testing purposes only. Enables experimental/unfinished features.</div>
+                    <div class="item-title">developer preview mode</div>
+                    <div class="item-subtitle">for testing only. unlocks experimental and unfinished stuff.</div>
                 </div>
             </div>
             <i class="material-icons-round" id="icon-dev-preview">toggle_off</i>
@@ -2199,8 +2344,8 @@
             <i class="material-icons-round dl-icon-wrap" id="dl-main-icon">download</i>
         </div>
         <div class="loader-wordmark show" style="opacity: 1; transform: translateY(0);">
-            <div class="loader-wordmark-name" id="dl-phase-title">Download Mode</div>
-            <div class="loader-wordmark-sub" id="dl-phase-sub">Thinking...</div>
+            <div class="loader-wordmark-name" id="dl-phase-title">download mode</div>
+            <div class="loader-wordmark-sub" id="dl-phase-sub">working on it...</div>
         </div>
         <div class="loader-bar-wrap show" style="width: 220px;">
             <div class="loader-bar" id="download-bar"></div>
@@ -2208,21 +2353,21 @@
         <div class="dl-pipeline" id="dl-pipeline">
             <div class="dl-pipeline-row" id="dl-phase-clear">
                 <span class="dl-phase-icon material-icons-round">pending</span>
-                <span class="dl-phase-label">Clear IDB/Cache</span>
-                <span class="dl-phase-status">Pondering...</span>
+                <span class="dl-phase-label">clear cache & storage</span>
+                <span class="dl-phase-status">waiting...</span>
             </div>
             <div class="dl-pipeline-row" id="dl-phase-download">
                 <span class="dl-phase-icon material-icons-round">pending</span>
-                <span class="dl-phase-label">Download files</span>
-                <span class="dl-phase-status">Pondering...</span>
+                <span class="dl-phase-label">download files</span>
+                <span class="dl-phase-status">waiting...</span>
             </div>
             <div class="dl-pipeline-row" id="dl-phase-cache">
                 <span class="dl-phase-icon material-icons-round">pending</span>
-                <span class="dl-phase-label">Write them to IDB/Cache</span>
-                <span class="dl-phase-status">Pondering...</span>
+                <span class="dl-phase-label">save to storage</span>
+                <span class="dl-phase-status">waiting...</span>
             </div>
         </div>
-        <div class="dl-tip-box" id="download-tip">All the tips goes here...</div>
+        <div class="dl-tip-box" id="download-tip">loading tips...</div>
     </div>
 
     <script>
@@ -2251,51 +2396,11 @@
             applyBgState(false);
         });
 
-        window.__PRISM_ENV__ = (function () {
-            function syncInstalledClass(installed) {
-                document.documentElement.classList.toggle('prism-installed', installed);
+        window.__PRISM_ENV__ = {
+            get isStandalone() {
+                return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
             }
-
-            const liveStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-            if (liveStandalone) localStorage.setItem('PRISM_INSTALLED', 'true');
-
-            const flagged = localStorage.getItem('PRISM_INSTALLED') === 'true';
-            syncInstalledClass(flagged);
-
-            if (!flagged && navigator.getInstalledRelatedApps) {
-                navigator.getInstalledRelatedApps().then(apps => {
-                    if (apps.length > 0) {
-                        localStorage.setItem('PRISM_INSTALLED', 'true');
-                        syncInstalledClass(true);
-                    }
-                }).catch(() => { });
-            }
-
-            if (flagged && !liveStandalone && navigator.getInstalledRelatedApps) {
-                navigator.getInstalledRelatedApps().then(apps => {
-                    if (apps.length === 0) {
-                        localStorage.removeItem('PRISM_INSTALLED');
-                        syncInstalledClass(false);
-                    }
-                }).catch(() => { });
-            }
-
-            return {
-                get isStandalone() { return localStorage.getItem('PRISM_INSTALLED') === 'true'; },
-                markInstalled() {
-                    localStorage.setItem('PRISM_INSTALLED', 'true');
-                    syncInstalledClass(true);
-                },
-                unmarkInstalled() {
-                    localStorage.removeItem('PRISM_INSTALLED');
-                    syncInstalledClass(false);
-                }
-            };
-        })();
-
-        window.addEventListener('appinstalled', () => {
-            window.__PRISM_ENV__.markInstalled();
-        });
+        };
 
         function triggerPWAInstall() {
             if (!_pwaInstallPrompt) return;
@@ -2617,38 +2722,38 @@
                     './Other/websend',
                     './Tools/lapscan',
                     './Tools/pixelpeek',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo.png',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo192.png',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo512.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo2.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo192.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo512.png',
                     'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap',
                     'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500;700&display=swap',
                     'https://fonts.googleapis.com/icon?family=Material+Icons+Round',
                 ];
 
                 const GAME_URLS = [
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3dfavicon.svg',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3dammo.js',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3dmatyou.js',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3duianim_pc.js',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3duianim_mobile.js',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/blind.mp4',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/explode.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/neutral/neu1.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/neutral/neu2.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/neutral/neu3.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/evening/eve1.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/evening/eve2.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/evening/eve3.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid1.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid2.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid3.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid4.mp3',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/ground.png',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/ramp.png',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/stairs.png',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/pool.png',
-                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/pillars.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dfavicon.svg',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dammo.js',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dmatyou.js',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3duianim_pc.js',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3duianim_mobile.js',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/blind.mp4',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/explode.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/neutral/neu1.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/neutral/neu2.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/neutral/neu3.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/evening/eve1.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/evening/eve2.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/evening/eve3.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid1.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid2.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid3.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid4.mp3',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ground.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ramp.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/stairs.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pool.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pillars.png',
                     'https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js',
                     'https://cdn.jsdelivr.net/npm/babylonjs@9.11.0/babylon.js',
                     'https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js',
@@ -2683,7 +2788,7 @@
                 }
 
                 await new Promise((resolve) => {
-                    const openReq = indexedDB.open('NOCTURNE_Studios_DB', 1);
+                    const openReq = indexedDB.open('PrismDB', 1);
                     openReq.onsuccess = (e) => {
                         const db = e.target.result;
                         try {
@@ -2851,6 +2956,10 @@
         function toggleSettings() {
             const page = document.getElementById('settings-page');
             page.classList.toggle('open');
+        }
+
+        function toggleTopbarAccordion() {
+            document.querySelector('.topbar').classList.toggle('expanded');
         }
 
         (function initPWAStatus() {
@@ -3030,7 +3139,7 @@
         });
 
         function saveAppDataToIDB(key, value) {
-            const request = indexedDB.open('NOCTURNE_Studios_DB', 1);
+            const request = indexedDB.open('PrismDB', 1);
             request.onsuccess = function (e) {
                 const db = e.target.result;
                 const transaction = db.transaction('dynamic-cache', 'readwrite');
@@ -3040,7 +3149,7 @@
         }
 
         function getAppDataFromIDB(key, callback) {
-            const request = indexedDB.open('NOCTURNE_Studios_DB', 1);
+            const request = indexedDB.open('PrismDB', 1);
             request.onsuccess = function (e) {
                 const db = e.target.result;
                 const transaction = db.transaction('dynamic-cache', 'readonly');
