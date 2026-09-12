@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rift Runners 2D // Prism Launcher</title>
+    <meta name="theme-color" content="#0a0a12">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        :root {
+            --glass-bg: rgba(10, 10, 20, 0.75);
+            --glass-bg-heavy: rgba(5, 5, 15, 0.85);
+            --glass-border: rgba(120, 100, 255, 0.3);
+            --glass-border-hover: rgba(160, 140, 255, 0.6);
+            --glass-shine: rgba(200, 184, 255, 0.08);
+            --accent: #a080ff;
+            --accent-glow: rgba(160, 128, 255, 0.4);
+            --accent-2: #c8b8ff;
+            --accent-2-glow: rgba(200, 184, 255, 0.3);
+            --text-primary: #e0e0ff;
+            --text-secondary: #9080cc;
+            --text-muted: rgba(112, 96, 204, 0.6);
+            --surface-hover: rgba(40, 30, 80, 0.7);
+            --blur: blur(20px);
+            --blur-heavy: blur(32px);
+            --radius-pill: 100px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: monospace;
+            background: #0a0a12;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        .label {
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-placeholder {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 30% 20%, rgba(100, 80, 220, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 70% at 80% 80%, rgba(200, 184, 255, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 100% 100% at 50% 50%, #0a0a12 0%, #05050a 100%);
+        }
+
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 15, 0.6);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        #chase-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        body.no-anim #chase-canvas {
+            display: none !important;
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 3;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 16px 48px;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .page-wrapper.fade-out {
+            opacity: 0;
+            transform: scale(0.97);
+            pointer-events: none;
+        }
+
+        .topbar {
+            width: 100%;
+            max-width: 560px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .topbar-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .topbar-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 1.5px;
+        }
+
+        .topbar-pill {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--blur);
+            border-radius: var(--radius-pill);
+            padding: 6px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero-card {
+            width: 100%;
+            max-width: 560px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            backdrop-filter: var(--blur-heavy);
+            padding: 36px 28px 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(200, 184, 255, 0.1);
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 16px;
+            right: 16px;
+            height: 1px;
+            background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(200, 184, 255, 0.2) 30%,
+                    rgba(200, 184, 255, 0.4) 50%,
+                    rgba(200, 184, 255, 0.2) 70%,
+                    transparent 100%);
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -40px;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, var(--accent-2-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .hero-icon-wrap {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(160, 128, 255, 0.2), rgba(100, 80, 220, 0.1));
+            border: 1px solid rgba(160, 128, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            color: var(--accent);
+            flex-shrink: 0;
+            box-shadow:
+                0 0 0 4px rgba(160, 128, 255, 0.1),
+                0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .hero-title {
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+            line-height: 1.1;
+            margin-bottom: 6px;
+            text-shadow: 0 0 10px rgba(200, 184, 255, 0.3);
+        }
+
+        .hero-sub {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 1px;
+        }
+
+        .hero-desc {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.65;
+            margin-bottom: 24px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 16px;
+        }
+
+        .hero-desc strong {
+            color: var(--accent-2);
+            font-weight: 600;
+            text-shadow: 0 0 4px var(--accent-glow);
+        }
+
+        .platform-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--glass-shine);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .platform-badge i {
+            font-size: 16px;
+            color: var(--accent-2);
+        }
+
+        .launch-btn {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            color: #05050f;
+            padding: 18px 24px;
+            border-radius: var(--radius-pill);
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px var(--accent-glow);
+            text-align: left;
+        }
+
+        .launch-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        .launch-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 32px rgba(160, 128, 255, 0.6);
+        }
+
+        .launch-btn:active {
+            transform: scale(0.98);
+        }
+
+        .launch-btn i {
+            font-size: 28px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .launch-content {
+            position: relative;
+        }
+
+        .launch-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            display: block;
+            text-transform: uppercase;
+        }
+
+        .launch-sub {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.8;
+            display: block;
+            margin-top: 2px;
+            font-family: monospace;
+        }
+
+        .page-footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        #loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 15, 0.95);
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            backdrop-filter: var(--blur-heavy);
+        }
+
+        #loader-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .loader-hex {
+            width: 90px;
+            height: 90px;
+            color: var(--accent);
+            animation: spin 1.5s infinite linear;
+            margin-bottom: 36px;
+            filter: drop-shadow(0 0 20px var(--accent-glow));
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-track {
+            width: 260px;
+            height: 4px;
+            background: rgba(200, 184, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-radius: 2px;
+            transition: width 0.05s linear;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .loader-status {
+            margin-top: 16px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--accent-2);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @media (min-width: 640px) {
+            .page-wrapper {
+                padding: 48px 24px 64px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(160, 128, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        body.reduce-blur * {
+            --blur: blur(0px) !important;
+            --blur-heavy: blur(0px) !important;
+            backdrop-filter: none !important;
+        }
+
+        body.no-anim * {
+            transition: none !important;
+        }
+
+        .bg-gif {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif') center / cover no-repeat;
+            opacity: 0.5;
+            pointer-events: none;
+            filter: brightness(0.75) saturate(0.6);
+        }
+        body.no-gif .bg-gif { display: none !important; }
+
+        .launch-btn.disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 24px var(--accent-glow);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="bg-canvas">
+        <div class="bg-placeholder"></div>
+    </div>
+
+    <canvas id="chase-canvas"></canvas>
+
+    <div class="bg-gif"></div>
+    <video id="bg-video" autoplay loop muted playsinline style="display: none; position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.5; pointer-events: none; filter: brightness(0.75) saturate(0.6);"></video>
+
+    <div class="bg-overlay"></div>
+
+    <div id="loader-overlay">
+        <svg class="loader-hex" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="4"
+                stroke-dasharray="60 20" />
+            <circle cx="50" cy="50" r="25" fill="none" stroke="#c8b8ff" stroke-width="2" stroke-dasharray="20 10" />
+        </svg>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="loader-status" id="loader-status">SYNCING NODES...</div>
+    </div>
+
+    <div class="page-wrapper" id="page-wrapper">
+
+        <div class="topbar">
+            <a href="https://nocturnestu.pages.dev" class="topbar-brand">
+                <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png" alt="..." class="topbar-logo">
+                <span class="topbar-name">PRISM</span>
+            </a>
+            <div class="topbar-pill">RR2D</div>
+        </div>
+
+        <div class="hero-card">
+
+            <div class="hero-header">
+                <div class="hero-icon-wrap">
+                    <i class="material-icons-round">track_changes</i>
+                </div>
+                <div class="hero-text">
+                    <h1 class="hero-title">Rift Runners 2D</h1>
+                    <div class="hero-sub">ECHO PROTOCOL</div>
+                </div>
+            </div>
+
+            <p class="hero-desc">
+                Engage in <strong>high-velocity extraction</strong> within shifting geometry. Survive the collapse,
+                deploy echoes, and secure integrity in this intensive top-down trial.
+            </p>
+
+            <div class="platform-badge" id="platform-badge">
+                <i class="material-icons-round">radar</i>
+                <span id="platform-label">System Stable</span>
+            </div>
+
+            <button class="launch-btn" id="btn-launch" onclick="initiateLaunch(event)">
+                <i class="material-icons-round">play_arrow</i>
+                <div class="launch-content">
+                    <span class="launch-title">Initialize Run</span>
+                    <span class="launch-sub" id="version-text">Connect to Matrix</span>
+                </div>
+            </button>
+
+        </div>
+
+        <div class="page-footer">
+            <p>NOCTURNE Studios // Project Prism</p>
+        </div>
+
+    </div>
+
+    <script>
+        let targetUrl = "RiftRunners2D";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 900;
+            const platformLabel = document.getElementById('platform-label');
+            const launchBtn = document.getElementById('btn-launch');
+
+            if (isMobile) {
+                platformLabel.textContent = "PC Required for Rift";
+                launchBtn.style.opacity = "0.3";
+                launchBtn.style.cursor = "not-allowed";
+                launchBtn.classList.add('disabled');
+            } else {
+                platformLabel.textContent = "Desktop Node Secured";
+            }
+            syncGlobalSettings();
+        });
+
+        function initiateLaunch(event) {
+            if (event.currentTarget.classList.contains('disabled')) return;
+            
+            createRipple(event);
+
+            const page = document.getElementById('page-wrapper');
+            const loader = document.getElementById('loader-overlay');
+            const bar = document.getElementById('progress-fill');
+            const status = document.getElementById('loader-status');
+
+            page.classList.add('fade-out');
+            loader.classList.add('active');
+
+            let progress = 0;
+            const stepTime = 50;
+            const increment = 100 / (2000 / stepTime);
+
+            const interval = setInterval(() => {
+                progress += increment + (Math.random() * 3);
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    status.textContent = "SHIFTING GEOMETRY...";
+                    setTimeout(() => { window.location.href = targetUrl; }, 400);
+                }
+                bar.style.width = Math.min(progress, 100) + "%";
+                if (progress < 40) status.textContent = "STABILIZING RIFT...";
+                else if (progress < 80) status.textContent = "LOADING ECHOES...";
+            }, stepTime);
+        }
+
+        function createRipple(e) {
+            const btn = e.currentTarget;
+            const existing = btn.querySelector('.ripple');
+            if (existing) existing.remove();
+            const circle = document.createElement('span');
+            const d = Math.max(btn.clientWidth, btn.clientHeight);
+            const rect = btn.getBoundingClientRect();
+            circle.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - rect.left - d / 2}px;top:${e.clientY - rect.top - d / 2}px`;
+            circle.classList.add('ripple');
+            btn.appendChild(circle);
+        }
+
+        const cvs = document.getElementById('chase-canvas');
+        const ctx = cvs.getContext('2d');
+        let cw, ch;
+        let px, py, tx, ty;
+        let shapes = [];
+        let bullets = [];
+
+        function resizeCvs() {
+            cw = cvs.width = window.innerWidth;
+            ch = cvs.height = window.innerHeight;
+            px = cw / 2; py = ch / 2;
+            tx = px; ty = py;
+        }
+
+        window.addEventListener('resize', resizeCvs);
+        resizeCvs();
+
+        function chaseLoop() {
+            if (document.body.classList.contains('no-anim')) {
+                requestAnimationFrame(chaseLoop);
+                return;
+            }
+
+            ctx.clearRect(0, 0, cw, ch);
+
+            if (Math.random() < 0.03) {
+                tx = Math.random() * cw;
+                ty = Math.random() * ch;
+            }
+
+            px += (tx - px) * 0.06;
+            py += (ty - py) * 0.06;
+
+            if (Math.random() < 0.04 && shapes.length < 20) {
+                shapes.push({
+                    x: Math.random() > 0.5 ? 0 : cw,
+                    y: Math.random() * ch,
+                    speed: 1.5 + Math.random() * 2,
+                    size: 8 + Math.random() * 8
+                });
+            }
+
+            if (Math.random() < 0.08 && shapes.length > 0) {
+                let target = shapes[Math.floor(Math.random() * shapes.length)];
+                let angle = Math.atan2(target.y - py, target.x - px);
+                bullets.push({ x: px, y: py, vx: Math.cos(angle) * 10, vy: Math.sin(angle) * 10 });
+            }
+
+            ctx.fillStyle = '#ff4060';
+            for (let i = shapes.length - 1; i >= 0; i--) {
+                let s = shapes[i];
+                let dx = px - s.x;
+                let dy = py - s.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                s.x += (dx / dist) * s.speed;
+                s.y += (dy / dist) * s.speed;
+
+                ctx.beginPath();
+                ctx.rect(s.x - s.size / 2, s.y - s.size / 2, s.size, s.size);
+                ctx.fill();
+
+                if (dist < 15) {
+                    shapes.splice(i, 1);
+                }
+            }
+
+            ctx.fillStyle = '#ffee60';
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                let b = bullets[i];
+                b.x += b.vx;
+                b.y += b.vy;
+
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                let hit = false;
+                for (let j = shapes.length - 1; j >= 0; j--) {
+                    let s = shapes[j];
+                    let bx = b.x - s.x;
+                    let by = b.y - s.y;
+                    if (Math.sqrt(bx * bx + by * by) < s.size) {
+                        shapes.splice(j, 1);
+                        hit = true;
+                        break;
+                    }
+                }
+
+                if (hit || b.x < 0 || b.x > cw || b.y < 0 || b.y > ch) {
+                    bullets.splice(i, 1);
+                }
+            }
+
+            ctx.fillStyle = '#a080ff';
+            ctx.beginPath();
+            ctx.arc(px, py, 14, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#c8b8ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(px, py, 20, 0, Math.PI * 2);
+            ctx.stroke();
+
+            requestAnimationFrame(chaseLoop);
+        }
+
+        chaseLoop();
+
+        function syncGlobalSettings() {
+            if (localStorage.getItem('reduce-blur') === 'true') {
+                document.body.classList.add('reduce-blur');
+            }
+            if (localStorage.getItem('no-anim') === 'true') {
+                document.body.classList.add('no-anim');
+            }
+
+            const savedTheme = localStorage.getItem('prism-theme');
+            if (savedTheme) {
+                const root = document.documentElement;
+                const themes = {
+                    blurple: { primary: '#7c9ef7', secondary: '#a78bfa' },
+                    amber: { primary: '#fbbf24', secondary: '#f59e0b' },
+                    emerald: { primary: '#34d399', secondary: '#10b981' },
+                    ruby: { primary: '#fb7185', secondary: '#e11d48' },
+                    mono: { primary: '#ffffff', secondary: '#a3a3a3' }
+                };
+                const selected = themes[savedTheme] || themes.blurple;
+                root.style.setProperty('--accent', selected.primary);
+                root.style.setProperty('--accent-2', selected.secondary);
+                root.style.setProperty('--accent-glow', `rgba(${hexToRgb(selected.primary)}, 0.4)`);
+                root.style.setProperty('--accent-2-glow', `rgba(${hexToRgb(selected.secondary)}, 0.3)`);
+            }
+
+            if (localStorage.getItem('bg-gif-enabled') === 'false') {
+                document.body.classList.add('no-gif');
+            } else {
+                if (navigator.onLine) document.body.classList.remove('no-gif');
+            }
+        }
+        
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '124, 158, 247';
+        }
+    </script>
+    <script>
+        (function () {
+            const GIF_PRESETS = {
+                gif1: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif',
+                gif2: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/32o1C0pz7HHC32ShtI/giphy.gif',
+                gif3: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hnq6UBZreLmGvwOtKH/giphy.gif',
+                gif4: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cCCWygFWkpChuiPlWi/giphy.gif',
+                gif5: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/djwyA3ChGKC5VkrmPy/giphy.gif',
+                gif6: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7rdCcxQDPuMgW61B1p/giphy.gif'
+            };
+
+            function applyGifBackground() {
+                const bgGif = document.querySelector('.bg-gif');
+                if (!bgGif) return;
+
+                const isEnabled = localStorage.getItem('bg-gif-enabled') !== 'false';
+                const isOffline = !navigator.onLine;
+                const shouldHide = !isEnabled || isOffline;
+
+                if (shouldHide) {
+                    document.body.classList.add('no-gif');
+                    return;
+                }
+
+                document.body.classList.remove('no-gif');
+
+                const preset = localStorage.getItem('bg-gif-preset') || 'gif1';
+                let gifUrl = '';
+
+                if (preset === 'custom') {
+                    gifUrl = localStorage.getItem('bg-gif-custom-url') || GIF_PRESETS.gif1;
+                } else {
+                    gifUrl = GIF_PRESETS[preset] || GIF_PRESETS.gif1;
+                }
+
+                if (gifUrl) {
+                    bgGif.style.background = `url('${gifUrl}') center / cover no-repeat`;
+                }
+            }
+
+            function handleChange() {
+                applyGifBackground();
+            }
+
+            window.addEventListener('online', handleChange);
+            window.addEventListener('offline', handleChange);
+            window.addEventListener('storage', handleChange);
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', handleChange);
+            } else {
+                handleChange();
+            }
+        })();
+
+        (function () {
+            const DB_NAME = 'PrismVideoCacheDB';
+            const STORE_NAME = 'videos';
+            const KEY = 'custom_bg_video';
+
+            function ensureVideoElement() {
+                let videoEl = document.getElementById('bg-video');
+                if (!videoEl) {
+                    videoEl = document.createElement('video');
+                    videoEl.id = 'bg-video';
+                    videoEl.autoplay = true;
+                    videoEl.loop = true;
+                    videoEl.muted = true;
+                    videoEl.playsInline = true;
+                    Object.assign(videoEl.style, {
+                        position: 'fixed',
+                        inset: '0',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        zIndex: '0',
+                        opacity: '0.5',
+                        pointerEvents: 'none',
+                        filter: 'brightness(0.75) saturate(0.6)',
+                        display: 'none'
+                    });
+                    const bgGif = document.querySelector('.bg-gif');
+                    if (bgGif && bgGif.parentNode) {
+                        bgGif.parentNode.insertBefore(videoEl, bgGif);
+                    } else {
+                        document.body.prepend(videoEl);
+                    }
+                }
+                return videoEl;
+            }
+
+            function openDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(DB_NAME, 1);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains(STORE_NAME)) {
+                            db.createObjectStore(STORE_NAME);
+                        }
+                    };
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function getVideoBlob() {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_NAME, 'readonly');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.get(KEY);
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function syncBackground() {
+                const videoEl = ensureVideoElement();
+                const gifEl = document.querySelector('.bg-gif');
+
+                try {
+                    const blob = await getVideoBlob();
+                    if (blob) {
+                        if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                        videoEl.src = URL.createObjectURL(blob);
+                        videoEl.style.display = 'block';
+                        if (gifEl) gifEl.style.display = 'none';
+                        videoEl.play().catch(() => { });
+                    } else {
+                        if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                        videoEl.removeAttribute('src');
+                        videoEl.style.display = 'none';
+                        if (gifEl && localStorage.getItem('bg-gif-enabled') !== 'false' && navigator.onLine) {
+                            gifEl.style.display = 'block';
+                        }
+                    }
+                } catch (e) {
+                    if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                    videoEl.style.display = 'none';
+                    if (gifEl && localStorage.getItem('bg-gif-enabled') !== 'false' && navigator.onLine) {
+                        gifEl.style.display = 'block';
+                    }
+                }
+            }
+
+            window.addEventListener('storage', syncBackground);
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', syncBackground);
+            } else {
+                syncBackground();
+            }
+        })();
+    </script>
+</body>
+
+</html>

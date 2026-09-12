@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Checker</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #1a1a1a;
+            --text-main: #f0f0f0;
+            --accent: #00e676;
+            --warning: #ffb74d;
+            --label: #888;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-label {
+            font-size: 0.9rem;
+            color: var(--label);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 1.6rem;
+            color: var(--accent);
+            font-weight: 600;
+            word-wrap: break-word;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .ua-text {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            color: #aaa;
+            line-height: 1.4;
+            background: #111;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #222;
+            white-space: pre-wrap;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Device Checker</h1>
+
+    <div class="grid-container">
+        <div class="card">
+            <span class="card-label">Operating System</span>
+            <div id="os-val" class="card-value">Detecting...</div>
+        </div>
+
+        <div class="card">
+            <span class="card-label">Browser Engine</span>
+            <div id="browser-val" class="card-value">Detecting...</div>
+        </div>
+
+        <div class="card">
+            <span class="card-label">Device Type</span>
+            <div id="device-type-val" class="card-value">...</div>
+        </div>
+
+        <div class="card">
+            <span class="card-label">Screen Res (Monitor)</span>
+            <div id="res-val" class="card-value">...</div>
+        </div>
+        
+        <div class="card">
+            <span class="card-label">Viewport (Browser)</span>
+            <div id="view-val" class="card-value">...</div>
+        </div>
+
+        <div class="card">
+            <span class="card-label">Status</span>
+            <div id="net-val" class="card-value">Checking...</div>
+        </div>
+
+        <div class="card full-width">
+            <span class="card-label">Client Data String</span>
+            <div id="ua-raw" class="card-value ua-text">Loading...</div>
+        </div>
+    </div>
+
+    <div class="footer">Device Checker by Master Shaman</div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            document.getElementById('res-val').textContent = `${window.screen.width} x ${window.screen.height}`;
+            document.getElementById('view-val').textContent = `${window.innerWidth} x ${window.innerHeight}`;
+
+            const netVal = document.getElementById('net-val');
+            netVal.textContent = navigator.onLine ? "Online" : "Offline";
+            netVal.style.color = navigator.onLine ? "#00e676" : "#ff3d00";
+
+            const uaRaw = document.getElementById('ua-raw');
+            const osVal = document.getElementById('os-val');
+            const browserVal = document.getElementById('browser-val');
+            const deviceTypeVal = document.getElementById('device-type-val');
+
+            if (navigator.userAgentData) {
+                try {
+                    const hints = await navigator.userAgentData.getHighEntropyValues([
+                        "architecture", "bitness", "model", "platformVersion", "uaFullVersion"
+                    ]);
+
+                    const brandString = navigator.userAgentData.brands.map(b => `${b.brand} ${b.version}`).join(', ');
+                    
+                    uaRaw.textContent = `Brands: ${brandString}\nMobile: ${navigator.userAgentData.mobile}\nPlatform: ${hints.platform} ${hints.platformVersion}\nArchitecture: ${hints.architecture} ${hints.bitness}-bit\nModel: ${hints.model || 'N/A'}`;
+
+                    osVal.textContent = `${hints.platform} ${hints.platformVersion}`;
+
+                    const mainBrand = navigator.userAgentData.brands.find(b => !b.brand.includes("Not") && !b.brand.includes("A") && !b.brand.includes("Brand"));
+                    browserVal.textContent = mainBrand ? `${mainBrand.brand} ${mainBrand.version}` : "Unknown Browser";
+
+                    deviceTypeVal.textContent = navigator.userAgentData.mobile ? "Phone/Tablet" : "Desktop/Laptop";
+                    
+                } catch (error) {
+                    fallbackUA();
+                }
+            } else {
+                fallbackUA();
+            }
+
+            function fallbackUA() {
+                const ua = navigator.userAgent;
+                uaRaw.textContent = ua;
+
+                let os = "Unknown OS";
+                let version = "";
+
+                const getVer = (regex) => {
+                    const match = ua.match(regex);
+                    return match ? match[1] : "";
+                };
+
+                if (/Tizen/i.test(ua)) {
+                    os = "Samsung Tizen";
+                    version = getVer(/Tizen[\s\/]([0-9\.]+)/i);
+                } 
+                else if (/Web0S|WebOS/i.test(ua)) {
+                    os = "LG WebOS";
+                    version = getVer(/Web0S|WebOS[\s\/]([0-9\.]+)/i);
+                } 
+                else if (/Android/i.test(ua)) {
+                    const isMobile = /Mobile/i.test(ua);
+                    const isTV = /TV|Smart|GoogleTV|AndroidTV/i.test(ua);
+                    
+                    version = getVer(/Android\s([0-9\.]+)/i);
+
+                    if (isTV && !isMobile) {
+                        os = "Android TV";
+                    } else if (isMobile) {
+                        os = "Android Mobile"; 
+                    } else {
+                        os = "Android (Tablet/Generic)";
+                    }
+                } 
+                else if (/iPhone|iPad|iPod/i.test(ua)) {
+                    os = "iOS";
+                    version = getVer(/OS\s([0-9_]+)/i).replace(/_/g, '.');
+                }
+                else if (/Macintosh|Mac OS X/i.test(ua)) {
+                    os = "macOS";
+                } 
+                else if (/Windows/i.test(ua)) {
+                    os = "Windows";
+                } 
+                else if (/CrOS/i.test(ua)) {
+                    os = "Chrome OS";
+                } 
+                else if (/Linux/i.test(ua)) {
+                    os = "Linux (Generic)";
+                }
+
+                if (version) os += ` ${version}`;
+                osVal.textContent = os;
+
+                let browser = "Unknown";
+                if (/SamsungBrowser/i.test(ua)) browser = "Samsung Internet " + getVer(/SamsungBrowser\/([0-9\.]+)/i);
+                else if (/Chrome/i.test(ua) && !/Edge/i.test(ua) && !/OPR/i.test(ua)) browser = "Chrome " + getVer(/Chrome\/([0-9\.]+)/i);
+                else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = "Safari";
+                else if (/Firefox/i.test(ua)) browser = "Firefox";
+                else if (/Edge/i.test(ua)) browser = "Edge";
+                
+                browserVal.textContent = browser;
+
+                let type = "Desktop/Laptop";
+                if (/Mobile/i.test(ua)) type = "Phone";
+                else if (/Tablet|iPad/i.test(ua)) type = "Tablet";
+                else if (/TV|Smart|Tizen|WebOS|BRAVIA|KDL|Viera/i.test(ua)) type = "Smart TV";
+                
+                if (type === "Desktop/Laptop" && /Android/i.test(ua)) {
+                    type = "Tablet or TV";
+                }
+
+                deviceTypeVal.textContent = type;
+            }
+        });
+    </script>
+</body>
+</html>

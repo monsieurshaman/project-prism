@@ -1,0 +1,3422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="manifest" href="/manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="NOCTURNE Studios - An All-in-One Hub for Everyone">
+    <meta property="og:description" content="Games, Apps & Utilities, and Tools — all in one hub. Built by NOCTURNE Studios.">
+    <meta property="og:image" content="https://nocturnestu.pages.dev/nocturneassets/og-image.png">
+    <meta property="og:url" content="https://nocturnestu.pages.dev/">
+    <meta property="og:site_name" content="Prism">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOCTURNE Studios - An All-in-One Hub for Everyone</title>
+    <meta name="theme-color" content="#0a0a14">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #07070f;
+            --surface-0: rgba(14, 14, 24, 0.72);
+            --surface-1: rgba(20, 20, 36, 0.68);
+            --surface-2: rgba(28, 28, 46, 0.75);
+            --surface-hover: rgba(36, 36, 58, 0.82);
+            --border: rgba(255, 255, 255, 0.07);
+            --border-strong: rgba(255, 255, 255, 0.14);
+            --border-accent: rgba(124, 158, 247, 0.22);
+            --primary: #7c9ef7;
+            --primary-dim: rgba(124, 158, 247, 0.12);
+            --primary-glow: rgba(124, 158, 247, 0.3);
+            --primary-container: rgba(124, 158, 247, 0.18);
+            --secondary: #a78bfa;
+            --secondary-dim: rgba(167, 139, 250, 0.12);
+            --secondary-glow: rgba(167, 139, 250, 0.25);
+            --secondary-container: rgba(167, 139, 250, 0.18);
+            --tertiary: #67e8f9;
+            --tertiary-dim: rgba(103, 232, 249, 0.1);
+            --on-primary: #080812;
+            --text: #eeeef8;
+            --text-sub: rgba(200, 202, 228, 0.65);
+            --text-muted: rgba(160, 164, 200, 0.38);
+            --blur-sm: blur(16px);
+            --blur-md: blur(28px);
+            --blur-lg: blur(48px);
+            --r-sm: 16px;
+            --r-md: 24px;
+            --r-lg: 32px;
+            --r-xl: 44px;
+            --r-pill: 100px;
+            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-out: cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .bg-gif {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif') center / cover no-repeat;
+            opacity: 0.5;
+            pointer-events: none;
+            filter: brightness(0.75) saturate(0.6);
+        }
+
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 15% 20%, rgba(124, 158, 247, 0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 55% 50% at 85% 80%, rgba(167, 139, 250, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        #cursor-glow {
+            position: fixed;
+            width: 560px;
+            height: 560px;
+            background: radial-gradient(circle, rgba(124, 158, 247, 0.055) 0%, transparent 65%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s var(--ease-out);
+            will-change: left, top;
+            display: none;
+        }
+
+        #startup-loader {
+            position: fixed;
+            inset: 0;
+            background: #05050d;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            transition: opacity 0.7s var(--ease-out);
+            overflow: hidden;
+        }
+
+        .loader-bg-pulse {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 60% at 50% 50%, rgba(124, 158, 247, 0.08) 0%, transparent 70%);
+            animation: loader-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes loader-pulse {
+
+            0%,
+            100% {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.08);
+            }
+        }
+
+        .loader-ring-wrap {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0);
+            opacity: 0;
+            transition: transform 0.75s var(--spring), opacity 0.45s ease;
+        }
+
+        .loader-ring-wrap.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .loader-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-top-color: var(--primary);
+            border-right-color: rgba(124, 158, 247, 0.3);
+            animation: spin 1.4s linear infinite;
+        }
+
+        .loader-ring-2 {
+            position: absolute;
+            inset: 10px;
+            border-radius: 50%;
+            border: 1.5px solid transparent;
+            border-bottom-color: var(--secondary);
+            border-left-color: rgba(167, 139, 250, 0.2);
+            animation: spin-rev 2s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin-rev {
+            to {
+                transform: rotate(-360deg);
+            }
+        }
+
+        .loader-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            object-fit: cover;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loader-wordmark {
+            margin-top: 28px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out);
+        }
+
+        .loader-wordmark.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .loader-wordmark-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--text);
+            text-transform: uppercase;
+        }
+
+        .loader-wordmark-sub {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        .loader-bar-wrap {
+            margin-top: 32px;
+            width: 160px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 99px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .loader-bar-wrap.show {
+            opacity: 1;
+        }
+
+        .loader-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 99px;
+            transition: width 1.2s var(--ease-out);
+        }
+
+        .loader-bar.fill {
+            width: 100%;
+        }
+
+        .page {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            opacity: 0;
+            transition: opacity 0.6s var(--ease-out);
+        }
+
+        .mobile-layout {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 16px 40px;
+            gap: 0;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 0 2px;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .topbar-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 11px;
+            object-fit: cover;
+        }
+
+        .topbar-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text);
+            text-transform: uppercase;
+        }
+
+        .topbar-badge {
+            background: var(--primary-container);
+            border: 1px solid var(--border-accent);
+            backdrop-filter: var(--blur-sm);
+            border-radius: var(--r-pill);
+            padding: 6px 14px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .hero-card {
+            background: var(--surface-0);
+            border: 1px solid var(--border);
+            border-radius: var(--r-xl);
+            backdrop-filter: var(--blur-md);
+            padding: 28px 24px 24px;
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18) 50%, transparent);
+        }
+
+        .hero-card-glow {
+            position: absolute;
+            top: -80px;
+            right: -60px;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, var(--secondary-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .hero-avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .hero-avatar {
+            width: 68px;
+            height: 68px;
+            border-radius: 22px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hero-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(22px, 5.5vw, 28px);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--text);
+            line-height: 1.15;
+            margin-bottom: 7px;
+            word-break: break-word;
+        }
+
+        .hero-status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12.5px;
+            color: var(--text-sub);
+            font-weight: 400;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.65);
+            animation: pulse-dot 2.2s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.55;
+                transform: scale(0.75);
+            }
+        }
+
+        .hero-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 16px;
+        }
+
+        .hero-desc {
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.7;
+            margin-bottom: 22px;
+            font-weight: 400;
+        }
+
+        .hero-desc strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .cta-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--on-primary);
+            padding: 16px 28px;
+            border-radius: var(--r-pill);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s var(--spring), box-shadow 0.25s var(--ease-out), filter 0.25s ease;
+            box-shadow: 0 4px 20px var(--primary-glow), 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, transparent 60%);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 36px var(--primary-glow), 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .cta-btn:active {
+            transform: translateY(0) scale(0.98);
+            filter: brightness(0.92);
+        }
+
+        .install-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: var(--surface-1);
+            color: var(--text-sub);
+            padding: 16px 28px;
+            border-radius: var(--r-pill);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s var(--spring), box-shadow 0.25s var(--ease-out), background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+            margin-top: 10px;
+        }
+
+        .install-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
+        }
+
+        .install-btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-strong);
+            color: var(--text);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .install-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .install-btn .material-icons-round {
+            font-size: 20px;
+        }
+
+        @media (display-mode: standalone) {
+            .install-btn { display: none !important; }
+        }
+
+        .cta-btn .material-icons-round {
+            font-size: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0 12px;
+            padding: 0 2px;
+        }
+
+        .section-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .cards-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .glass-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--surface-0);
+            border: 1px solid var(--border);
+            border-radius: var(--r-lg);
+            padding: 18px 20px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s var(--spring), box-shadow 0.25s var(--ease-out), background 0.2s ease, border-color 0.2s ease;
+            backdrop-filter: var(--blur-sm);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            user-select: none;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.09) 50%, transparent);
+        }
+
+        .glass-card:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-strong);
+            transform: translateY(-3px) scale(1.008);
+            box-shadow: 0 10px 36px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+        }
+
+        .glass-card:active {
+            transform: translateY(0) scale(0.99);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            transition: transform 0.3s var(--spring);
+        }
+
+        .glass-card:hover .card-icon-wrap {
+            transform: scale(1.1) rotate(-4deg);
+        }
+
+        .card-icon-wrap.blue {
+            background: linear-gradient(145deg, rgba(124, 158, 247, 0.22), rgba(124, 158, 247, 0.06));
+            color: var(--primary);
+            border: 1px solid rgba(124, 158, 247, 0.2);
+        }
+
+        .card-icon-wrap.purple {
+            background: linear-gradient(145deg, rgba(167, 139, 250, 0.22), rgba(167, 139, 250, 0.06));
+            color: var(--secondary);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            letter-spacing: 0.1px;
+        }
+
+        .card-desc {
+            font-size: 12.5px;
+            color: var(--text-sub);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-arrow {
+            color: var(--text-muted);
+            font-size: 20px;
+            flex-shrink: 0;
+            transition: transform 0.3s var(--spring), color 0.2s ease;
+        }
+
+        .glass-card:hover .card-arrow {
+            transform: translateX(5px);
+            color: var(--primary);
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-anim 0.65s linear;
+            background: rgba(255, 255, 255, 0.09);
+            pointer-events: none;
+        }
+
+        @keyframes ripple-anim {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .app-library-page {
+            position: fixed;
+            inset: 0;
+            background: rgba(7, 7, 15, 0.40);
+            backdrop-filter: var(--blur-lg);
+            -webkit-backdrop-filter: var(--blur-lg);
+            z-index: 400;
+            transform: translateX(100%);
+            transition: transform 0.4s var(--spring);
+            padding: 40px;
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+        }
+        
+        .app-library-page.open {
+            transform: translateX(0);
+        }
+
+        .library-container {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .library-header-wrap {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .library-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .library-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 600px) {
+            .library-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        body.reduce-blur .app-library-page {
+            background: rgba(7, 7, 15, 0.98);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        .list-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 15px 16px;
+            border-radius: var(--r-md);
+            text-decoration: none;
+            color: var(--text);
+            position: relative;
+            overflow: hidden;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.25s var(--spring);
+        }
+
+        .list-item:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-strong);
+            transform: translateX(3px);
+        }
+
+        .list-item:active {
+            transform: translateX(0) scale(0.99);
+        }
+
+        .item-icon {
+            color: var(--text-sub);
+            font-size: 22px;
+            flex-shrink: 0;
+            transition: color 0.2s ease;
+        }
+
+        .list-item:hover .item-icon {
+            color: var(--primary);
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .item-subtitle {
+            font-size: 11.5px;
+            color: var(--text-sub);
+        }
+
+        .item-arrow {
+            color: var(--text-muted);
+            font-size: 18px;
+            flex-shrink: 0;
+            transition: transform 0.25s var(--spring), color 0.2s ease;
+        }
+
+        .list-item:hover .item-arrow {
+            transform: translateX(4px);
+            color: var(--primary);
+        }
+
+        .modal-close-btn {
+            margin-top: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            font-weight: 600;
+            font-size: 15px;
+            padding: 15px;
+            border-radius: var(--r-lg);
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.25s var(--spring);
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.2px;
+        }
+
+        .modal-close-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+            border-color: var(--border-strong);
+            transform: scale(1.01);
+        }
+
+        .modal-close-btn:active {
+            transform: scale(0.98);
+        }
+
+        .fs-footer {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10.5px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 28px 0 0;
+        }
+
+        @keyframes fade-up {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                overflow: hidden;
+                height: 100vh;
+            }
+
+            #cursor-glow {
+                display: block;
+            }
+
+            .mobile-layout {
+                display: none;
+            }
+
+            .desktop-layout {
+                display: flex;
+                height: 100vh;
+                position: relative;
+                z-index: 2;
+            }
+
+            .desktop-left {
+                flex: 0 0 420px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 52px 40px 52px 52px;
+                border-right: 1px solid var(--border);
+                background: rgba(8, 8, 18, 0.08);
+                backdrop-filter: blur(44px);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .desktop-left::before {
+                content: '';
+                position: absolute;
+                top: -100px;
+                left: -80px;
+                width: 360px;
+                height: 360px;
+                background: radial-gradient(circle, rgba(124, 158, 247, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+            }
+
+            .desktop-left::after {
+                content: '';
+                position: absolute;
+                bottom: -100px;
+                right: -80px;
+                width: 340px;
+                height: 340px;
+                background: radial-gradient(circle, rgba(167, 139, 250, 0.08) 0%, transparent 70%);
+                pointer-events: none;
+            }
+
+            .desktop-right {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 52px 52px 52px 44px;
+                overflow-y: auto;
+                position: relative;
+                z-index: 2;
+            }
+
+            .dt-topbar {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                margin-bottom: 44px;
+            }
+
+            .dt-brand {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                text-decoration: none;
+            }
+
+            .dt-logo {
+                width: 38px;
+                height: 38px;
+                border-radius: 12px;
+                object-fit: cover;
+            }
+
+            .dt-brand-name {
+                font-family: 'Space Grotesk', sans-serif;
+                font-size: 19px;
+                font-weight: 700;
+                letter-spacing: 2.5px;
+                color: var(--text);
+                text-transform: uppercase;
+            }
+
+            .dt-badge {
+                background: var(--primary-container);
+                border: 1px solid var(--border-accent);
+                border-radius: var(--r-pill);
+                padding: 5px 14px;
+                font-family: 'Space Grotesk', sans-serif;
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--primary);
+                letter-spacing: 2px;
+                text-transform: uppercase;
+            }
+
+            .dt-hero-avatar-wrap {
+                position: relative;
+                display: inline-block;
+                margin-bottom: 24px;
+            }
+
+            .dt-hero-avatar {
+                width: 86px;
+                height: 86px;
+                object-fit: cover;
+                display: block;
+            }
+
+            .dt-hero-title {
+                font-family: 'Space Grotesk', sans-serif;
+                font-size: clamp(30px, 2.8vw, 40px);
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                color: var(--text);
+                line-height: 1.15;
+                margin-bottom: 10px;
+                word-break: break-word;
+            }
+
+            .dt-hero-status {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 13.5px;
+                color: var(--text-sub);
+                margin-bottom: 22px;
+            }
+
+            .dt-divider {
+                height: 1px;
+                background: var(--border);
+                margin-bottom: 20px;
+            }
+
+            .dt-hero-desc {
+                font-size: 15px;
+                color: var(--text-sub);
+                line-height: 1.72;
+                margin-bottom: 32px;
+                font-weight: 400;
+                max-width: 320px;
+            }
+
+            .dt-hero-desc strong {
+                color: var(--primary);
+                font-weight: 600;
+            }
+
+            .dt-footer {
+                margin-top: auto;
+                padding-top: 36px;
+                font-family: 'Space Grotesk', sans-serif;
+                font-size: 10.5px;
+                font-weight: 500;
+                color: var(--text-muted);
+                letter-spacing: 1.5px;
+                text-transform: uppercase;
+            }
+
+            .dt-section-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .dt-section-label {
+                font-family: 'Space Grotesk', sans-serif;
+                font-size: 10px;
+                font-weight: 700;
+                color: var(--text-muted);
+                letter-spacing: 2.5px;
+                text-transform: uppercase;
+                white-space: nowrap;
+            }
+
+            .dt-section-line {
+                flex: 1;
+                height: 1px;
+                background: var(--border);
+            }
+
+            .dt-cards-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .dt-glass-card {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                background: var(--surface-0);
+                border: 1px solid var(--border);
+                border-radius: var(--r-lg);
+                padding: 20px;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                transition: transform 0.3s var(--spring), box-shadow 0.25s var(--ease-out), background 0.2s ease, border-color 0.2s ease;
+                backdrop-filter: var(--blur-sm);
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+                user-select: none;
+            }
+
+            .dt-glass-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.09) 50%, transparent);
+            }
+
+            .dt-glass-card:hover {
+                background: var(--surface-hover);
+                border-color: var(--border-strong);
+                transform: translateY(-4px) scale(1.012);
+                box-shadow: 0 14px 44px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+            }
+
+            .dt-glass-card:active {
+                transform: translateY(0) scale(0.99);
+            }
+
+            .dt-glass-card:hover .card-icon-wrap {
+                transform: scale(1.12) rotate(-5deg);
+            }
+
+            .dt-glass-card:hover .card-arrow {
+                transform: translateX(5px);
+                color: var(--primary);
+            }
+        }
+
+        @media (max-width: 1023px) {
+            .desktop-layout {
+                display: none;
+            }
+        }
+
+        html.prism-installed #pwa-status {
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 13px;
+            border-radius: var(--r-pill);
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            backdrop-filter: var(--blur-sm);
+            -webkit-backdrop-filter: var(--blur-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-sub);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(6px) scale(0.95);
+            transition: opacity 0.3s var(--ease-out), transform 0.3s var(--spring);
+        }
+        html.prism-installed #pwa-status.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        html.prism-installed #pwa-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: background 0.4s ease;
+        }
+        html.prism-installed #pwa-status.online #pwa-status-dot  { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.55); }
+        html.prism-installed #pwa-status.offline #pwa-status-dot { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.55); }
+
+        @media (max-width: 1023px) {
+            .list-item-disabled {
+                opacity: 0.38;
+                pointer-events: none;
+                cursor: not-allowed;
+                filter: grayscale(1);
+            }
+        }
+
+        .settings-trigger {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            padding: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        .settings-trigger:hover { background: var(--surface-hover); color: var(--text); }
+
+        #settings-page {
+            position: fixed;
+            inset: 0;
+            background: rgba(7, 7, 15);
+            background: rgba(7, 7, 15, 0.20); 
+            backdrop-filter: var(--blur-lg);
+            -webkit-backdrop-filter: var(--blur-lg);
+            z-index: 500;
+            transform: translateX(100%);
+            transition: transform 0.4s var(--spring);
+            padding: 40px;
+            padding-bottom: 60px;
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        #settings-page.open { transform: translateX(0); }
+
+        #settings-page .list-item {
+            background: rgba(20, 20, 36, 0.5);
+            backdrop-filter: blur(8px);
+            transition: all 0.25s var(--spring);
+        }
+
+        #settings-page .list-item:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-strong);
+            transform: translateX(3px);
+        }
+
+        #settings-page .material-icons-round {
+            transition: color 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        #settings-page .list-item i.material-icons-round[style*="toggle_on"],
+        #settings-page .list-item i.material-icons-round.toggle-on {
+            color: var(--primary);
+            text-shadow: 0 0 6px var(--primary-glow);
+        }
+
+        #settings-page .list-item i.material-icons-round[style*="toggle_off"],
+        #settings-page .list-item i.material-icons-round.toggle-off {
+            color: var(--text-muted);
+            text-shadow: none;
+        }
+
+        #settings-page .item-title {
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        #settings-page .item-subtitle {
+            color: var(--text-sub);
+            font-size: 11px;
+        }
+
+        #gif-toggle-container {
+            background: rgba(20, 20, 36, 0.6);
+        }
+
+        .setting-select {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .setting-select:hover {
+            border-color: var(--border-strong);
+            box-shadow: 0 0 0 1px var(--primary-glow);
+        }
+
+        #settings-page.open {
+            box-shadow: -2px 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-sub);
+            cursor: pointer;
+            margin-bottom: 32px;
+        }
+
+        body.no-gif .bg-gif {
+            display: none !important;
+        }
+
+        .no-gif-toggle-disabled {
+            cursor: not-allowed !important;
+            opacity: 0.6;
+        }
+
+        body.reduce-blur {
+            --blur-sm: blur(0px);
+            --blur-md: blur(0px);
+            --blur-lg: blur(0px);
+        }
+
+        body.reduce-blur #settings-page {
+            background: rgba(7, 7, 15, 0.98);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.reduce-blur * {
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.no-anim * {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        .setting-select {
+            width: 100%;
+            background: var(--surface-1);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--border);
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            margin-top: 10px;
+            appearance: none;
+        }
+
+        #download-page {
+            position: fixed;
+            inset: 0;
+            background: #05050d;
+            z-index: 600;
+            transform: translateX(100%);
+            transition: transform 0.4s var(--spring);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            overflow: hidden;
+        }
+        #download-page.open {
+            transform: translateX(0);
+        }
+        .dl-icon-wrap {
+            position: absolute;
+            z-index: 3;
+            color: var(--primary);
+            font-size: 28px;
+            animation: dl-bounce 2s ease-in-out infinite;
+        }
+        @keyframes dl-bounce {
+            0%, 100% { transform: translateY(0); opacity: 0.8; }
+            50% { transform: translateY(-6px); opacity: 1; }
+        }
+        .dl-tip-box {
+            margin-top: 36px;
+            max-width: 280px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.5;
+            min-height: 40px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.4s ease, transform 0.4s var(--spring);
+        }
+        .dl-tip-box.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dl-pipeline {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 24px;
+            width: min(320px, 88vw);
+        }
+
+        .dl-pipeline-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 10px 14px;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .dl-pipeline-row.active {
+            background: var(--primary-dim);
+            border-color: var(--border-accent);
+        }
+
+        .dl-pipeline-row.done {
+            background: rgba(74, 222, 128, 0.06);
+            border-color: rgba(74, 222, 128, 0.18);
+        }
+
+        .dl-pipeline-row.error {
+            background: rgba(248, 113, 113, 0.06);
+            border-color: rgba(248, 113, 113, 0.18);
+        }
+
+        .dl-phase-icon {
+            font-size: 17px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            transition: color 0.3s ease;
+        }
+
+        .dl-pipeline-row.active .dl-phase-icon { color: var(--primary); animation: spin 1.2s linear infinite; }
+        .dl-pipeline-row.done .dl-phase-icon   { color: #4ade80; animation: none; }
+        .dl-pipeline-row.error .dl-phase-icon  { color: #f87171; animation: none; }
+
+        .dl-phase-label {
+            flex: 1;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--text-sub);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .dl-pipeline-row.active .dl-phase-label { color: var(--text); }
+        .dl-pipeline-row.done .dl-phase-label   { color: #4ade80; }
+
+        .dl-phase-status {
+            font-size: 10.5px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .dl-pipeline-row.active .dl-phase-status { color: var(--primary); }
+        .dl-pipeline-row.done .dl-phase-status   { color: #4ade80; }
+        .dl-pipeline-row.error .dl-phase-status  { color: #f87171; }
+
+        #gif-custom-url-wrap {
+            display: none;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        #gif-custom-url-wrap.visible {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #gif-custom-url-input {
+            flex: 1;
+            background: var(--surface-1);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--border);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        #gif-custom-url-input:focus {
+            border-color: var(--primary);
+        }
+
+        #gif-custom-url-apply {
+            background: var(--primary-container);
+            border: 1px solid var(--border-accent);
+            color: var(--primary);
+            padding: 12px 14px;
+            border-radius: var(--r-md);
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        #gif-custom-url-apply:hover {
+            background: var(--primary);
+            color: var(--on-primary);
+        }
+
+        .shaman-socials-bar {
+            position: fixed !important;
+            bottom: 20px !important;
+            right: 20px !important;
+            top: auto !important;
+            left: auto !important;
+            transform: none !important;
+            margin: 0 !important;
+            z-index: 999 !important;
+        }
+
+        .shaman-social-item {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-sub);
+            border-radius: 12px;
+            text-decoration: none;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.25s var(--spring);
+        }
+
+        .shaman-social-item:hover {
+            background: var(--surface-hover);
+            color: var(--primary);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .shaman-social-item:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .shaman-social-item .material-icons-round {
+            font-size: 20px;
+        }
+
+        @media (max-width: 599px) {
+            .shaman-socials-bar {
+                bottom: 20px !important;
+                right: 20px !important;
+            }
+            .shaman-social-item {
+                width: 34px;
+                height: 34px;
+            }
+            .shaman-social-item .material-icons-round {
+                font-size: 18px;
+            }
+        }
+
+        @media (display-mode: standalone) {
+            .shaman-socials-bar {
+                bottom: 20px !important;
+            }
+        }
+
+        html:not(.prism-installed) #recache-btn,
+        html:not(.prism-installed) .storage-heading,
+        html:not(.prism-installed) .developer-heading {
+            display: none !important;
+        }
+
+        @keyframes enter-down {
+            from { opacity: 0; transform: translateY(-18px); }
+            to   { opacity: 1; transform: none; }
+        }
+        @keyframes enter-up {
+            from { opacity: 0; transform: translateY(22px); }
+            to   { opacity: 1; transform: none; }
+        }
+        @keyframes enter-up-spring {
+            0%   { opacity: 0; transform: translateY(28px) scale(0.97); }
+            60%  { opacity: 1; transform: translateY(-4px) scale(1.008); }
+            100% { opacity: 1; transform: none; }
+        }
+        @keyframes enter-right {
+            from { opacity: 0; transform: translateX(32px); }
+            to   { opacity: 1; transform: none; }
+        }
+        @keyframes enter-pop {
+            0%   { opacity: 0; transform: scale(0.82) translateY(10px); }
+            65%  { opacity: 1; transform: scale(1.04) translateY(-2px); }
+            100% { opacity: 1; transform: none; }
+        }
+        @keyframes enter-fade {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        #recache-game-toggle {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(20, 20, 36, 0.5);
+            border: 1px solid var(--border);
+            padding: 11px 16px;
+            border-radius: var(--r-md);
+            margin-top: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+            user-select: none;
+        }
+
+        #recache-game-toggle:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-strong);
+        }
+
+        #recache-game-toggle .item-content {
+            flex: 1;
+        }
+
+        #recache-game-toggle .item-title {
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            margin-bottom: 1px;
+        }
+
+        #recache-game-toggle .item-subtitle {
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
+        #icon-include-games {
+            font-size: 22px;
+            color: var(--text-muted);
+            transition: color 0.2s ease, text-shadow 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        #icon-include-games.toggle-on {
+            color: var(--primary);
+            text-shadow: 0 0 6px var(--primary-glow);
+        }
+
+        html:not(.prism-installed) #recache-game-toggle {
+            display: none !important;
+        }
+
+        .changelog-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.25s var(--spring);
+            width: fit-content;
+        }
+        .changelog-trigger:hover {
+            color: var(--secondary);
+            transform: translateX(3px);
+        }
+        .changelog-trigger:active {
+            transform: translateX(0) scale(0.98);
+        }
+        .changelog-trigger .material-icons-round {
+            font-size: 16px;
+        }
+
+        .changelog-modal-body {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .changelog-version-badge {
+            display: inline-block;
+            background: rgba(74, 222, 128, 0.12);
+            border: 1px solid rgba(74, 222, 128, 0.25);
+            color: #4ade80;
+            padding: 6px 14px;
+            border-radius: var(--r-pill);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+        .changelog-modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.3;
+        }
+        .changelog-modal-text {
+            font-size: 15px;
+            color: var(--text-sub);
+            line-height: 1.7;
+        }
+
+        .glass-card, .dt-glass-card {
+            touch-action: none;
+        }
+
+        #dev-preview-toggle { display: none; }
+        html.prism-installed #dev-preview-toggle { display: flex; }
+
+    </style>
+</head>
+
+<body>
+    <div class="bg-gif"></div>
+    <video id="bg-video" autoplay loop muted playsinline style="display: none; position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.5; pointer-events: none; filter: brightness(0.75) saturate(0.6);"></video>
+    <div class="bg-overlay"></div>
+    <div id="cursor-glow"></div>
+
+    <div id="startup-loader">
+        <div class="loader-bg-pulse"></div>
+        <div class="loader-ring-wrap" id="loader-ring">
+            <div class="loader-ring"></div>
+            <div class="loader-ring-2"></div>
+            <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo.png" alt="..." class="loader-logo">
+        </div>
+        <div class="loader-wordmark" id="loader-wordmark">
+            <div class="loader-wordmark-name">NOCTURNE</div>
+            <div class="loader-wordmark-sub">Studios</div>
+        </div>
+        <div class="loader-bar-wrap" id="loader-bar-wrap">
+            <div class="loader-bar" id="loader-bar"></div>
+        </div>
+        <div id="loader-status" style="
+            margin-top: 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(200,202,228,0.38);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            text-align: center;
+            min-height: 16px;
+            user-select: none;
+        "></div>
+    </div>
+
+    <div class="page" id="page">
+
+        <div class="mobile-layout">
+            <div class="topbar">
+                <a href="#" class="topbar-brand">
+                    <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png" alt="..." class="topbar-logo">
+                    <span class="topbar-name">PRISM</span>
+                </a>
+                <div class="topbar-badge">Main</div>
+            </div>
+
+            <div class="hero-card">
+                <div class="hero-card-glow"></div>
+                <div class="hero-header">
+                    <div class="hero-avatar-wrap">
+                        <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo.png" alt="..." class="hero-avatar">
+                    </div>
+                    <div class="hero-text">
+                        <h1 class="hero-title">NOCTURNE Studios</h1>
+                        <div class="hero-status">
+                            <span class="status-dot"></span>
+                            Active Development
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-divider"></div>
+                <p class="hero-desc">
+                    NOCTURNE's <strong>Prism</strong>, an all-in-one hub for every projects made for everyone.
+                </p>
+                <a href="https://github.com/nocturnestu" target="_blank" class="cta-btn" onclick="createRipple(event)">
+                    <i class="material-icons-round">code</i>
+                    Our GitHub Repositories
+                </a>
+                <button class="install-btn" id="pwa-install-btn-mobile" onclick="triggerPWAInstall(); createRipple(event)" style="display:none;">
+                    <i class="material-icons-round">download</i>
+                    Install Prism App
+                </button>
+                <a href="#" class="changelog-trigger" id="changelog-trigger-mobile"
+                    onclick="openModal('modal-changelog'); createRipple(event); return false;" style="display:none; margin-top:12px;">
+                    <i class="material-icons-round">new_releases</i>
+                    <span>See what's new to Prism</span>
+                </a>
+                <div class="settings-trigger" onclick="toggleSettings()" style="top: 10px; right: 10px;">
+                    <i class="material-icons-round">settings</i>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <span class="section-label">Projects</span>
+                <span class="section-line"></span>
+            </div>
+
+            <div class="cards-grid">
+                <div class="glass-card" onclick="openModal('modal-3d'); createRipple(event)">
+                    <div class="card-icon-wrap blue">
+                        <i class="material-icons-round">view_in_ar</i>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">Games</div>
+                        <div class="card-desc">Fun Interactive Worlds</div>
+                    </div>
+                    <i class="material-icons-round card-arrow">chevron_right</i>
+                </div>
+                <div class="glass-card" onclick="openModal('modal-other'); createRipple(event)">
+                    <div class="card-icon-wrap purple">
+                        <i class="material-icons-round">widgets</i>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">Apps & Utilities</div>
+                        <div class="card-desc">Other NOCTURNE Works</div>
+                    </div>
+                    <i class="material-icons-round card-arrow">chevron_right</i>
+                </div>
+                <div class="glass-card" onclick="openModal('modal-tools'); createRipple(event)">
+                    <div class="card-icon-wrap purple">
+                        <i class="material-icons-round">build</i>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title">Tools</div>
+                        <div class="card-desc">Essentials</div>
+                    </div>
+                    <i class="material-icons-round card-arrow">chevron_right</i>
+                </div>
+            </div>
+
+            <div class="fs-footer">NOCTURNE Studios // Project Prism</div>
+        </div>
+
+        <div class="desktop-layout">
+            <div class="desktop-left">
+                <div class="dt-topbar">
+                    <a href="#" class="dt-brand">
+                        <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png" alt="..." class="dt-logo">
+                        <span class="dt-brand-name">PRISM</span>
+                    </a>
+                    <div class="dt-badge">Main</div>
+                </div>
+
+                <div class="dt-hero-avatar-wrap">
+                    <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo.png" alt="..." class="dt-hero-avatar">
+                </div>
+
+                <h1 class="dt-hero-title">NOCTURNE Studios</h1>
+                <div class="dt-hero-status">
+                    <span class="status-dot"></span>
+                    Active Development
+                </div>
+                <div class="dt-divider"></div>
+                <p class="dt-hero-desc">
+                    NOCTURNE's <strong>Prism</strong>, an all-in-one hub for every projects made for everyone.
+                </p>
+                <a href="https://github.com/nocturnestu" target="_blank" class="cta-btn" onclick="createRipple(event)">
+                    <i class="material-icons-round">code</i>
+                    Our GitHub Repositories
+                </a>
+                <button class="install-btn" id="pwa-install-btn-desktop" onclick="triggerPWAInstall(); createRipple(event)" style="display:none;">
+                    <i class="material-icons-round">download</i>
+                    Install Prism App
+                </button>
+                <a href="#" class="changelog-trigger" id="changelog-trigger-desktop"
+                    onclick="openModal('modal-changelog'); createRipple(event); return false;" style="display:none; margin-top:20px;">
+                    <i class="material-icons-round">new_releases</i>
+                    <span>See what's new to Prism</span>
+                </a>
+                <div class="settings-trigger" onclick="toggleSettings()" style="top: 40px; right: 40px;">
+                    <i class="material-icons-round">settings</i>
+                </div>
+                <div class="dt-footer">NOCTURNE Studios // Project Prism</div>
+            </div>
+
+            <div class="desktop-right">
+                <div class="dt-section-header">
+                    <span class="dt-section-label">Projects</span>
+                    <span class="dt-section-line"></span>
+                </div>
+
+                <div class="dt-cards-grid">
+                    <div class="dt-glass-card" onclick="openModal('modal-3d'); createRipple(event)">
+                        <div class="card-icon-wrap blue">
+                            <i class="material-icons-round">videogame_asset</i>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Games</div>
+                            <div class="card-desc">Fun Interactive Worlds</div>
+                        </div>
+                        <i class="material-icons-round card-arrow">chevron_right</i>
+                    </div>
+                    <div class="dt-glass-card" onclick="openModal('modal-other'); createRipple(event)">
+                        <div class="card-icon-wrap purple">
+                            <i class="material-icons-round">widgets</i>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Apps & Utilities</div>
+                            <div class="card-desc">Experimental Web Pages</div>
+                        </div>
+                        <i class="material-icons-round card-arrow">chevron_right</i>
+                    </div>
+                    <div class="dt-glass-card" onclick="openModal('modal-tools'); createRipple(event)">
+                        <div class="card-icon-wrap purple">
+                            <i class="material-icons-round">build</i>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Tools</div>
+                            <div class="card-desc">Essentials</div>
+                        </div>
+                        <i class="material-icons-round card-arrow">chevron_right</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="shaman-socials-bar">
+            <a href="https://www.instagram.com/da.real.mastershaman?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="shaman-social-item" title="Master Shaman (Instagram)">
+                <span class="material-icons-round">construction</span>
+            </a>
+            <a href="https://www.instagram.com/nocturne.stu?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="shaman-social-item" title="NOCTURNE Studios (Instagram)">
+                <span class="material-icons-round">hub</span>
+            </a>
+        </div>
+
+    </div>
+
+    <div id="modal-3d" class="app-library-page">
+        <div class="library-container">
+            <div class="back-btn" onclick="closeAllModals()">
+                <i class="material-icons-round">arrow_back</i> Back
+            </div>
+            <div class="library-header-wrap">
+                <h2 class="library-title">Games</h2>
+            </div>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">Our main stars of NOCTURNE, heavily maintained to be stable just for you.</p>
+    
+            <div class="library-grid">
+                <a href="./SandBox3D/sb3d_page" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">view_in_ar</i>
+                    <div class="item-content">
+                        <div class="item-title">Sand Box 3D</div>
+                        <div class="item-subtitle">Interactive 3D Physics Sandbox</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+                <a href="./RiftRunners2D/rr2d_page" class="list-item list-item-disabled"
+                    onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">track_changes</i>
+                    <div class="item-content">
+                        <div class="item-title">Rift Runners 2D</div>
+                        <div class="item-subtitle">Top-down 2D Survival Game (PC Only)</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-changelog" class="app-library-page">
+        <div class="library-container">
+            <div class="back-btn" onclick="closeAllModals()">
+                <i class="material-icons-round">arrow_back</i> Back
+            </div>
+            <div class="library-header-wrap">
+                <h2 class="library-title">Prism Changelogs</h2>
+            </div>
+            <div class="changelog-modal-body">
+                <div class="changelog-version-badge" id="cl-modal-version">Thinking...</div>
+                <h3 class="changelog-modal-title" id="cl-modal-title">Thinking...</h3>
+                <p class="changelog-modal-text" id="cl-modal-msg">
+                    Thinking...
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal-other" class="app-library-page">
+        <div class="library-container">
+            <div class="back-btn" onclick="closeAllModals()">
+                <i class="material-icons-round">arrow_back</i> Back
+            </div>
+            <div class="library-header-wrap">
+                <h2 class="library-title">Apps & Utilities</h2>
+            </div>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">Experimental apps.</p>
+    
+            <div class="library-grid">
+                <a href="./Other/ismycompteureron" class="list-item"
+                    onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">web_asset</i>
+                    <div class="item-content">
+                        <div class="item-title">Is My Compooper On?</div>
+                        <div class="item-subtitle">Checks whether your 'Compooper' is ON or nah</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+                <a href="./Other/devcheck" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">web_asset</i>
+                    <div class="item-content">
+                        <div class="item-title">Device Checker</div>
+                        <div class="item-subtitle">See your user-agent in stats</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+                <a href="./Other/notmoving" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">web_asset</i>
+                    <div class="item-content">
+                        <div class="item-title">Objects Move or Nah</div>
+                        <div class="item-subtitle">ThreeJS Simulation (just cubes)</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+                <a href="./Other/gifview" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">web_asset</i>
+                    <div class="item-content">
+                        <div class="item-title">GIF Viewer</div>
+                        <div class="item-subtitle">View GIFs by their links</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+                <a href="./Other/mathlol" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">web_asset</i>
+                    <div class="item-content">
+                        <div class="item-title">Math or DIE</div>
+                        <div class="item-subtitle">Random Math Generator</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+                <a href="./Other/coinsort" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">web_asset</i>
+                    <div class="item-content">
+                        <div class="item-title">Coin Sort</div>
+                        <div class="item-subtitle">Coin Sorting Game</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+                <a href="./Other/websend" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">web_asset</i>
+                    <div class="item-content">
+                        <div class="item-title">Webhook Transit</div>
+                        <div class="item-subtitle">A transit for Discord webhooks</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-tools" class="app-library-page">
+        <div class="library-container">
+            <div class="back-btn" onclick="closeAllModals()">
+                <i class="material-icons-round">arrow_back</i> Back
+            </div>
+            <div class="library-header-wrap">
+                <h2 class="library-title">Tools</h2>
+            </div>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">Essential tools tailored for you.</p>
+    
+            <div class="library-grid">
+                <a href="./Tools/lapscan" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">build</i>
+                    <div class="item-content">
+                        <div class="item-title">LAPSCAN</div>
+                        <div class="item-subtitle">Variance of Laplacian Scanner</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+
+                <a href="./Tools/pixelpeek" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">build</i>
+                    <div class="item-content">
+                        <div class="item-title">PixelPeek</div>
+                        <div class="item-subtitle">Image Metadata Inspector</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="pwa-status">
+        <span id="pwa-status-dot"></span>
+        <span id="pwa-status-label"></span>
+    </div>
+
+    <div id="settings-page">
+        <div class="back-btn" onclick="toggleSettings()">
+            <i class="material-icons-round">arrow_back</i> Back
+        </div>
+        <h1 style="font-family: 'Space Grotesk';">Settings</h1>
+        <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">Prism's settings, tweak whatever you want. All changes take effect before you even notice it.</p>
+
+        <div style="margin-top: 24px;">
+            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">Visuals</h3>
+            <div class="list-item" id="gif-toggle-container" style="cursor: pointer; justify-content: space-between;" onclick="if(navigator.onLine) toggleGifBackground()">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <i class="material-icons-round item-icon">wallpaper</i>
+                    <div class="item-content">
+                        <div class="item-title">Background GIF</div>
+                        <div class="item-subtitle" id="bg-status">Enabled</div>
+                    </div>
+                </div>
+                <i class="material-icons-round" id="toggle-icon">toggle_on</i>
+            </div>
+
+            <div class="list-item" id="dev-video-upload-card"
+                style="display: none; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 12px; cursor: default;">
+                <div style="display: flex; align-items: center; gap: 14px; width: 100%;">
+                    <i class="material-icons-round item-icon">video_settings</i>
+                    <div class="item-content">
+                        <div class="item-title">Custom Video Background</div>
+                        <div class="item-subtitle">Upload video file to cache as background</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; width: 100%;">
+                    <input type="file" id="video-bg-file-input" accept="video/*" style="display: none;" onclick="this.value = null"
+                        onchange="PrismVideoBg.handleUpload(this.files[0])">
+                    <button class="setting-select" style="margin-top: 0; flex: 1; text-align: center;"
+                        onclick="document.getElementById('video-bg-file-input').click()">Choose Video</button>
+                    <button class="setting-select" id="refresh-video-bg-btn"
+                        style="margin-top: 0; width: auto; display: none;"
+                        onclick="PrismVideoBg.refreshVideo()">↻ Refresh</button>
+                    <button class="setting-select" id="clear-video-bg-btn"
+                        style="margin-top: 0; width: auto; display: none; color: #f87171;"
+                        onclick="PrismVideoBg.removeVideo()">Clear</button>
+                </div>
+            </div>
+
+            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 20px; margin-bottom: 8px;">GIF Presets</h3>
+            <select id="gif-selector" class="setting-select" onchange="handleGifSelect(this.value)">
+                <option value="gif1">Default GIF</option>
+                <option value="gif2">GIF 1</option>
+                <option value="gif3">GIF 2</option>
+                <option value="gif4">GIF 3</option>
+                <option value="gif5">GIF 4</option>
+                <option value="gif6">GIF 5</option>
+                <option value="custom">"I'll add the link myself" (GIPHY Recommended)</option>
+            </select>
+            <div id="gif-custom-url-wrap">
+                <input id="gif-custom-url-input" type="url" placeholder="https://media.giphy.com/..." />
+                <button id="gif-custom-url-apply" onclick="applyCustomGifUrl()">Apply</button>
+            </div>
+        </div>
+
+        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 8px;">Theme Presets</h3>
+        <select id="theme-selector" class="setting-select" onchange="changeTheme(this.value)">
+            <option value="blurple">Good Vibes (Default)</option>
+            <option value="amber">Bright Amber</option>
+            <option value="emerald">Emerald</option>
+            <option value="ruby">Vibrant Ruby</option>
+            <option value="mono">Nostalgia</option>
+        </select>
+
+        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Performance</h3>
+        <div class="list-group">
+            <div class="list-item" style="cursor: pointer; justify-content: space-between;"
+                onclick="toggleSetting('reduce-blur')">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <i class="material-icons-round item-icon">blur_off</i>
+                    <div class="item-content">
+                        <div class="item-title">Reduce Blur effects</div>
+                    </div>
+                </div>
+                <i class="material-icons-round" id="icon-reduce-blur">toggle_off</i>
+            </div>
+            <div class="list-item" style="cursor: pointer; justify-content: space-between;" onclick="toggleSetting('no-anim')">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <i class="material-icons-round item-icon">motion_photos_off</i>
+                    <div class="item-content">
+                        <div class="item-title">Reduced motion</div>
+                    </div>
+                </div>
+                <i class="material-icons-round" id="icon-no-anim">toggle_off</i>
+            </div>
+        </div>
+        
+        <h3 class="storage-heading" style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">Storage</h3>
+        <button id="recache-btn" class="list-item" style="width: 100%; border: none; cursor: pointer;"
+            onclick="confirmAndRecache()">
+            <i class="material-icons-round item-icon">refresh</i>
+            <div class="item-content">
+                <div class="item-title">Update or Reinstall Prism</div>
+                <div class="item-subtitle">Updates Prism to the latest build, or reinstall it</div>
+            </div>
+        </button>
+
+        <div id="recache-game-toggle" onclick="toggleIncludeGames()">
+            <i class="material-icons-round" id="icon-include-games">toggle_off</i>
+            <div class="item-content">
+                <div class="item-title">Include Additional Assets</div>
+                <div class="item-subtitle">Enabling this allows Prism to update other assets, may consume more data.</div>
+            </div>
+        </div>
+
+        <h3 class="developer-heading" style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">Developer</h3>
+        <div class="list-item" id="dev-preview-toggle" style="cursor: pointer; justify-content: space-between;"
+            onclick="toggleDevPreviewMode()">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <i class="material-icons-round item-icon">code</i>
+                <div class="item-content">
+                    <div class="item-title">Developer Preview Mode</div>
+                    <div class="item-subtitle">For testing purposes only. Enables experimental/unfinished features.</div>
+                </div>
+            </div>
+            <i class="material-icons-round" id="icon-dev-preview">toggle_off</i>
+        </div>
+
+        <div id="sw-version-display" style="display: none; position: absolute; top: 16px; right: 20px; font-size: 11px; opacity: 0.35; font-family: 'Space Grotesk', sans-serif; pointer-events: none; user-select: none;"></div>
+    </div>
+
+    <div id="download-page">
+        <div class="loader-bg-pulse"></div>
+        <div class="loader-ring-wrap show" style="transform: scale(1); opacity: 1;">
+            <div class="loader-ring"></div>
+            <div class="loader-ring-2"></div>
+            <i class="material-icons-round dl-icon-wrap" id="dl-main-icon">download</i>
+        </div>
+        <div class="loader-wordmark show" style="opacity: 1; transform: translateY(0);">
+            <div class="loader-wordmark-name" id="dl-phase-title">Download Mode</div>
+            <div class="loader-wordmark-sub" id="dl-phase-sub">Thinking...</div>
+        </div>
+        <div class="loader-bar-wrap show" style="width: 220px;">
+            <div class="loader-bar" id="download-bar"></div>
+        </div>
+        <div class="dl-pipeline" id="dl-pipeline">
+            <div class="dl-pipeline-row" id="dl-phase-clear">
+                <span class="dl-phase-icon material-icons-round">pending</span>
+                <span class="dl-phase-label">Clear IDB/Cache</span>
+                <span class="dl-phase-status">Pondering...</span>
+            </div>
+            <div class="dl-pipeline-row" id="dl-phase-download">
+                <span class="dl-phase-icon material-icons-round">pending</span>
+                <span class="dl-phase-label">Download files</span>
+                <span class="dl-phase-status">Pondering...</span>
+            </div>
+            <div class="dl-pipeline-row" id="dl-phase-cache">
+                <span class="dl-phase-icon material-icons-round">pending</span>
+                <span class="dl-phase-label">Write them to IDB/Cache</span>
+                <span class="dl-phase-status">Pondering...</span>
+            </div>
+        </div>
+        <div class="dl-tip-box" id="download-tip">All the tips goes here...</div>
+    </div>
+
+    <script>
+
+        var _pwaInstallPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            _pwaInstallPrompt = e;
+            document.getElementById('pwa-install-btn-mobile').style.display = 'flex';
+            document.getElementById('pwa-install-btn-desktop').style.display = 'flex';
+        });
+
+        window.addEventListener('appinstalled', function () {
+            _pwaInstallPrompt = null;
+            document.getElementById('pwa-install-btn-mobile').style.display = 'none';
+            document.getElementById('pwa-install-btn-desktop').style.display = 'none';
+        });
+
+        window.addEventListener('online', () => {
+            const savedState = localStorage.getItem('bg-gif-enabled') !== 'false';
+            applyBgState(savedState);
+        });
+
+        window.addEventListener('offline', () => {
+            applyBgState(false);
+        });
+
+        window.__PRISM_ENV__ = (function () {
+            function syncInstalledClass(installed) {
+                document.documentElement.classList.toggle('prism-installed', installed);
+            }
+
+            const liveStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+            if (liveStandalone) localStorage.setItem('PRISM_INSTALLED', 'true');
+
+            const flagged = localStorage.getItem('PRISM_INSTALLED') === 'true';
+            syncInstalledClass(flagged);
+
+            if (!flagged && navigator.getInstalledRelatedApps) {
+                navigator.getInstalledRelatedApps().then(apps => {
+                    if (apps.length > 0) {
+                        localStorage.setItem('PRISM_INSTALLED', 'true');
+                        syncInstalledClass(true);
+                    }
+                }).catch(() => { });
+            }
+
+            if (flagged && !liveStandalone && navigator.getInstalledRelatedApps) {
+                navigator.getInstalledRelatedApps().then(apps => {
+                    if (apps.length === 0) {
+                        localStorage.removeItem('PRISM_INSTALLED');
+                        syncInstalledClass(false);
+                    }
+                }).catch(() => { });
+            }
+
+            return {
+                get isStandalone() { return localStorage.getItem('PRISM_INSTALLED') === 'true'; },
+                markInstalled() {
+                    localStorage.setItem('PRISM_INSTALLED', 'true');
+                    syncInstalledClass(true);
+                },
+                unmarkInstalled() {
+                    localStorage.removeItem('PRISM_INSTALLED');
+                    syncInstalledClass(false);
+                }
+            };
+        })();
+
+        window.addEventListener('appinstalled', () => {
+            window.__PRISM_ENV__.markInstalled();
+        });
+
+        function triggerPWAInstall() {
+            if (!_pwaInstallPrompt) return;
+            _pwaInstallPrompt.prompt();
+            _pwaInstallPrompt.userChoice.then(function (result) {
+                if (result.outcome === 'accepted') _pwaInstallPrompt = null;
+            });
+        }
+
+        (function () {
+            const isStandalone = window.__PRISM_ENV__.isStandalone;
+            if (!isStandalone) return;
+            const v = localStorage.getItem('PRISM_SW_VERSION');
+            const el = document.getElementById('sw-version-display');
+            if (v && el) { el.textContent = v; el.style.display = 'block'; }
+        })();
+
+        function toggleSetting(className) {
+            const isEnabled = document.body.classList.toggle(className);
+            localStorage.setItem(className, isEnabled);
+
+            const icon = document.getElementById('icon-' + className);
+            icon.textContent = isEnabled ? 'toggle_on' : 'toggle_off';
+            icon.style.color = isEnabled ? 'var(--primary)' : 'var(--text-muted)';
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '124, 158, 247';
+        }
+
+        function changeTheme(theme) {
+            const root = document.documentElement;
+            const themes = {
+                blurple: { primary: '#7c9ef7', secondary: '#a78bfa' },
+                amber: { primary: '#fbbf24', secondary: '#f59e0b' },
+                emerald: { primary: '#34d399', secondary: '#10b981' },
+                ruby: { primary: '#fb7185', secondary: '#e11d48' },
+                mono: { primary: '#ffffff', secondary: '#a3a3a3' }
+            };
+
+            const selected = themes[theme] || themes.blurple;
+            const primaryRgb = hexToRgb(selected.primary);
+            const secondaryRgb = hexToRgb(selected.secondary);
+
+            root.style.setProperty('--primary', selected.primary);
+            root.style.setProperty('--secondary', selected.secondary);
+
+            root.style.setProperty('--primary-glow', `rgba(${primaryRgb}, 0.3)`);
+            root.style.setProperty('--secondary-glow', `rgba(${secondaryRgb}, 0.25)`);
+
+            root.style.setProperty('--primary-dim', `rgba(${primaryRgb}, 0.12)`);
+            root.style.setProperty('--secondary-dim', `rgba(${secondaryRgb}, 0.12)`);
+            root.style.setProperty('--primary-container', `rgba(${primaryRgb}, 0.18)`);
+            root.style.setProperty('--secondary-container', `rgba(${secondaryRgb}, 0.18)`);
+            root.style.setProperty('--border-accent', `rgba(${primaryRgb}, 0.22)`);
+
+            localStorage.setItem('prism-theme', theme);
+        }
+
+        (function loadSavedTheme() {
+            const saved = localStorage.getItem('prism-theme');
+            if (saved) {
+                changeTheme(saved);
+                document.getElementById('theme-selector').value = saved;
+            }
+        })();
+
+        (function initPerformanceState() {
+            ['reduce-blur', 'no-anim'].forEach(className => {
+                if (localStorage.getItem(className) === 'true') {
+                    document.body.classList.add(className);
+                    const icon = document.getElementById('icon-' + className);
+                    if (icon) {
+                        icon.textContent = 'toggle_on';
+                        icon.style.color = 'var(--primary)';
+                    }
+                }
+            });
+        })();
+
+        let _includeGames = false;
+
+        function toggleIncludeGames() {
+            _includeGames = !_includeGames;
+            const icon = document.getElementById('icon-include-games');
+            icon.textContent = _includeGames ? 'toggle_on' : 'toggle_off';
+            icon.classList.toggle('toggle-on', _includeGames);
+        }
+
+        const DEV_PREVIEW_KEY = 'dev-preview-mode';
+
+        function setDevPreviewMode(value) {
+            localStorage.setItem(DEV_PREVIEW_KEY, value);
+            window.dispatchEvent(new CustomEvent('dev-preview-change', { detail: { enabled: value === 'true' } }));
+        }
+
+        function toggleDevPreviewMode() {
+            const isCurrentlyOn = localStorage.getItem(DEV_PREVIEW_KEY) === 'true';
+            const icon = document.getElementById('icon-dev-preview');
+
+            if (!isCurrentlyOn) {
+                if (!confirm('Prism Developer Preview Mode\n\nThis enables experimental/unfinished features intended for testing purposes only. Things may break.\n\nProceed?')) return;
+                setDevPreviewMode('true');
+                icon.textContent = 'toggle_on';
+                icon.style.color = 'var(--primary)';
+            } else {
+                if (!confirm('Prism Developer Preview Mode?\n\nThis will turn off experimental/testing features across Prism. Proceed?')) return;
+                setDevPreviewMode('false');
+                icon.textContent = 'toggle_off';
+                icon.style.color = 'var(--text-muted)';
+            }
+        }
+
+        (function initDevPreviewState() {
+            const isOn = localStorage.getItem(DEV_PREVIEW_KEY) === 'true';
+            const icon = document.getElementById('icon-dev-preview');
+            const videoCard = document.getElementById('dev-video-upload-card');
+            if (isOn) {
+                if (icon) {
+                    icon.textContent = 'toggle_on';
+                    icon.style.color = 'var(--primary)';
+                }
+                if (videoCard) videoCard.style.display = 'flex';
+            } else {
+                if (videoCard) videoCard.style.display = 'none';
+            }
+        })();
+
+        function confirmAndRecache() {
+            const gameWarning = _includeGames ? '\n\nGame assets included for download.' : '\n\nCore files only. Game assets excluded.';
+            if (!confirm(`Prism Download Mode\nCAUTION!\n\nPrism will delete old content and replace them with newer ones. Proceed?${gameWarning}\n\nYes, proceed. (OK)\nNo, do not proceed. (Cancel)`)) return;
+            clearAndRecache('full');
+        }
+
+        let _cacheProgressHandler = null;
+
+        async function clearAndRecache(mode = 'full') {
+            if (!navigator.onLine) return;
+            const isStandalone = window.__PRISM_ENV__.isStandalone;
+
+            const dlPage = document.getElementById('download-page');
+            const dlBar = document.getElementById('download-bar');
+            const dlTip = document.getElementById('download-tip');
+            const dlTitle = document.getElementById('dl-phase-title');
+            const dlSub = document.getElementById('dl-phase-sub');
+
+            dlPage.classList.add('open');
+            dlBar.style.transition = 'none';
+            dlBar.style.width = '0%';
+
+            function setPhase(rowId, state, statusText, icon) {
+                const row = document.getElementById(rowId);
+                if (!row) return;
+                row.className = 'dl-pipeline-row ' + state;
+                row.querySelector('.dl-phase-status').textContent = statusText;
+                row.querySelector('.dl-phase-icon').textContent = icon;
+            }
+
+            const tips = [
+                "Even bedrock can be turned to rubble under the right conditions.",
+                "Osmanthus wine tastes the same as I remember... But where are those who share the memory?",
+                "Aiming a beam of moonlight at Lauma's head makes her antlers grow taller, and if you get the angle just right, you can even get them to stab a piece of fruit that's too high to reach... Hmm? What then? Oh, um... you get scolded.",
+                "Our pure and merciful Lady Moonchanter... So kind, so gentle, and full of compassion for all. It's no wonder that people are drawn to her.",
+                "Clearly, we are different people with different ways of doing things, but I have never taken that to mean that we cannot get along. No matter what, the light of the moon will always fall favorably upon her.",
+                "Water comes in many flavors to the discerning palate. Mondstadt's water is crisp and pure, while water from Liyue has an enduring aftertaste. In Inazuma, the water possesses a flavor unlike any other.",
+                "The work that she has done over the centuries is truly immense.",
+                "If she were to ever make a return to the stage, I should personally attend the performance and give her my heartfelt applause... Yes, I must do so when the opportunity arises.",
+                "I have a great many names, though when on leave… I tend to go by Zhongli.",
+                "The skies here are full of stars, but they aren't the same as the ones back home.",
+                "As long as there's a dedicated laboratory, I am more than satisfied.",
+                "Inazuma shines eternal, and you shall stand by my side.",
+                "Witness the divine power of the Shogun!",
+                "The strength of the one I protect is the sword of justice.",
+                "Rain is temporary, but the glory of thunder is eternal.",
+                "The rain will not slow me down.",
+                "The wind of freedom blows across the land.",
+                "The world looks magnificent in its light... It makes me want to compose a poem!",
+                "Justice must be served, no matter what it takes. I have made peace with that.",
+                "Even the stars above will fall from the sky if threatened. That is the law.",
+                "I must go, my people need me. The Law must be upheld.",
+                "Why do people insist on proving that their existence is more valuable than another's? Isn't simply existing enough?",
+                "There will always be those who dare to brave the lightning's glow.",
+                "Don't waste time trying to explain yourself to people who are committed to misunderstanding you.",
+                "Heh, the weather here is quite calm... No, wait, this is a new type of storm?",
+                "The journey has an end, but no need to rush.",
+                "Today, I will witness a new era with my own eyes.",
+                "Cherish the time you have, for it will pass in the blink of an eye.",
+                "The battle has just begun. Don't let your guard down.",
+                "If you can't make up your mind, take the first step. The path will unfold before you on its own.",
+                "I trust in the protection of the stars.",
+                "No one fights alone.",
+                "Your strength shall be recorded in the history books, and every leaf and branch will bear witness.",
+                "The road ahead is long and uncertain, but I'm willing to take the first step.",
+                "The rule of the world is equality.",
+                "It's not the storm that makes a man brave, but the courage to face it.",
+                "My past is full of regrets, but the future is still ahead of me.",
+                "Home is wherever we are together.",
+                "Slay!",
+                "The strongest oath is the one that binds one's own heart.",
+                "The price of magic is memory, and the price of power is pain.",
+                "Life is a series of choices. The key is to find the courage to make them.",
+                "The darkness is not my enemy. It is my refuge.",
+                "My blade is a symbol of my loyalty. I will never betray that.",
+                "The world is full of mysteries, and I intend to solve them all.",
+                "Sometimes, the simplest answer is the most profound.",
+                "The past is a ghost that haunts us all. But we must not let it define our future.",
+                "The only way to truly understand someone is to walk a mile in their shoes.",
+                "Don't be afraid to make mistakes. It's all part of the learning process.",
+                "The wind is gentle today... a sign of good fortune perhaps.",
+                "I will protect the peace of Liyue Harbor with my life.",
+                "Your next line is...",
+                "The rules of the world are written by the strong, but the weak have the power to change them.",
+                "In the end, the only thing that matters is the strength of your will.",
+                "A blade's true power comes from the heart of its wielder.",
+                "No matter how far you run, the law will always catch up to you.",
+                "The most dangerous thing in the world is hope.",
+                "I may not be able to change the world, but I can change myself.",
+            ];
+
+            function cycleTip() {
+                dlTip.classList.remove('show');
+                setTimeout(() => {
+                    dlTip.textContent = tips[Math.floor(Math.random() * tips.length)];
+                    dlTip.classList.add('show');
+                }, 400);
+            }
+            cycleTip();
+            const tipInterval = setInterval(cycleTip, 3000);
+
+            let freshVersion = null;
+            let watchdogTimer = null;
+            let finished = false;
+
+            function resetWatchdog() {
+                clearTimeout(watchdogTimer);
+                watchdogTimer = setTimeout(() => {
+                    if (finished) return;
+                    console.warn('[Prism Download Mode]: No progress after 20s, proceeding restart...');
+                    finished = true;
+                    clearInterval(tipInterval);
+                    dlTitle.textContent = 'Stalled';
+                    dlSub.textContent = 'Reloading anyway...';
+                    setTimeout(() => { window.location.reload(); }, 1500);
+                }, 30000);
+            }
+
+            if (_cacheProgressHandler && navigator.serviceWorker) {
+                navigator.serviceWorker.removeEventListener('message', _cacheProgressHandler);
+            }
+
+            _cacheProgressHandler = (event) => {
+                if (!event.data) return;
+                const { type, progress, processed, total, errors, url } = event.data;
+
+                if (type === 'CACHE_START') {
+                    resetWatchdog();
+                    dlBar.style.transition = 'width 0.15s linear';
+                    setPhase('dl-phase-download', 'active', `0 / ${total}`, 'sync');
+                    setPhase('dl-phase-cache', 'active', 'Writing', 'sync');
+                    dlTitle.textContent = 'Downloading';
+                    dlSub.textContent = `Fetching ${total} assets`;
+                    return;
+                }
+
+                if (type === 'CACHE_ERROR') {
+                    resetWatchdog();
+                    dlSub.textContent = `${errors} error${errors !== 1 ? 's' : ''} so far`;
+                    return;
+                }
+
+                if (type === 'CACHE_PROGRESS') {
+                    resetWatchdog();
+                    dlBar.style.width = progress + '%';
+
+                    if (progress > 0 && progress < 100) {
+                        setPhase('dl-phase-download', 'active', `${processed} / ${total}`, 'sync');
+                        dlTitle.textContent = 'PROCESSING';
+                        dlSub.textContent = `${progress}%${errors > 0 ? ` · ${errors} skipped` : ''}`;
+                    }
+
+                    if (progress >= 100) {
+                        finished = true;
+                        clearTimeout(watchdogTimer);
+                        clearInterval(tipInterval);
+                        navigator.serviceWorker.removeEventListener('message', _cacheProgressHandler);
+                        setPhase('dl-phase-download', 'done', 'Done', 'check_circle');
+                        setPhase('dl-phase-cache', errors > 0 ? 'error' : 'done', errors > 0 ? `${errors} skipped` : 'Done', errors > 0 ? 'warning' : 'check_circle');
+                        dlTitle.textContent = 'Complete';
+                        dlSub.textContent = errors > 0 ? `Done with ${errors} skip${errors !== 1 ? 's' : ''}` : 'Finished, proceeding restart...';
+                        if (freshVersion) localStorage.setItem('PRISM_SW_VERSION', freshVersion);
+                        setTimeout(() => { window.location.reload(); }, 2500);
+                    }
+                }
+            };
+
+            navigator.serviceWorker.addEventListener('message', _cacheProgressHandler);
+            resetWatchdog();
+
+            try {
+                dlTitle.textContent = 'Purging';
+                dlSub.textContent = 'Deleting old IDB/Cache content...';
+                setPhase('dl-phase-clear', 'active', 'Running', 'sync');
+
+                const CORE_URLS = [
+                    '/',
+                    '/index.html',
+                    './SandBox3D/sb3d_page',
+                    './RiftRunners2D/rr2d_page',
+                    './RiftRunners2D/RiftRunners2D',
+                    './SandBox3D/SandBox3D_PC',
+                    './SandBox3D/SandBox3D_Mobile',
+                    './Other/ismycompteureron',
+                    './Other/devcheck',
+                    './Other/notmoving',
+                    './Other/gifview',
+                    './Other/mathlol',
+                    './Other/coinsort',
+                    './Other/websend',
+                    './Tools/lapscan',
+                    './Tools/pixelpeek',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo.png',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo192.png',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo512.png',
+                    'https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap',
+                    'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500;700&display=swap',
+                    'https://fonts.googleapis.com/icon?family=Material+Icons+Round',
+                ];
+
+                const GAME_URLS = [
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3dfavicon.svg',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3dammo.js',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3dmatyou.js',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3duianim_pc.js',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3duianim_mobile.js',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/blind.mp4',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/explode.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/neutral/neu1.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/neutral/neu2.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/neutral/neu3.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/evening/eve1.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/evening/eve2.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/evening/eve3.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid1.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid2.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid3.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid4.mp3',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/ground.png',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/ramp.png',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/stairs.png',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/pool.png',
+                    'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/pillars.png',
+                    'https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js',
+                    'https://cdn.jsdelivr.net/npm/babylonjs@9.11.0/babylon.js',
+                    'https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js',
+                    'https://cdn.babylonjs.com/ammo.js',
+                    'https://cdn.jsdelivr.net/npm/babylonjs-loaders@9.11.0/babylonjs.loaders.min.js',
+                    'https://cdn.jsdelivr.net/npm/babylonjs-inspector@9.11.0/babylon.inspector.bundle.js',
+                    'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+                    'https://assets.babylonjs.com/textures/flare.png',
+                ];
+
+                const urlsToPurge = _includeGames ? [...CORE_URLS, ...GAME_URLS] : CORE_URLS;
+                const absoluteUrlsToPurge = urlsToPurge.map(u => new URL(u, location.origin).href);
+
+                if ('caches' in window) {
+                    const cacheKeys = await caches.keys();
+                    await Promise.all(cacheKeys.map(async (cacheName) => {
+                        const cache = await caches.open(cacheName);
+                        const requests = await cache.keys();
+                        await Promise.all(
+                            requests
+                                .filter(req => absoluteUrlsToPurge.includes(req.url))
+                                .map(req => cache.delete(req))
+                        );
+                        const remaining = await cache.keys();
+                        if (remaining.length === 0) await caches.delete(cacheName);
+                    }));
+                }
+
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const reg of registrations) await reg.unregister();
+                }
+
+                await new Promise((resolve) => {
+                    const openReq = indexedDB.open('NOCTURNE_Studios_DB', 1);
+                    openReq.onsuccess = (e) => {
+                        const db = e.target.result;
+                        try {
+                            if (!db.objectStoreNames.contains('dynamic-cache')) {
+                                db.close();
+                                return resolve();
+                            }
+                            const tx = db.transaction('dynamic-cache', 'readwrite');
+                            const store = tx.objectStore('dynamic-cache');
+                            const cursorReq = store.openCursor();
+                            cursorReq.onsuccess = (ev) => {
+                                const cursor = ev.target.result;
+                                if (!cursor) return;
+                                if (absoluteUrlsToPurge.includes(cursor.key)) {
+                                    cursor.delete();
+                                }
+                                cursor.continue();
+                            };
+                            tx.oncomplete = () => { db.close(); resolve(); };
+                            tx.onerror = () => { db.close(); resolve(); };
+                        } catch (err) {
+                            db.close();
+                            resolve();
+                        }
+                    };
+                    openReq.onerror = () => resolve();
+                });
+
+                setPhase('dl-phase-clear', 'done', 'Done', 'check_circle');
+                dlTitle.textContent = 'DOWNLOADING';
+                dlSub.textContent = 'Starting up...';
+                setPhase('dl-phase-download', 'active', 'Starting', 'sync');
+
+                try {
+                    const swRes = await fetch('/sw.js', { cache: 'no-store' });
+                    const swText = await swRes.text();
+                    const vMatch = swText.match(/const CACHE_NAME\s*=\s*['"](.+?)['"]/);
+                    if (vMatch) freshVersion = vMatch[1];
+                } catch (_) { }
+
+                const swUrl = `/sw.js?update=${Date.now()}&standalone=${isStandalone}&includeGames=${_includeGames}`;
+                await navigator.serviceWorker.register(swUrl);
+
+            } catch (err) {
+                console.error('[Prism Download Mode]: Prism reinstall error: ', err);
+                finished = true;
+                clearTimeout(watchdogTimer);
+                clearInterval(tipInterval);
+                setPhase('dl-phase-clear', 'error', 'Failed', 'error');
+                setTimeout(() => { window.location.reload(); }, 1500);
+            }
+        }
+
+
+        function toggleGifBackground() {
+            const isEnabled = localStorage.getItem('bg-gif-enabled') !== 'false';
+            const newState = !isEnabled;
+
+            localStorage.setItem('bg-gif-enabled', newState);
+            applyBgState(newState);
+        }
+
+        function applyBgState(enabled) {
+            const icon = document.getElementById('toggle-icon');
+            const status = document.getElementById('bg-status');
+            const isOffline = !navigator.onLine;
+
+            if (isOffline) {
+                document.body.classList.add('no-gif');
+                icon.textContent = 'block';
+                icon.style.color = 'var(--text-muted)';
+                status.textContent = 'Network error (Disabled)';
+                return;
+            }
+
+            if (enabled) {
+                document.body.classList.remove('no-gif');
+                icon.textContent = 'toggle_on';
+                icon.style.color = 'var(--primary)';
+                status.textContent = 'Enabled';
+            } else {
+                document.body.classList.add('no-gif');
+                icon.textContent = 'toggle_off';
+                icon.style.color = 'var(--text-muted)';
+                status.textContent = 'Disabled';
+            }
+        }
+
+        var GIF_PRESETS = {
+            gif1: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif',
+            gif2: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/32o1C0pz7HHC32ShtI/giphy.gif',
+            gif3: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hnq6UBZreLmGvwOtKH/giphy.gif',
+            gif4: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cCCWygFWkpChuiPlWi/giphy.gif',
+            gif5: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/djwyA3ChGKC5VkrmPy/giphy.gif',
+            gif6: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7rdCcxQDPuMgW61B1p/giphy.gif'
+        };
+
+        function applyGifUrl(url) {
+            const el = document.querySelector('.bg-gif');
+            if (!el) return;
+            el.style.background = `url('${url}') center / cover no-repeat`;
+        }
+
+        function handleGifSelect(value) {
+            const customWrap = document.getElementById('gif-custom-url-wrap');
+            if (value === 'custom') {
+                customWrap.classList.add('visible');
+                const saved = localStorage.getItem('bg-gif-custom-url');
+                if (saved) {
+                    document.getElementById('gif-custom-url-input').value = saved;
+                    applyGifUrl(saved);
+                }
+            } else {
+                customWrap.classList.remove('visible');
+                localStorage.setItem('bg-gif-preset', value);
+                localStorage.removeItem('bg-gif-custom-url');
+                applyGifUrl(GIF_PRESETS[value]);
+            }
+        }
+
+        function applyCustomGifUrl() {
+            const input = document.getElementById('gif-custom-url-input');
+            const url = input.value.trim();
+            if (!url) return;
+            localStorage.setItem('bg-gif-preset', 'custom');
+            localStorage.setItem('bg-gif-custom-url', url);
+            applyGifUrl(url);
+        }
+
+        (function initGifPreset() {
+            const saved = localStorage.getItem('bg-gif-preset') || 'gif1';
+            const selector = document.getElementById('gif-selector');
+            selector.value = saved;
+            const customWrap = document.getElementById('gif-custom-url-wrap');
+            if (saved === 'custom') {
+                customWrap.classList.add('visible');
+                const customUrl = localStorage.getItem('bg-gif-custom-url');
+                if (customUrl) {
+                    document.getElementById('gif-custom-url-input').value = customUrl;
+                    applyGifUrl(customUrl);
+                }
+            } else {
+                if (GIF_PRESETS[saved]) applyGifUrl(GIF_PRESETS[saved]);
+            }
+        })();
+
+        (function initBgState() {
+            const savedState = localStorage.getItem('bg-gif-enabled');
+            const isEnabled = savedState !== 'false';
+            applyBgState(isEnabled);
+        })();
+
+        var cursorGlow = document.getElementById('cursor-glow');
+        window.addEventListener('mousemove', function (e) {
+            if (window.innerWidth >= 1024) {
+                cursorGlow.style.opacity = '1';
+                cursorGlow.style.left = e.clientX + 'px';
+                cursorGlow.style.top = e.clientY + 'px';
+            }
+        });
+        window.addEventListener('mouseleave', function () {
+            cursorGlow.style.opacity = '0';
+        });
+
+        function toggleSettings() {
+            const page = document.getElementById('settings-page');
+            page.classList.toggle('open');
+        }
+
+        (function initPWAStatus() {
+            var el = document.getElementById('pwa-status');
+            var label = document.getElementById('pwa-status-label');
+            var hideTimer;
+
+            function setStatus(online) {
+                el.classList.remove('online', 'offline');
+                el.classList.add(online ? 'online' : 'offline');
+                label.textContent = online ? 'Online' : 'Offline';
+                el.classList.add('visible');
+                clearTimeout(hideTimer);
+                if (online) hideTimer = setTimeout(function () { el.classList.remove('visible'); }, 3000);
+
+                const recacheBtn = document.getElementById('recache-btn');
+                if (recacheBtn) {
+                    if (online) {
+                        recacheBtn.style.opacity = '1';
+                        recacheBtn.style.pointerEvents = 'auto';
+                        recacheBtn.style.cursor = 'pointer';
+                    } else {
+                        recacheBtn.style.opacity = '0.4';
+                        recacheBtn.style.pointerEvents = 'none';
+                        recacheBtn.style.cursor = 'not-allowed';
+                    }
+                }
+            }
+
+            window.addEventListener('online', function () { setStatus(true); });
+            window.addEventListener('offline', function () { setStatus(false); });
+
+            if (!navigator.onLine) setStatus(false);
+        })();
+
+        (function setupGifReloadOnOnline() {
+            const bgGifElement = document.querySelector('.bg-gif');
+            if (!bgGifElement) return;
+
+            function getCurrentGifUrl() {
+                const isEnabled = localStorage.getItem('bg-gif-enabled') !== 'false';
+                if (!isEnabled) return null;
+
+                const preset = localStorage.getItem('bg-gif-preset') || 'gif1';
+                if (preset === 'custom') {
+                    return localStorage.getItem('bg-gif-custom-url') || null;
+                } else {
+                    const presets = {
+                        gif1: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif',
+                        gif2: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/32o1C0pz7HHC32ShtI/giphy.gif',
+                        gif3: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hnq6UBZreLmGvwOtKH/giphy.gif',
+                        gif4: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cCCWygFWkpChuiPlWi/giphy.gif',
+                        gif5: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/djwyA3ChGKC5VkrmPy/giphy.gif',
+                        gif6: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7rdCcxQDPuMgW61B1p/giphy.gif'
+                    };
+                    return presets[preset] || presets.gif1;
+                }
+            }
+
+            function reloadGifBackground() {
+                if (!navigator.onLine) return;
+                const url = getCurrentGifUrl();
+                if (!url) {
+                    document.body.classList.add('no-gif');
+                    return;
+                }
+                document.body.classList.remove('no-gif');
+                const separator = url.includes('?') ? '&' : '?';
+                const freshUrl = `${url}${separator}reload=${Date.now()}`;
+                bgGifElement.style.background = `url('${freshUrl}') center / cover no-repeat`;
+            }
+
+            window.addEventListener('online', reloadGifBackground);
+        })();
+
+        function openModal(id) {
+            closeAllModals();
+            const targetPanel = document.getElementById(id);
+            if(targetPanel) {
+                targetPanel.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.app-library-page').forEach(function (panel) {
+                panel.classList.remove('open');
+            });
+            if (!document.getElementById('settings-page').classList.contains('open')) {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function handleOverlayClick(e) { return; }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeAllModals();
+        });
+
+        function createRipple(e) {
+            var el = e.currentTarget;
+            var existing = el.querySelector('.ripple');
+            if (existing) existing.remove();
+            var circle = document.createElement('span');
+            var d = Math.max(el.clientWidth, el.clientHeight);
+            var rect = el.getBoundingClientRect();
+            circle.style.cssText = 'width:' + d + 'px;height:' + d + 'px;left:' + (e.clientX - rect.left - d / 2) + 'px;top:' + (e.clientY - rect.top - d / 2) + 'px';
+            circle.classList.add('ripple');
+            el.appendChild(circle);
+        }
+
+        window.addEventListener('load', function () {
+            var loader = document.getElementById('startup-loader');
+            var ring = document.getElementById('loader-ring');
+            var wordmark = document.getElementById('loader-wordmark');
+            var barWrap = document.getElementById('loader-bar-wrap');
+            var bar = document.getElementById('loader-bar');
+            var statusEl = document.getElementById('loader-status');
+            var page = document.getElementById('page');
+
+            const isStandalone = window.__PRISM_ENV__.isStandalone;
+
+            const taglines = [
+                'Making thoughts...',
+                'Progressing...',
+                'Deeply thinking...',
+                'Waking up...',
+                'Thinking...',
+            ];
+
+            function setStatus(text) {
+                if (!statusEl) return;
+                statusEl.style.opacity = '0';
+                setTimeout(() => {
+                    statusEl.textContent = text;
+                    statusEl.style.opacity = '1';
+                }, 250);
+            }
+
+            function dismissLoader() {
+                loader.style.opacity = '0';
+                page.style.opacity = '1';
+                setTimeout(() => { loader.style.display = 'none'; }, 700);
+            }
+
+            setStatus(taglines[Math.floor(Math.random() * taglines.length)]);
+            statusEl.style.opacity = '1';
+
+            setTimeout(() => ring.classList.add('show'), 250);
+            setTimeout(() => wordmark.classList.add('show'), 750);
+            setTimeout(() => {
+                barWrap.classList.add('show');
+                setTimeout(() => bar.classList.add('fill'), 60);
+            }, 1050);
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(
+                    `/sw.js?standalone=${isStandalone}&includeGames=true`
+                );
+            }
+
+            if (navigator.serviceWorker) {
+                navigator.serviceWorker.addEventListener('message', function (e) {
+                    if (e.data && e.data.type === 'CACHE_PROGRESS') {
+                        const pct = e.data.progress;
+                        bar.style.transition = 'width 0.4s ease';
+                        bar.style.width = pct + '%';
+                        if (pct >= 100) {
+                            setStatus('Ready');
+                            setTimeout(dismissLoader, 800);
+                        }
+                    }
+                });
+            }
+
+            setTimeout(dismissLoader, isStandalone ? 3200 : 2400);
+        });
+
+        function saveAppDataToIDB(key, value) {
+            const request = indexedDB.open('NOCTURNE_Studios_DB', 1);
+            request.onsuccess = function (e) {
+                const db = e.target.result;
+                const transaction = db.transaction('dynamic-cache', 'readwrite');
+                const store = transaction.objectStore('dynamic-cache');
+                store.put(value, key);
+            };
+        }
+
+        function getAppDataFromIDB(key, callback) {
+            const request = indexedDB.open('NOCTURNE_Studios_DB', 1);
+            request.onsuccess = function (e) {
+                const db = e.target.result;
+                const transaction = db.transaction('dynamic-cache', 'readonly');
+                const store = transaction.objectStore('dynamic-cache');
+                const getReq = store.get(key);
+                getReq.onsuccess = function () {
+                    callback(getReq.result);
+                };
+            };
+        }
+
+        function killStartupLoader() {
+            var loader = document.getElementById('startup-loader');
+            var page = document.getElementById('page');
+            if (!loader) return;
+            loader.style.transition = 'none';
+            loader.style.opacity = '0';
+            loader.style.display = 'none';
+            if (page) page.style.opacity = '1';
+        }
+
+        (function fixSettingsButtonPlacement() {
+            function reposition() {
+                const btn = document.querySelector('.prism-settings-btn');
+                const panel = document.querySelector('.settings-panel');
+                if (!btn) return;
+
+                btn.style.setProperty('position', 'fixed', 'important');
+                btn.style.setProperty('bottom', '24px', 'important');
+                btn.style.setProperty('right', '24px', 'important');
+                btn.style.setProperty('top', 'auto', 'important');
+                btn.style.setProperty('left', 'auto', 'important');
+                btn.style.setProperty('z-index', '1000', 'important');
+
+                if (panel) {
+                    panel.style.setProperty('bottom', '90px', 'important');
+                    panel.style.setProperty('right', '24px', 'important');
+                    panel.style.setProperty('top', 'auto', 'important');
+                    panel.style.setProperty('left', 'auto', 'important');
+                    panel.style.transformOrigin = 'bottom right';
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', reposition);
+            } else {
+                reposition();
+            }
+
+            const observer = new MutationObserver(() => reposition());
+            observer.observe(document.body, { childList: true, subtree: true });
+        })();
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const isStandalone = window.__PRISM_ENV__.isStandalone;
+
+            if (isStandalone) {
+                const mobileTrigger = document.getElementById('changelog-trigger-mobile');
+                const desktopTrigger = document.getElementById('changelog-trigger-desktop');
+                if (mobileTrigger) mobileTrigger.style.display = 'inline-flex';
+                if (desktopTrigger) desktopTrigger.style.display = 'inline-flex';
+
+                fetch('changelog.json?t=' + Date.now(), { cache: 'no-store' })
+                    .then(res => {
+                        if (!res.ok) throw new Error('[Prism Logs]: Network error');
+                        return res.json();
+                    })
+                    .then(data => {
+                        document.getElementById('cl-modal-version').textContent = data.release;
+                        document.getElementById('cl-modal-title').textContent = data.title;
+                        document.getElementById('cl-modal-msg').textContent = data.message;
+                    })
+                    .catch(err => {
+                        console.error('[Prism Logs]: Could not fetch the latest Prism changelogs...', err);
+                        document.getElementById('cl-modal-msg').textContent =
+                            'Prism is unable to fetch new contents for changelogs, try again next time when you have internet connection...';
+                    });
+            }
+        });
+
+        (function initCardPhysics() {
+            let isFalling = false;
+
+            const triggerFall = () => {
+                if (isFalling) return;
+                isFalling = true;
+
+                const allCards = document.querySelectorAll('.glass-card, .dt-glass-card');
+
+                allCards.forEach(c => {
+                    const randomRot = (Math.random() - 0.5) * 60;
+                    c.style.transition = 'transform 0.8s cubic-bezier(0.55, 0.085, 0.68, 0.53), opacity 0.6s ease';
+                    c.style.transform = `translateY(150vh) rotate(${randomRot}deg)`;
+                    c.style.opacity = '0';
+                    c.style.pointerEvents = 'none';
+                });
+
+                setTimeout(() => {
+                    allCards.forEach(c => {
+                        c.style.transition = 'transform 0.8s var(--spring), opacity 0.8s ease';
+                        c.style.transform = '';
+                        c.style.opacity = '';
+                        c.style.pointerEvents = '';
+                    });
+
+                    setTimeout(() => {
+                        allCards.forEach(c => {
+                            c.style.transition = '';
+                        });
+                        isFalling = false;
+                    }, 800);
+                }, 3000);
+            };
+
+            document.querySelectorAll('.glass-card, .dt-glass-card').forEach(card => {
+                let isDragging = false;
+                let wasDragged = false;
+                let startX = 0;
+                let startY = 0;
+
+                let lastX = 0;
+                let lastDir = 0;
+                let shakeCount = 0;
+                let lastShakeTime = 0;
+
+                card.addEventListener('pointerdown', e => {
+                    if (document.body.classList.contains('no-anim') || isFalling) return;
+                    isDragging = true;
+                    wasDragged = false;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    lastX = e.clientX;
+                    shakeCount = 0;
+                    lastShakeTime = Date.now();
+
+                    card.style.transition = 'none';
+                    card.style.zIndex = '20';
+                    card.setPointerCapture(e.pointerId);
+                });
+
+                card.addEventListener('pointermove', e => {
+                    if (!isDragging) return;
+
+                    const rawDx = e.clientX - startX;
+                    const rawDy = e.clientY - startY;
+
+                    if (Math.abs(rawDx) > 5 || Math.abs(rawDy) > 5) {
+                        wasDragged = true;
+                    }
+
+                    const currentX = e.clientX;
+                    const deltaX = currentX - lastX;
+                    const now = Date.now();
+
+                    if (Math.abs(deltaX) > 12) {
+                        const dir = Math.sign(deltaX);
+                        if (dir !== lastDir && lastDir !== 0) {
+                            shakeCount++;
+                            lastShakeTime = now;
+
+                            if (shakeCount > 10) {
+                                releaseCard();
+                                triggerFall();
+                                return;
+                            }
+                        }
+                        lastDir = dir;
+                        lastX = currentX;
+                    }
+
+                    if (now - lastShakeTime > 250) {
+                        shakeCount = 0;
+                    }
+
+                    const dx = rawDx * 0.35;
+                    const dy = rawDy * 0.35;
+                    const tilt = dx * 0.08;
+
+                    card.style.transform = `translate(${dx}px, ${dy}px) rotate(${tilt}deg) scale(1.03)`;
+                });
+
+                const releaseCard = () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    if (!isFalling) {
+                        card.style.transition = '';
+                        card.style.transform = '';
+                    }
+                    card.style.zIndex = '';
+                };
+
+                card.addEventListener('pointerup', releaseCard);
+                card.addEventListener('pointercancel', releaseCard);
+
+                card.addEventListener('click', e => {
+                    if (wasDragged) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                    }
+                }, true);
+            });
+        })();
+
+        const PrismVideoBg = (function () {
+            const DB_NAME = 'PrismVideoCacheDB';
+            const STORE_NAME = 'videos';
+            const KEY = 'custom_bg_video';
+
+            function openDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(DB_NAME, 1);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains(STORE_NAME)) {
+                            db.createObjectStore(STORE_NAME);
+                        }
+                    };
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function saveVideoBlob(blob) {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_NAME, 'readwrite');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.put(blob, KEY);
+                    req.onsuccess = () => resolve();
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function getVideoBlob() {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_NAME, 'readonly');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.get(KEY);
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function deleteVideoBlob() {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_NAME, 'readwrite');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.delete(KEY);
+                    req.onsuccess = () => resolve();
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function applyVideo() {
+                const videoEl = document.getElementById('bg-video');
+                const gifEl = document.querySelector('.bg-gif');
+                const clearBtn = document.getElementById('clear-video-bg-btn');
+                const refreshBtn = document.getElementById('refresh-video-bg-btn');
+
+                if (!videoEl) return;
+
+                try {
+                    const blob = await getVideoBlob();
+                    if (blob) {
+                        if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                        videoEl.src = URL.createObjectURL(blob);
+                        videoEl.style.display = 'block';
+                        if (gifEl) gifEl.style.display = 'none';
+                        if (clearBtn) clearBtn.style.display = 'inline-block';
+                        if (refreshBtn) refreshBtn.style.display = 'inline-block';
+                    } else {
+                        if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                        videoEl.removeAttribute('src');
+                        videoEl.style.display = 'none';
+                        if (gifEl && localStorage.getItem('bg-gif-enabled') !== 'false') {
+                            gifEl.style.display = 'block';
+                        }
+                        if (clearBtn) clearBtn.style.display = 'none';
+                        if (refreshBtn) refreshBtn.style.display = 'none';
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            function refreshVideo() {
+                const videoEl = document.getElementById('bg-video');
+                if (!videoEl) return;
+                videoEl.pause();
+                videoEl.currentTime = 0;
+                videoEl.load();
+                videoEl.play().catch(() => { });
+            }
+
+            function syncDevVisibility() {
+                const card = document.getElementById('dev-video-upload-card');
+                const isDev = localStorage.getItem('dev-preview-mode') === 'true';
+                if (card) {
+                    card.style.display = isDev ? 'flex' : 'none';
+                }
+            }
+
+            async function handleUpload(file) {
+                if (!file || !file.type.startsWith('video/')) return;
+                await deleteVideoBlob();
+                await saveVideoBlob(file);
+                await applyVideo();
+            }
+
+            async function removeVideo() {
+                await deleteVideoBlob();
+                await applyVideo();
+            }
+
+            function handleDevPreviewChange(enabled) {
+                syncDevVisibility();
+                if (!enabled) removeVideo();
+            }
+
+            window.addEventListener('DOMContentLoaded', () => {
+                syncDevVisibility();
+                applyVideo();
+            });
+
+            window.addEventListener('dev-preview-change', (e) => {
+                handleDevPreviewChange(e.detail.enabled);
+            });
+
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'dev-preview-mode') {
+                    handleDevPreviewChange(e.newValue === 'true');
+                }
+            });
+
+            return {
+                handleUpload,
+                removeVideo,
+                refreshVideo,
+                syncDevVisibility,
+                applyVideo
+            };
+        })();
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            const SW_VERSION_KEY = 'PRISM_SW_VERSION';
+            const isStandalone = window.__PRISM_ENV__.isStandalone;
+
+            fetch('/sw.js', { cache: 'no-store' })
+                .then(res => res.text())
+                .then(text => {
+                    const match = text.match(/const CACHE_NAME\s*=\s*['"](.+?)['"]/);
+                    if (!match) return;
+
+                    const liveVersion = match[1];
+                    const savedVersion = localStorage.getItem(SW_VERSION_KEY);
+
+                    if (savedVersion !== liveVersion) {
+                        if (isStandalone) {
+                            const ok = confirm(`Prism Download Mode\n\nPrism found a new version: ${liveVersion}\n\nDo you want to update now?\n\nYes, update my Prism. (OK)\nNo, do not update my Prism yet. (Cancel)`);
+                            if (ok) {
+                                killStartupLoader();
+                                localStorage.setItem(SW_VERSION_KEY, liveVersion);
+                                clearAndRecache('full');
+                            }
+                        } else {
+                            localStorage.setItem(SW_VERSION_KEY, liveVersion);
+                            navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=true`);
+                        }
+                    } else {
+                        navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=true`);
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

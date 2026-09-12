@@ -1,0 +1,158 @@
+5<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>gif viewer lol 🤤🤤🤤</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #111;
+            font-family: sans-serif;
+            overflow: hidden;
+        }
+
+        .viewer {
+            text-align: center;
+        }
+
+        img {
+            width: 320px;
+            max-width: 90vw;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        img.fullscreen {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            border-radius: 0;
+        }
+
+        .controls {
+            margin-top: 12px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #222;
+            color: white;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        input {
+            margin-bottom: 12px;
+            width: 280px;
+            padding: 8px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+        }
+
+        #exitBtn {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            display: none;
+            z-index: 999;
+        }
+
+        #exitBtn.show {
+            display: block;
+        }
+
+        .error-shake {
+            animation: shake 0.15s infinite;
+        }
+
+        .error-bg {
+            background: #700 !important;
+            transition: background 0.1s;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="viewer">
+        <input type="text" id="gifUrl" placeholder="past gif link hir 🤤">
+        <br>
+
+        <img id="gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNmYybDJyM2dnMzU0bzl6ZHB0aWcydzF1cjB1NGpkenhjaDh0bDFmdiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/N8BW1NJqOTx8rPfLBF/giphy.gif">
+
+        <div class="controls">
+            <button onclick="loadGif()">lod gif💀</button>
+            <button onclick="goFullscreen()">go fulscren lol🤡</button>
+        </div>
+    </div>
+
+    <button id="exitBtn" onclick="backToSmol()">
+        go smol like ur pp 🥴
+    </button>
+
+    <script>
+        const gif = document.getElementById("gif");
+        const exitBtn = document.getElementById("exitBtn");
+
+        function loadGif() {
+            const input = document.getElementById("gifUrl");
+            const url = input.value.trim();
+            const viewer = document.querySelector(".viewer");
+            const body = document.body;
+
+            if (url && (url.startsWith('http') || url.includes('.'))) {
+                gif.src = url;
+                body.classList.remove("error-bg");
+                viewer.classList.remove("error-shake");
+            } else {
+                body.classList.add("error-bg");
+                viewer.classList.add("error-shake");
+
+                setTimeout(() => {
+                    body.classList.remove("error-bg");
+                    viewer.classList.remove("error-shake");
+                }, 1000);
+            }
+        }
+
+        function goFullscreen() {
+            gif.classList.add("fullscreen");
+            exitBtn.classList.add("show");
+        }
+
+        function backToSmol() {
+            gif.classList.remove("fullscreen");
+            exitBtn.classList.remove("show");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Webhook Transit</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 480px;
+      margin: 60px auto;
+      padding: 0 16px;
+    }
+
+    input,
+    textarea,
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    button {
+      margin-top: 12px;
+      cursor: pointer;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Webhook Transit for Discord</h2>
+
+  <label>Mode</label>
+  <select id="modeSelect">
+    <option value="basic">Basic (channel)</option>
+    <option value="forumNew">Forum — New Post</option>
+    <option value="forumReply">Forum — Reply to Thread</option>
+  </select>
+
+  <div id="basicFields">
+    <label>Webhook URL</label>
+    <input type="text" id="webhookUrl_basic" placeholder="https://discord.com/api/webhooks/...">
+
+    <label>Username (optional)</label>
+    <input type="text" id="username_basic" placeholder="Bot name">
+  </div>
+
+  <div id="forumFields" style="display:none">
+    <label>Forum Webhook URL</label>
+    <input type="text" id="webhookUrl_forum" placeholder="https://discord.com/api/webhooks/...">
+
+    <label>Username (optional)</label>
+    <input type="text" id="username_forum" placeholder="Bot name">
+
+    <div id="threadNameField">
+      <label>New Post Title (thread_name)</label>
+      <input type="text" id="threadName" placeholder="Patch Notes v1.2">
+    </div>
+
+    <div id="threadIdField" style="display:none">
+      <label>Thread ID (thread_id)</label>
+      <input type="text" id="threadId" placeholder="123456789012345678">
+    </div>
+  </div>
+
+  <label>Message</label>
+  <textarea id="message" placeholder="Type your message..."></textarea>
+
+  <button id="sendBtn">Send</button>
+  <div id="status"></div>
+
+  <script>
+    const modeSelect = document.getElementById('modeSelect');
+    const basicFields = document.getElementById('basicFields');
+    const forumFields = document.getElementById('forumFields');
+    const threadNameField = document.getElementById('threadNameField');
+    const threadIdField = document.getElementById('threadIdField');
+    const status = document.getElementById('status');
+
+    modeSelect.value = localStorage.getItem('lastMode') || 'basic';
+
+    document.getElementById('webhookUrl_basic').value = localStorage.getItem('webhookUrl_basic') || '';
+    document.getElementById('username_basic').value = localStorage.getItem('username_basic') || '';
+    document.getElementById('webhookUrl_forum').value = localStorage.getItem('webhookUrl_forum') || '';
+    document.getElementById('username_forum').value = localStorage.getItem('username_forum') || '';
+
+    function renderMode() {
+      const mode = modeSelect.value;
+      basicFields.style.display = mode === 'basic' ? 'block' : 'none';
+      forumFields.style.display = mode === 'basic' ? 'none' : 'block';
+      threadNameField.style.display = mode === 'forumNew' ? 'block' : 'none';
+      threadIdField.style.display = mode === 'forumReply' ? 'block' : 'none';
+      localStorage.setItem('lastMode', mode);
+    }
+    modeSelect.onchange = renderMode;
+    renderMode();
+
+    document.getElementById('sendBtn').onclick = async () => {
+      const mode = modeSelect.value;
+      const content = document.getElementById('message').value.trim();
+
+      let url, username;
+
+      if (mode === 'basic') {
+        url = document.getElementById('webhookUrl_basic').value.trim();
+        username = document.getElementById('username_basic').value.trim();
+        localStorage.setItem('webhookUrl_basic', url);
+        localStorage.setItem('username_basic', username);
+      } else {
+        url = document.getElementById('webhookUrl_forum').value.trim();
+        username = document.getElementById('username_forum').value.trim();
+        localStorage.setItem('webhookUrl_forum', url);
+        localStorage.setItem('username_forum', username);
+      }
+
+      if (!url || !content) {
+        status.textContent = 'Need a webhook URL and a message, chief.';
+        return;
+      }
+
+      const payload = {content, ...(username && {username})};
+      let sendUrl = url;
+
+      if (mode === 'forumNew') {
+        const threadName = document.getElementById('threadName').value.trim();
+        if (!threadName) {
+          status.textContent = 'Forum posts need a title (thread_name), chief.';
+          return;
+        }
+        payload.thread_name = threadName;
+      }
+
+      if (mode === 'forumReply') {
+        const threadId = document.getElementById('threadId').value.trim();
+        if (!threadId) {
+          status.textContent = 'Need a thread_id to reply into, chief.';
+          return;
+        }
+        sendUrl = `${url}?thread_id=${threadId}`;
+      }
+
+      status.textContent = 'Sending...';
+
+      try {
+        const res = await fetch(sendUrl, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok || res.status === 204) {
+          status.textContent = '✅ Sent!';
+          document.getElementById('message').value = '';
+        } else {
+          status.textContent = `❌ Failed: ${res.status}`;
+        }
+      } catch (err) {
+        status.textContent = `❌ Error: ${err.message}`;
+      }
+    };
+  </script>
+
+</body>
+
+</html>

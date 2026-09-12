@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rift Runners 2D: Echo Protocol</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: #0a0a12;
+      color: #e0e0ff;
+      font-family: monospace;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #game-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    #rr-hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 16px 24px;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+    }
+
+    .hud-panel {
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(120, 100, 255, 0.4);
+      border-radius: 8px;
+      padding: 12px 16px;
+      min-width: 150px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .hud-label {
+      font-size: 12px;
+      color: #7060cc;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .hud-val {
+      font-size: 24px;
+      font-weight: bold;
+      color: #c8b8ff;
+      margin-top: 4px;
+    }
+
+    .hud-val.danger {
+      color: #ff6060;
+      text-shadow: 0 0 8px rgba(255, 96, 96, 0.5);
+    }
+
+    .phase-badge {
+      text-align: center;
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid;
+      font-weight: bold;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .phase-stabilize {
+      background: rgba(80, 120, 220, 0.25);
+      border-color: rgba(80, 120, 220, 0.6);
+      color: #80b0ff;
+    }
+
+    .phase-collapse {
+      background: rgba(180, 60, 30, 0.25);
+      border-color: rgba(180, 60, 30, 0.6);
+      color: #ff8060;
+    }
+
+    .phase-expansion {
+      background: rgba(60, 180, 80, 0.2);
+      border-color: rgba(60, 180, 80, 0.5);
+      color: #60ff90;
+    }
+
+    .phase-anomaly {
+      background: rgba(255, 0, 50, 0.25);
+      border-color: rgba(255, 0, 50, 0.8);
+      color: #ff3050;
+      text-shadow: 0 0 10px rgba(255, 0, 50, 0.8);
+    }
+
+    .hp-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .hp-bar {
+      height: 100%;
+      border-radius: 4px;
+      background: #60ff90;
+      transition: width 0.1s, background 0.2s;
+    }
+
+    #kill-feed {
+      position: absolute;
+      top: 100px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .kf-item {
+      background: rgba(10, 10, 20, 0.9);
+      border: 1px solid rgba(120, 100, 255, 0.3);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: #a090ff;
+      animation: kf-fade 2.5s forwards;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes kf-fade {
+      0% {
+        opacity: 0;
+        transform: translateX(20px)
+      }
+
+      10% {
+        opacity: 1;
+        transform: translateX(0)
+      }
+
+      80% {
+        opacity: 1
+      }
+
+      100% {
+        opacity: 0
+      }
+    }
+
+    #rr-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      padding: 16px 24px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .key-hint {
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(120, 100, 255, 0.3);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: #9080cc;
+    }
+
+    .key-hint span {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .echo-pip {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 4px;
+      border: 1px solid rgba(180, 160, 255, 0.4);
+      transition: all 0.2s;
+    }
+
+    .echo-pip.active {
+      background: #a080ff;
+      box-shadow: 0 0 8px #a080ff;
+    }
+
+    .echo-pip.inactive {
+      background: transparent;
+    }
+
+    #rr-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 5, 15, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 50;
+    }
+
+    #rr-overlay h1 {
+      font-size: 48px;
+      font-weight: 900;
+      color: #c8b8ff;
+      letter-spacing: 6px;
+      text-shadow: 0 0 20px rgba(200, 184, 255, 0.5);
+    }
+
+    #rr-overlay .sub {
+      font-size: 16px;
+      color: #7060cc;
+      letter-spacing: 4px;
+    }
+
+    #start-btn {
+      margin-top: 16px;
+      padding: 14px 40px;
+      background: rgba(100, 80, 220, 0.2);
+      border: 1px solid rgba(160, 140, 255, 0.8);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      font-family: monospace;
+      cursor: pointer;
+      pointer-events: all;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      box-shadow: 0 0 15px rgba(100, 80, 220, 0.3);
+    }
+
+    #start-btn:hover {
+      background: rgba(120, 100, 240, 0.6);
+      box-shadow: 0 0 25px rgba(160, 140, 255, 0.6);
+      transform: scale(1.05);
+    }
+
+    #ammo-counter {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      pointer-events: none;
+      z-index: 20;
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(120, 100, 255, 0.4);
+      border-radius: 10px;
+      padding: 10px 14px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+      transition: box-shadow 0.2s;
+    }
+
+    #ammo-counter.reloading {
+      animation: ammo-reload-pulse 0.6s ease-in-out infinite alternate;
+      border-color: rgba(255, 200, 60, 0.7);
+      box-shadow: 0 0 18px rgba(255, 200, 60, 0.25);
+    }
+
+    #ammo-counter.low-ammo {
+      animation: ammo-danger-shake 0.35s ease-in-out infinite;
+      border-color: rgba(255, 60, 60, 0.8);
+      box-shadow: 0 0 18px rgba(255, 60, 60, 0.3);
+    }
+
+    #ammo-label {
+      font-size: 10px;
+      color: #7060cc;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-family: monospace;
+    }
+
+    #ammo-reload-text {
+      font-size: 13px;
+      font-weight: bold;
+      color: #ffcc40;
+      font-family: monospace;
+      letter-spacing: 1px;
+      animation: ammo-reload-pulse 0.5s ease-in-out infinite alternate;
+    }
+
+    #ammo-pips-row {
+      display: flex;
+      flex-direction: row;
+      gap: 3px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      max-width: 160px;
+    }
+
+    .ammo-pip {
+      display: inline-block;
+      width: 6px;
+      height: 14px;
+      background: #ffcc40;
+      border-radius: 2px;
+      box-shadow: 0 0 5px rgba(255, 204, 64, 0.5);
+      transition: background 0.1s, box-shadow 0.1s;
+    }
+
+    .ammo-pip.empty {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    .ammo-pip.low {
+      background: #ff4444;
+      box-shadow: 0 0 6px rgba(255, 60, 60, 0.7);
+      animation: pip-danger-glow 0.4s ease-in-out infinite alternate;
+    }
+
+    .ammo-pip.just-fired {
+      animation: pip-drain 0.15s ease-out forwards;
+    }
+
+    .ammo-pip.refill-pop {
+      animation: pip-refill 0.3s ease-out forwards;
+    }
+
+    @keyframes ammo-reload-pulse {
+      from { opacity: 0.6; transform: scale(0.97); }
+      to   { opacity: 1;   transform: scale(1.02); }
+    }
+
+    @keyframes ammo-danger-shake {
+      0%   { transform: translateX(0); }
+      25%  { transform: translateX(-2px); }
+      75%  { transform: translateX(2px); }
+      100% { transform: translateX(0); }
+    }
+
+    @keyframes pip-danger-glow {
+      from { box-shadow: 0 0 4px rgba(255, 60, 60, 0.5); }
+      to   { box-shadow: 0 0 10px rgba(255, 60, 60, 1); }
+    }
+
+    @keyframes pip-drain {
+      0%   { transform: scaleY(1);   opacity: 1; }
+      60%  { transform: scaleY(0.3); opacity: 0.4; }
+      100% { transform: scaleY(0);   opacity: 0; }
+    }
+
+    @keyframes pip-refill {
+      0%   { transform: scaleY(0) translateY(4px); opacity: 0; }
+      70%  { transform: scaleY(1.2) translateY(-1px); opacity: 1; }
+      100% { transform: scaleY(1) translateY(0); opacity: 1; }
+    }
+
+    #weapon-panel {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: all;
+    }
+
+    .wpn-btn {
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(120, 100, 255, 0.3);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #9080cc;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      min-width: 170px;
+    }
+
+    .wpn-btn.active {
+      border-color: #ffee60;
+      color: #fff;
+      background: rgba(255, 200, 50, 0.15);
+      box-shadow: 0 0 10px rgba(255, 230, 100, 0.2);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 16px;
+      pointer-events: all;
+    }
+
+    .menu-btn {
+      padding: 14px 30px;
+      background: rgba(100, 80, 220, 0.2);
+      border: 1px solid rgba(160, 140, 255, 0.8);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      font-family: monospace;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      box-shadow: 0 0 15px rgba(100, 80, 220, 0.3);
+    }
+
+    .menu-btn:hover {
+      background: rgba(120, 100, 240, 0.6);
+      box-shadow: 0 0 25px rgba(160, 140, 255, 0.6);
+      transform: scale(1.05);
+    }
+
+    #settings-view, #pause-menu {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 5, 15, 0.98);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 60;
+    }
+
+    #pause-menu {
+      background: rgba(5, 5, 15, 0.85);
+      z-index: 40;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(10, 10, 20, 0.6);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 255, 0.4);
+      border-radius: 4px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 255, 255, 0.8);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+
+    #rr-version-tag {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: rgba(200, 184, 255, 0.35);
+      z-index: 999;
+      pointer-events: none;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="game-container"></div>
+  <div id="ammo-counter">
+    <div id="ammo-label">AMMO</div>
+    <div id="ammo-pips-row"></div>
+  </div>
+
+  <div id="weapon-panel" style="display:none;">
+    <div class="wpn-btn active" id="wpn-zapper" onclick="window.switchWpn('zapper')">[1] Zip Zapper</div>
+    <div class="wpn-btn" id="wpn-shotgun" onclick="window.switchWpn('shotgun')">[2] Tactical Shotgun</div>
+    <div class="wpn-btn" id="wpn-bazooka" onclick="window.switchWpn('bazooka')">[3] Bazooka</div>
+    <div class="wpn-btn" id="wpn-grenade" onclick="window.switchWpn('grenade')">[4] Grenade</div>
+  </div>
+
+  <div id="rr-hud" style="display:none;">
+    <div class="hud-panel">
+      <div class="hud-label">Integrity</div>
+      <div class="hud-val" id="hud-hp">100</div>
+      <div class="hp-bar-wrap">
+        <div class="hp-bar" id="hp-bar" style="width:100%"></div>
+      </div>
+      <div id="hud-shield-container" style="display:none; margin-top:8px;">
+        <div class="hud-label" style="color:#aaaaff;">Shield</div>
+        <div class="hud-val" id="hud-shield-hp" style="color:#aaaaff; font-size:18px;">100</div>
+        <div class="hp-bar-wrap" style="height:4px;">
+          <div class="hp-bar" id="shield-bar" style="width:100%; background:#aaaaff;"></div>
+        </div>
+      </div>
+      <div id="hud-shards-container" style="margin-top:12px; padding-top:8px; border-top:1px solid rgba(120, 100, 255, 0.3);">
+        <div class="hud-label" style="color:#00ffff;">Shards</div>
+        <div class="hud-val" id="hud-shards" style="color:#00ffff; text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);">0</div>
+      </div>
+    </div>
+    <div class="hud-panel" style="text-align:center;">
+      <div class="hud-label">LVL <span id="hud-level" style="color:#fff;">1</span> // Phase</div>
+      <div id="phase-badge" class="phase-badge phase-stabilize">STABILIZE</div>
+      <div style="margin-top:8px;font-size:12px;color:#7060cc;">Shift in <span id="shift-timer"
+          style="color:#fff;font-weight:bold;">60.0s</span></div>
+      <div id="boss-hud-hp" style="display:none; margin-top:12px; font-size:12px; color:#ff3050; font-weight:bold; text-shadow:0 0 5px rgba(255,0,50,0.5);">
+        ANOMALY HP: <span id="boss-hp-val">0</span> / <span id="boss-max-hp-val">0</span>
+      </div>
+      <div id="enemy-hud-count" style="margin-top:10px; font-size:12px; color:#a090ff;">
+        HOSTILES: <span id="enemy-curr-val" style="color:#fff; font-weight:bold;">0</span> / <span id="enemy-limit-val" style="color:#7060cc;">0</span>
+      </div>
+    </div>
+    <div class="hud-panel" style="text-align:right;">
+      <div class="hud-label">Extraction Score</div>
+      <div class="hud-val" id="hud-score">0</div>
+      <div style="margin-top:8px;font-size:12px;color:#7060cc;">Echo Nodes: <span id="echo-pips"></span></div>
+    </div>
+  </div>
+
+  <div id="kill-feed"></div>
+  <div id="rr-bottom" style="display:none;">
+    <div class="key-hint"><span>WASD</span> Move</div>
+    <div class="key-hint"><span>Mouse</span> Aim / Shoot</div>
+    <div class="key-hint"><span>SPACE</span> Dash</div>
+    <div class="key-hint"><span>E</span> Deploy Echo</div>
+    <div class="key-hint"><span>R</span> Reload</div>
+  </div>
+
+  <div id="rr-overlay">
+    <h1>RIFT RUNNERS 2D</h1>
+    <div class="sub">ECHO PROTOCOL</div>
+    <div style="font-size:12px;color:#5040aa;margin-top:8px;">HIGH VELOCITY EXTRACTION // SHIFTING GEOMETRY // SURVIVE
+    </div>
+    <div class="btn-group">
+      <button id="start-btn" class="menu-btn">Initialize</button>
+      <button class="menu-btn" onclick="RiftRun.showShop('main')">Shop</button>
+      <button id="open-settings-btn" class="menu-btn" onclick="RiftRun.showSettings('main')">Settings</button>
+    </div>
+  </div>
+
+  <div id="settings-view">
+    <h1 style="font-size:36px;color:#c8b8ff;letter-spacing:4px;">SETTINGS PANEL</h1>
+    
+    <div id="settings-tabs" style="display:flex; gap:10px; margin-bottom:10px;">
+      <button class="wpn-btn active" onclick="window.switchSettingsPage(1)" style="min-width:120px; text-align:center;">General</button>
+      <button class="wpn-btn" onclick="window.switchSettingsPage(2)" style="min-width:120px; text-align:center;">Cosmetics</button>
+    </div>
+  
+    <div id="settings-page-1" style="color:#7060cc;font-size:14px;letter-spacing:2px; display:block;">
+      [ WE'LL BE BACK SOON ]
+    </div>
+  
+    <div id="settings-page-2" style="color:#7060cc;font-size:14px; display:none; flex-direction:column; gap:15px; width:280px; text-align:left;">
+      <div>
+        <label style="color:#c8b8ff; font-weight:bold;">Player Base Color:</label><br>
+        <input type="color" id="opt-color-base" style="width:100%; height:35px; border:none; cursor:pointer;">
+      </div>
+      <div>
+        <label style="color:#c8b8ff; font-weight:bold;">Player Core Color:</label><br>
+        <input type="color" id="opt-color-core" style="width:100%; height:35px; border:none; cursor:pointer;">
+      </div>
+      <div>
+        <label style="color:#c8b8ff; font-weight:bold;">Weapon Skin Preset:</label><br>
+        <select id="opt-wpn-skin" style="width:100%; padding:10px; background:rgba(10,10,20,0.85); color:#c8b8ff; border:1px solid rgba(120,100,255,0.3); border-radius:6px; font-family:monospace; cursor:pointer;">
+          <option value="default">Default Blaster</option>
+          <option value="heavy">Heavy Cannon</option>
+          <option value="sleek">Sleek Laser</option>
+        </select>
+      </div>
+      <button class="menu-btn" onclick="window.saveCustomizations()" style="padding:10px; font-size:14px; margin-top:10px;">Save Customizations</button>
+    </div>
+  
+    <button id="close-settings-btn" class="menu-btn" style="margin-top:20px;">Back</button>
+  </div>
+
+  <div id="pause-menu">
+    <h1 style="font-size:42px;color:#ffee60;letter-spacing:6px;text-shadow:0 0 15px rgba(255,238,96,0.4);">PROTOCOL PAUSED
+    </h1>
+    <button id="resume-btn" class="menu-btn">Continue</button>
+    <button class="menu-btn" onclick="RiftRun.showShop('pause')">Shop</button>
+    <button id="pause-settings-btn" class="menu-btn" onclick="RiftRun.showSettings('pause')">Settings</button>
+    <button id="exit-btn" class="menu-btn">Exit Game</button>
+  </div>
+
+  <div id="shop-view" style="position:absolute; inset:0; background:rgba(5,5,15,0.98); display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px; z-index:60;">
+    <h1 style="font-size:36px;color:#00ffff;letter-spacing:4px;text-shadow:0 0 16px rgba(0,255,255,0.5);">RIFT SHOP</h1>
+    <div style="font-size:22px;font-weight:bold;color:#00ffff;background:rgba(0,255,255,0.08);border:1px solid rgba(0,255,255,0.3);border-radius:8px;padding:10px 28px;text-shadow:0 0 10px rgba(0,255,255,0.5);">
+      SHARDS: <span id="shop-shards-display">0</span>
+    </div>
+    <div style="font-size:11px;color:#5040aa;letter-spacing:2px;">UPGRADES RESET ON DEATH — SPEND WISELY</div>
+    <div id="shop-items"
+      style="display:grid;grid-template-columns:repeat(5, 1fr);gap:16px;width:2000px;max-width:95vw;max-height:65vh;overflow-y:auto;overflow-x:hidden;padding:10px 15px;">
+    </div>
+    <button id="close-shop-btn" class="menu-btn" style="margin-top:10px;">Back</button>
+  </div>
+
+  <div id="rr-version-tag">RIFT VERSION: v2.6.0</div>
+  
+  <script>
+    window.rrConfig = JSON.parse(localStorage.getItem('rr_custom_config')) || {
+      colorBase: '#c8b8ff',
+      colorCore: '#7060cc',
+      weaponSkin: 'default'
+    };
+
+    window._rrShopUpgrades = JSON.parse(localStorage.getItem('rr_shop_upgrades')) || {
+      moreHp: 0,
+      moreEchoes: 0,
+      betterShield: 0,
+      zapperDmg: 0,
+      shotgunDmg: 0,
+      bazookaDmg: 0,
+      grenadeDmg: 0,
+      bazookaAoEDmg: 0,
+      grenadeAoEDmg: 0
+    };
+
+    window._rrSaveShopUpgrades = () => {
+      localStorage.setItem('rr_shop_upgrades', JSON.stringify(window._rrShopUpgrades));
+    };
+
+    window._rrRenderShop = () => {
+      const upg = window._rrShopUpgrades;
+      const shards = (typeof window._rrShardCache === 'number' && window._rrShardCache >= 0)
+        ? window._rrShardCache
+        : (parseInt(localStorage.getItem('rr_shards')) || 0);
+
+      window._rrPowerupUses = window._rrPowerupUses || {
+        instant_hp: 0,
+        instant_shield: 0,
+        instant_freeze: 0,
+        instant_ammo: 0,
+        instant_speed: 0,
+        instant_nuke: 0
+      };
+
+      document.getElementById('shop-shards-display').innerText = shards;
+
+      const activeScene = (window.game || window.rrGame || window.RiftRun?._game)?.scene?.getScene('MainScene');
+      const isPlaying = activeScene && document.getElementById('rr-hud').style.display === 'flex';
+
+      const items = [
+        {
+          key: 'moreHp',
+          label: 'More HP',
+          desc: '+50 Max Integrity per purchase',
+          cost: 150,
+          max: 5,
+          current: upg.moreHp
+        },
+        {
+          key: 'moreEchoes',
+          label: 'More Echoes',
+          desc: '+1 Echo Charge per purchase',
+          cost: 200,
+          max: 3,
+          current: upg.moreEchoes
+        },
+        {
+          key: 'betterShield',
+          label: 'Better Shield',
+          desc: '+50 Max Shield HP per purchase',
+          cost: 250,
+          max: 5,
+          current: upg.betterShield
+        },
+        {
+          key: 'zapperDmg',
+          label: 'Zapper DMG',
+          desc: '+25% Zapper DMG per purchase',
+          cost: 160,
+          max: 4,
+          current: upg.zapperDmg
+        },
+        {
+          key: 'shotgunDmg',
+          label: 'Shotgun DMG',
+          desc: '+20% Shotgun DMG per purchase',
+          cost: 170,
+          max: 4,
+          current: upg.shotgunDmg
+        },
+        {
+          key: 'bazookaDmg',
+          label: 'Bazooka DMG',
+          desc: '+50% Bazooka DMG per purchase',
+          cost: 200,
+          max: 3,
+          current: upg.bazookaDmg
+        },
+        {
+          key: 'grenadeDmg',
+          label: 'Grenade DMG',
+          desc: '+40% Grenade DMG per purchase',
+          cost: 180,
+          max: 3,
+          current: upg.grenadeDmg
+        },
+        {
+          key: 'bazookaAoEDmg',
+          label: 'Bazooka AoE',
+          desc: '+50% AoE DMG (Bazooka)',
+          cost: 260,
+          max: 2,
+          current: upg.bazookaAoEDmg
+        },
+        {
+          key: 'grenadeAoEDmg',
+          label: 'Grenade AoE',
+          desc: '+40% AoE DMG (Grenade)',
+          cost: 240,
+          max: 2,
+          current: upg.grenadeAoEDmg
+        },
+        {
+          key: 'instant_hp',
+          label: 'Instant Heal',
+          desc: 'Instantly restores +25 Integrity',
+          cost: 80,
+          isInstant: true
+        },
+        {
+          key: 'instant_shield',
+          label: 'Instant Shield',
+          desc: 'Instantly deploys Kinetic Shield',
+          cost: 130,
+          isInstant: true
+        },
+        {
+          key: 'instant_freeze',
+          label: 'Rift Freeze',
+          desc: 'Instantly freezes all hostiles for 4s',
+          cost: 150,
+          isInstant: true
+        },
+        {
+          key: 'instant_ammo',
+          label: 'Infinite Ammo',
+          desc: 'Instantly triggers 10s of infinite ammo',
+          cost: 120,
+          isInstant: true
+        },
+        {
+          key: 'instant_speed',
+          label: 'Speed Surge',
+          desc: 'Instantly triggers 10s of hyper speed',
+          cost: 100,
+          isInstant: true
+        },
+        {
+          key: 'instant_nuke',
+          label: 'Tactical Nuke',
+          desc: 'Instantly arms a single tactical nuke',
+          cost: 1000,
+          isInstant: true
+        }
+      ];
+
+      const container = document.getElementById('shop-items');
+      container.innerHTML = '';
+
+      items.forEach(item => {
+        const maxed = item.isInstant ? ((window._rrPowerupUses?.[item.key] || 0) >= 4) : item.current >= item.max;
+        const canAfford = shards >= item.cost;
+        const disabledForMenu = item.isInstant && !isPlaying;
+        const buttonDisabled = maxed || !canAfford || disabledForMenu;
+
+        let buttonText = `💎 ${item.cost}`;
+        if (maxed) buttonText = 'CAPPED';
+        else if (disabledForMenu) buttonText = 'IN-RUN ONLY';
+
+        const statusVisual = item.isInstant
+          ? `<span style="color:#60ff90;font-weight:bold;letter-spacing:1px;">[ INSTANT USE ] (${window._rrPowerupUses?.[item.key] || 0}/4)</span>`
+          : [...Array(item.max)].map((_, i) => `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:3px;background:${i < item.current ? '#00ffff' : 'rgba(0,255,255,0.15)'};box-shadow:${i < item.current ? '0 0 6px #00ffff' : 'none'};"></span>`).join('');
+
+        const row = document.createElement('div');
+        row.style.cssText = `display:flex;flex-direction:column;justify-content:space-between;background:rgba(10,10,20,0.85);border:1px solid rgba(120,100,255,${maxed ? '0.15' : '0.4'});border-radius:8px;padding:16px;gap:12px;`;
+        row.innerHTML = `
+        <div>
+          <div style="font-size:15px;font-weight:bold;color:${maxed ? '#5040aa' : '#c8b8ff'};">${item.label}</div>
+          <div style="font-size:11px;color:#7060cc;margin-top:4px;">${item.desc}</div>
+          <div style="font-size:11px;color:#00ffff;margin-top:8px;">
+            ${statusVisual}
+          </div>
+        </div>
+        <button
+          onclick="window._rrBuyShopItem('${item.key}', ${item.cost}, ${item.isInstant ? 0 : item.max}, ${!!item.isInstant})"
+          style="width:100%;padding:10px;background:${buttonDisabled ? 'rgba(30,30,50,0.6)' : 'rgba(0,255,255,0.15)'};border:1px solid ${buttonDisabled ? 'rgba(80,60,150,0.3)' : 'rgba(0,255,255,0.6)'};border-radius:6px;color:${buttonDisabled ? '#4a3a7a' : '#00ffff'};font-family:monospace;font-size:13px;cursor:${buttonDisabled ? 'not-allowed' : 'pointer'};font-weight:bold;transition:all 0.2s;text-align:center;">
+          ${buttonText}
+        </button>
+      `;
+        container.appendChild(row);
+      });
+    };
+
+    window._rrBuyShopItem = (key, cost, max, isInstant) => {
+      let shards = (typeof window._rrShardCache === 'number' && window._rrShardCache >= 0)
+        ? window._rrShardCache
+        : (parseInt(localStorage.getItem('rr_shards')) || 0);
+      if (shards < cost) return;
+
+      const activeScene = (window.game || window.rrGame || window.RiftRun?._game)?.scene?.getScene('MainScene');
+
+      window._rrPowerupUses = window._rrPowerupUses || {
+        instant_hp: 0,
+        instant_shield: 0,
+        instant_freeze: 0,
+        instant_ammo: 0,
+        instant_speed: 0,
+        instant_nuke: 0
+      };
+
+      if (isInstant) {
+        const isPlaying = activeScene && document.getElementById('rr-hud').style.display === 'flex';
+        if (!isPlaying) return;
+        if ((window._rrPowerupUses[key] || 0) >= 4) return;
+
+        shards -= cost;
+        window._rrShardCache = shards;
+        localStorage.setItem('rr_shards', shards);
+        window._rrPowerupUses[key] = (window._rrPowerupUses[key] || 0) + 1;
+
+        if (key === 'instant_hp') {
+          activeScene.pState.hp = Math.min(activeScene.pState.maxHp, activeScene.pState.hp + 25);
+          activeScene.logFeed('SHOP VENDOR: Integrity Restored +25');
+        } else if (key === 'instant_shield') {
+          activeScene.pState.shieldActive = true;
+          activeScene.pState.shieldHp = activeScene.pState.shieldMaxHp;
+          activeScene.logFeed('SHOP VENDOR: Kinetic Shield Deployed');
+        } else if (key === 'instant_freeze') {
+          activeScene.logFeed('SHOP VENDOR: Cryogenic Freeze Overriding Hostiles');
+          activeScene.enemies.getChildren().forEach(enemy => {
+            if (enemy.active) {
+              enemy.isFrozen = true;
+              activeScene.time.delayedCall(4000, () => {
+                if (enemy.active) {
+                  enemy.isFrozen = false;
+                  enemy.clearTint();
+                }
+              });
+            }
+          });
+        } else if (key === 'instant_ammo') {
+          activeScene.pState.infiniteAmmo = 10000;
+          activeScene.logFeed('SHOP VENDOR: Infinite Ammo Matrix Active (10s)');
+        } else if (key === 'instant_speed') {
+          activeScene.pState.speedBoost = 10000;
+          activeScene.logFeed('SHOP VENDOR: Speed Protocol Engaged (10s)');
+        } else if (key === 'instant_nuke') {
+          activeScene.pState.weapons['nuke'].ammo = 1;
+          activeScene.pState.currentWeapon = 'nuke';
+          activeScene.pState.ammo = 1;
+          activeScene.pState.maxAmmo = 1;
+          document.querySelectorAll('.wpn-btn').forEach(b => b.classList.remove('active'));
+          activeScene.logFeed('SHOP VENDOR: CRITICAL // TACTICAL NUKE ARMED');
+        }
+
+        activeScene.updateDOM();
+        window._rrRenderShop();
+        return;
+      }
+
+      const upg = window._rrShopUpgrades;
+      if (upg[key] >= max) return;
+      shards -= cost;
+      window._rrShardCache = shards;
+      localStorage.setItem('rr_shards', shards);
+      upg[key]++;
+      window._rrSaveShopUpgrades();
+      window._rrRenderShop();
+
+      if (activeScene && typeof activeScene.updateDOM === 'function') {
+        activeScene.updateDOM();
+      }
+
+      if (window.RiftRun && window.RiftRun.applyUpgradesToScene) {
+        window.RiftRun.applyUpgradesToScene();
+      }
+    };
+
+    window._rrResetRunUpgrades = () => {
+      window._rrShopUpgrades = {
+        moreHp: 0,
+        moreEchoes: 0,
+        betterShield: 0,
+        zapperDmg: 0,
+        shotgunDmg: 0,
+        bazookaDmg: 0,
+        grenadeDmg: 0,
+        bazookaAoEDmg: 0,
+        grenadeAoEDmg: 0
+      };
+      window._rrSaveShopUpgrades();
+      window._rrPowerupUses = {
+        instant_hp: 0,
+        instant_shield: 0,
+        instant_freeze: 0,
+        instant_ammo: 0,
+        instant_speed: 0,
+        instant_nuke: 0
+      };
+    };
+
+    window.switchSettingsPage = (page) => {
+      document.getElementById('settings-page-1').style.display = page === 1 ? 'block' : 'none';
+      document.getElementById('settings-page-2').style.display = page === 2 ? 'flex' : 'none';
+
+      const tabs = document.getElementById('settings-tabs').children;
+      tabs[0].classList.toggle('active', page === 1);
+      tabs[1].classList.toggle('active', page === 2);
+
+      if (page === 2) {
+        document.getElementById('opt-color-base').value = window.rrConfig.colorBase;
+        document.getElementById('opt-color-core').value = window.rrConfig.colorCore;
+        document.getElementById('opt-wpn-skin').value = window.rrConfig.weaponSkin;
+      }
+    };
+
+    window.saveCustomizations = () => {
+      window.rrConfig = {
+        colorBase: document.getElementById('opt-color-base').value,
+        colorCore: document.getElementById('opt-color-core').value,
+        weaponSkin: document.getElementById('opt-wpn-skin').value
+      };
+      localStorage.setItem('rr_custom_config', JSON.stringify(window.rrConfig));
+      alert('Cosmetics saved! Reboot the game to apply changes.');
+    };
+    window.RiftRun = (() => {
+      const NS = 'workshop.shaman.phaser.riftRunners';
+      let _game = null;
+      let settingsOrigin = 'main';
+      function _showHUD() {
+        document.getElementById('rr-overlay').style.display = 'none';
+        document.getElementById('settings-view').style.display = 'none';
+        document.getElementById('pause-menu').style.display = 'none';
+        document.getElementById('rr-hud').style.display = 'flex';
+        document.getElementById('rr-bottom').style.display = 'flex';
+        document.getElementById('ammo-counter').style.display = 'block';
+        document.getElementById('enemy-hud-count').style.display = 'block';
+        document.getElementById('weapon-panel').style.display = 'flex';
+      }
+      function boot() {
+        _showHUD();
+        if (!_game) {
+          _game = new Phaser.Game(RiftRun.config);
+          window.game = _game;
+        } else {
+          const scene = _game.scene.keys['MainScene'];
+          if (scene) {
+            scene.physics.resume();
+            scene.scene.restart();
+          }
+        }
+      }
+      function reboot(sceneRef) {
+        _showHUD();
+        sceneRef.scene.restart();
+      }
+      function showSettings(origin) {
+        settingsOrigin = origin;
+        document.getElementById('rr-overlay').style.display = 'none';
+        document.getElementById('pause-menu').style.display = 'none';
+        document.getElementById('settings-view').style.display = 'flex';
+      }
+      function closeSettings() {
+        document.getElementById('settings-view').style.display = 'none';
+        if (settingsOrigin === 'main') {
+          document.getElementById('rr-overlay').style.display = 'flex';
+        } else {
+          document.getElementById('pause-menu').style.display = 'flex';
+        }
+      }
+      let shopOrigin = 'main';
+
+      function showShop(origin) {
+        shopOrigin = origin;
+        document.getElementById('rr-overlay').style.display = 'none';
+        document.getElementById('pause-menu').style.display = 'none';
+        document.getElementById('shop-view').style.display = 'flex';
+
+        window._rrRenderShop();
+      }
+
+      function closeShop() {
+        document.getElementById('shop-view').style.display = 'none';
+        if (shopOrigin === 'main') {
+          document.getElementById('rr-overlay').style.display = 'flex';
+        } else {
+          document.getElementById('pause-menu').style.display = 'flex';
+        }
+      }
+
+      function applyUpgradesToScene() {
+        if (_game) {
+          const scene = _game.scene.keys['MainScene'];
+          if (scene && scene.applyShopUpgrades) {
+            scene.applyShopUpgrades();
+          }
+        }
+      }
+
+      document.getElementById('start-btn').addEventListener('click', boot);
+      document.getElementById('close-settings-btn').addEventListener('click', closeSettings);
+      document.getElementById('close-shop-btn').addEventListener('click', closeShop);
+
+      return { NS, boot, reboot, showSettings, closeSettings, showShop, closeShop, applyUpgradesToScene };
+    })();
+  </script>
+  <script>
+    (() => {
+      const { NS } = RiftRun;
+      const ENEMY_HITBOXES = {
+        enemy_basic: { r: 10, ox: 2, oy: 2 },
+        enemy_tank: { r: 14, ox: 2, oy: 2 },
+        enemy_fast: { r: 8, ox: 2, oy: 2 },
+        enemy_boss: { r: 30, ox: 2, oy: 2 }
+      };
+      class MainScene extends Phaser.Scene {
+        constructor() {
+          super({ key: 'MainScene' });
+        }
+        init() {
+          this.isShooting = false;
+          this.sharedEmitter = null;
+          const _upg = window._rrShopUpgrades || { moreHp: 0, moreEchoes: 0, betterShield: 0 };
+          const _baseMaxHp = 100 + (_upg.moreHp * 50);
+          const _baseMaxEcho = 3 + _upg.moreEchoes;
+          const _baseShieldMax = 100 + (_upg.betterShield * 50);
+          this.pState = {
+            score: 0,
+            currentWeapon: 'zapper',
+            weapons: {
+              zapper: { name: 'Zip Zapper', ammo: 18, maxAmmo: 20, cooldown: 120, reloadTimer: 1200 },
+              shotgun: { name: 'Tactical Shotgun', ammo: 7, maxAmmo: 7, cooldown: 600, reloadTimer: 1800 },
+              bazooka: { name: 'Bazooka', ammo: 5, maxAmmo: 5, cooldown: 1500, reloadTimer: 2200 },
+              grenade: { name: 'Grenade', ammo: 4, maxAmmo: 4, cooldown: 800, reloadTimer: 1500 },
+              nuke: { name: 'Nuke', ammo: 1, maxAmmo: 1, cooldown: 1000, reloadTimer: 99999 }
+            },
+            hp: _baseMaxHp,
+            maxHp: _baseMaxHp,
+            echoCharges: _baseMaxEcho,
+            maxEchoCharges: _baseMaxEcho,
+            ammo: 20,
+            maxAmmo: 20,
+            speed: 300,
+            dashSpeed: 800,
+            isDashing: false,
+            dashCooldown: 0,
+            reloading: false,
+            reloadTimer: 0,
+            shootCooldown: 0,
+            invincible: 0,
+            infiniteAmmo: 0,
+            speedBoost: 0,
+            shieldActive: false,
+            shieldHp: 0,
+            shieldMaxHp: _baseShieldMax,
+            mindControlled: false,
+            spaceSpamCount: 0,
+            mcBoss: null,
+            echoRechargeTimers: []
+          };
+          Object.defineProperty(this.pState, 'shards', {
+            get: () => parseInt(localStorage.getItem('rr_shards')) || 0,
+            set: (val) => {
+              localStorage.setItem('rr_shards', val);
+            },
+            configurable: true
+          });
+          this.pState.shards = (() => {
+            if (typeof window._rrShardCache === 'number' && isFinite(window._rrShardCache) && window._rrShardCache >= 0) {
+              return window._rrShardCache;
+            }
+            const stored = parseInt(localStorage.getItem('rr_shards'));
+            const safe = (isFinite(stored) && stored >= 0) ? stored : 0;
+            window._rrShardCache = safe;
+            return safe;
+          })();
+          this.gState = {
+            level: 1,
+            phase: 0,
+            phaseNames: ['STABILIZE', 'COLLAPSE', 'EXPANSION', 'ANOMALY'],
+            phaseClasses: ['phase-stabilize', 'phase-collapse', 'phase-expansion', 'phase-anomaly'],
+            phaseTimer: 60,
+            enemySpawnRate: 5000,
+            enemySpawnTimer: 0,
+            spawnLimit: 15,
+            spawnedThisPhase: 0,
+            isBossPhase: false,
+            bossSpawned: false,
+            history: [],
+            isPlaying: true,
+            healSpawnTimer: 15000,
+            randomPowerupTimer: 20000,
+          };
+          this.worldSize = 2000;
+        }
+        preload() {
+          const g = this.make.graphics({ x: 0, y: 0, add: false });
+          const baseColor = Phaser.Display.Color.HexStringToColor(window.rrConfig.colorBase).color;
+          const coreColor = Phaser.Display.Color.HexStringToColor(window.rrConfig.colorCore).color;
+
+          g.fillStyle(baseColor); g.fillCircle(16, 16, 16);
+          g.fillStyle(coreColor); g.fillCircle(16, 16, 8);
+
+          g.fillStyle(0xe0d8ff);
+          if (window.rrConfig.weaponSkin === 'heavy') {
+            g.fillRect(12, 6, 26, 20);
+            g.fillStyle(0xffaa00);
+            g.fillRect(34, 12, 6, 8);
+          } else if (window.rrConfig.weaponSkin === 'sleek') {
+            g.fillRect(16, 14, 24, 4);
+            g.fillStyle(0x00ffff);
+            g.fillCircle(38, 16, 3);
+          } else {
+            g.fillRect(16, 10, 20, 12);
+          }
+
+          if (this.textures.exists('player')) {
+            this.textures.remove('player');
+          }
+          g.generateTexture('player', 40, 32);
+          g.clear();
+          g.fillStyle(0xff4060); g.fillRect(0, 0, 24, 24);
+          g.fillStyle(0x1a0a20); g.fillRect(6, 6, 12, 12);
+          g.generateTexture('enemy_basic', 24, 24);
+          g.clear();
+          g.fillStyle(0xff8030); g.fillTriangle(16, 0, 32, 32, 0, 32);
+          g.fillStyle(0x1a0a20); g.fillTriangle(16, 8, 24, 26, 8, 26);
+          g.generateTexture('enemy_tank', 32, 32);
+          g.clear();
+          g.fillStyle(0xcc30ff); g.fillCircle(10, 10, 10);
+          g.fillStyle(0x1a0a20); g.fillCircle(10, 10, 4);
+          g.generateTexture('enemy_fast', 20, 20);
+          g.clear();
+          g.fillStyle(0xff1030); g.fillCircle(32, 32, 32);
+          g.fillStyle(0xffa020); g.fillCircle(32, 32, 16);
+          g.generateTexture('enemy_boss', 64, 64);
+          g.clear();
+          g.fillStyle(0xff0040); g.fillCircle(6, 6, 6);
+          g.generateTexture('boss_bullet', 12, 12);
+          g.clear();
+          g.fillStyle(0xffee60); g.fillCircle(4, 4, 4);
+          g.generateTexture('bullet', 8, 8);
+          g.clear();
+          g.fillStyle(0xa080ff); g.fillCircle(4, 4, 4);
+          g.generateTexture('echo_bullet', 8, 8);
+          g.clear();
+          g.fillStyle(0x141428); g.lineStyle(2, 0x6450c8);
+          g.fillRect(0, 0, 64, 64); g.strokeRect(0, 0, 64, 64);
+          g.generateTexture('wall_0', 64, 64);
+          g.clear();
+          g.fillStyle(0x3a1a0a); g.lineStyle(2, 0xb4501e);
+          g.fillRect(0, 0, 64, 64); g.strokeRect(0, 0, 64, 64);
+          g.generateTexture('wall_1', 64, 64);
+          g.clear();
+          g.fillStyle(0x0a2a1a); g.lineStyle(2, 0x3cb450);
+          g.fillRect(0, 0, 64, 64); g.strokeRect(0, 0, 64, 64);
+          g.generateTexture('wall_2', 64, 64);
+          g.clear();
+          g.fillStyle(0x3a001a); g.lineStyle(2, 0xff0040);
+          g.fillRect(0, 0, 64, 64); g.strokeRect(0, 0, 64, 64);
+          g.generateTexture('wall_3', 64, 64);
+          g.clear();
+          g.fillStyle(0xffffff); g.fillRect(0, 0, 4, 4);
+          g.generateTexture('particle', 4, 4);
+          g.clear();
+          g.fillStyle(0x60ff90); g.fillRect(0, 0, 16, 16);
+          g.lineStyle(2, 0xffffff); g.strokeRect(0, 0, 16, 16);
+          g.generateTexture('powerup_hp', 16, 16);
+          g.clear();
+          g.fillStyle(0x60ff90); g.fillCircle(16, 16, 16);
+          g.generateTexture('heal_circle', 32, 32);
+          g.clear();
+          g.fillStyle(0xff3333); g.fillRect(0, 0, 16, 8);
+          g.generateTexture('rocket', 16, 8);
+          g.clear();
+          g.fillStyle(0xffcc33); g.fillCircle(8, 8, 8);
+          g.generateTexture('grenade', 16, 16);
+          g.clear();
+          g.fillStyle(0x00f0ff); g.fillRect(0, 0, 16, 16);
+          g.lineStyle(2, 0xffffff); g.strokeRect(0, 0, 16, 16);
+          g.generateTexture('powerup_freeze', 16, 16);
+          g.clear();
+          g.fillStyle(0xffa500); g.fillRect(0, 0, 16, 16);
+          g.lineStyle(2, 0xffffff); g.strokeRect(0, 0, 16, 16);
+          g.generateTexture('powerup_ammo', 16, 16);
+          g.clear();
+          g.fillStyle(0xffff00); g.fillTriangle(8, 0, 16, 16, 0, 16);
+          g.lineStyle(2, 0xffffff); g.strokeTriangle(8, 0, 16, 16, 0, 16);
+          g.generateTexture('powerup_speed', 16, 16);
+          g.clear();
+          g.fillStyle(0xaaaaff); g.fillCircle(8, 8, 8);
+          g.lineStyle(2, 0xffffff); g.strokeCircle(8, 8, 8);
+          g.generateTexture('powerup_shield', 16, 16);
+          g.clear();
+          g.fillStyle(0xffffff); g.fillCircle(16, 16, 16);
+          g.generateTexture('nuke_proj', 32, 32);
+          g.clear();
+          g.fillStyle(0xffffff); g.fillRect(0, 0, 16, 16);
+          g.lineStyle(2, 0xff0000); g.strokeRect(0, 0, 16, 16);
+          g.generateTexture('powerup_nuke', 16, 16);
+          g.clear();
+        }
+        create() {
+          this.physics.world.setBounds(0, 0, this.worldSize, this.worldSize);
+          this.gridBg = this.add.grid(
+            this.worldSize / 2, this.worldSize / 2,
+            this.worldSize, this.worldSize,
+            64, 64, 0x07070f, 1, 0x3c3264, 0.15
+          );
+          this.walls = this.physics.add.staticGroup();
+          this.enemies = this.physics.add.group();
+          this.bullets = this.physics.add.group();
+          this.echoBullets = this.physics.add.group();
+          this.bossBullets = this.physics.add.group();
+          this.echoNodes = this.add.group();
+          this.powerups = this.physics.add.group();
+          this.healCircles = this.physics.add.group();
+          this.player = this.physics.add.sprite(this.worldSize / 2, this.worldSize / 2, 'player');
+          this.player.setCollideWorldBounds(true);
+          this.player.setCircle(14, 2, 2);
+          this.cameras.main.setBounds(0, 0, this.worldSize, this.worldSize);
+          this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+          this.cameras.main.setDeadzone(100, 100);
+          this.keys = this.input.keyboard.addKeys('W,A,S,D,SPACE,E,R');
+          this.input.keyboard.on('keydown-Q', () => {
+            const pm = document.getElementById('pause-menu');
+            const sv = document.getElementById('settings-view');
+            if (sv.style.display === 'flex') {
+              RiftRun.closeSettings();
+            } else if (pm.style.display === 'flex') {
+              pm.style.display = 'none';
+              this.physics.resume();
+              this.gState.isPlaying = true;
+            } else if (this.gState.isPlaying) {
+              pm.style.display = 'flex';
+              this.physics.pause();
+              this.gState.isPlaying = false;
+            }
+          });
+
+          document.getElementById('resume-btn').onclick = () => {
+            document.getElementById('pause-menu').style.display = 'none';
+            this.physics.resume();
+            this.gState.isPlaying = true;
+          };
+
+          document.getElementById('exit-btn').onclick = () => {
+            document.getElementById('pause-menu').style.display = 'none';
+            document.getElementById('rr-hud').style.display = 'none';
+            document.getElementById('rr-bottom').style.display = 'none';
+            document.getElementById('ammo-counter').style.display = 'none';
+            document.getElementById('weapon-panel').style.display = 'none';
+            document.getElementById('boss-hud-hp').style.display = 'none';
+            document.getElementById('enemy-hud-count').style.display = 'none';
+            this.physics.pause();
+            this.gState.isPlaying = false;
+
+            if (typeof window._rrResetRunUpgrades === 'function') {
+              window._rrResetRunUpgrades();
+            }
+            const ov = document.getElementById('rr-overlay');
+            ov.innerHTML = `
+              <h1>RIFT RUNNERS 2D</h1>
+              <div class="sub">ECHO PROTOCOL</div>
+              <div style="font-size:12px;color:#5040aa;margin-top:8px;">HIGH VELOCITY EXTRACTION // SHIFTING GEOMETRY // SURVIVE</div>
+              <div class="btn-group">
+                <button id="start-btn" class="menu-btn">Initialize</button>
+                <button class="menu-btn" onclick="RiftRun.showShop('pause')">Shop</button>
+                <button id="open-settings-btn" class="menu-btn" onclick="RiftRun.showSettings('main')">Settings</button>
+              </div>
+            `;
+            ov.style.display = 'flex';
+            document.getElementById('start-btn').addEventListener('click', () => RiftRun.reboot(this));
+          };
+          this.keysWpn = this.input.keyboard.addKeys('ONE,TWO,THREE,FOUR');
+
+          document.querySelectorAll('.wpn-btn').forEach(b => b.classList.remove('active'));
+          document.getElementById('wpn-zapper').classList.add('active');
+          window.switchWpn = (type) => {
+            if (this.pState.reloading || this.pState.currentWeapon === type) return;
+            this.playSfx(500, 'square', 0.08);
+            this.pState.weapons[this.pState.currentWeapon].ammo = this.pState.ammo;
+            this.pState.currentWeapon = type;
+            this.pState.ammo = this.pState.weapons[type].ammo;
+            this.pState.maxAmmo = this.pState.weapons[type].maxAmmo;
+            this.pState.shootCooldown = 200;
+            document.querySelectorAll('.wpn-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`wpn-${type}`).classList.add('active');
+            this.logFeed(`ARMED: ${this.pState.weapons[type].name}`);
+          };
+          this.physics.add.collider(this.player, this.walls);
+          this.physics.add.collider(this.enemies, this.walls);
+          this.physics.add.collider(this.enemies, this.enemies);
+          this.physics.add.collider(this.powerups, this.walls);
+          this.physics.add.overlap(this.bullets, this.walls, (b) => {
+            if (!b.active) return;
+            if (b.isNuke) this.nukeExplode(b.x, b.y);
+            else if (b.isRocket) this.aoeExplode(b.x, b.y, 160, 8);
+            else if (b.isGrenade) this.aoeExplode(b.x, b.y, 140, 5);
+            b.destroy();
+          });
+          this.physics.add.overlap(this.bossBullets, this.walls, (b) => {
+            if (!b.active) return;
+            if (b.isRocket) this._bossAoeHit(b.x, b.y, 160, 25);
+            b.destroy();
+          });
+          this.physics.add.overlap(this.echoBullets, this.walls, (b) => { if (b.active) b.destroy(); });
+          this.physics.add.overlap(this.bullets, this.enemies, this.hitEnemy, null, this);
+          this.physics.add.overlap(this.echoBullets, this.enemies, this.hitEnemyEcho, null, this);
+          this.physics.add.collider(this.player, this.enemies, this.hitPlayer, null, this);
+          this.physics.add.overlap(this.player, this.bossBullets, this.hitPlayerBossProj, null, this);
+          this.physics.add.overlap(this.player, this.powerups, this.collectPowerup, null, this);
+          this.physics.add.overlap(this.player, this.healCircles, this.collectHealCircle, null, this);
+          this.isShooting = false;
+          this.input.on('pointerdown', (ptr) => { if (ptr.leftButtonDown()) this.isShooting = true; });
+          this.input.on('pointerup', () => { this.isShooting = false; });
+          this.input.on('pointerout', () => { this.isShooting = false; });
+          this.physics.world.on('worldbounds', (body) => {
+            if (body.gameObject && body.gameObject.active) body.gameObject.destroy();
+          });
+          this.generateMap();
+          this.updateDOM();
+          this.flashRect = this.add.rectangle(
+            this.cameras.main.centerX, this.cameras.main.centerY,
+            this.cameras.main.width, this.cameras.main.height,
+            0xffffff, 0
+          );
+          this.flashRect.setScrollFactor(0);
+          this.flashRect.setDepth(100);
+
+          this.mcText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'MIND CONTROLLED\nPRESS SPACE MULTIPLE TIMES TO ESCAPE', {
+            fontFamily: 'monospace', fontSize: '32px', color: '#ff0000', align: 'center', fontStyle: 'bold', stroke: '#000000', strokeThickness: 6
+          }).setOrigin(0.5).setScrollFactor(0).setDepth(101).setVisible(false);
+
+          this.aimLine = this.add.graphics();
+          this.aimLine.setDepth(2);
+          this.shieldSprite = this.add.circle(0, 0, 20, 0xaaaaff, 0.4);
+          this.shieldSprite.setStrokeStyle(2, 0xffffff);
+          this.shieldSprite.setVisible(false);
+        }
+        generateMap() {
+          this.walls.clear(true, true);
+          this.wallGrid = new Set();
+          const wallType = `wall_${this.gState.phase}`;
+          const density = this.gState.phase === 0 ? 0.08 : this.gState.phase === 1 ? 0.18 : this.gState.phase === 3 ? 0.02 : 0.05;
+          for (let x = 64; x < this.worldSize - 64; x += 64) {
+            for (let y = 64; y < this.worldSize - 64; y += 64) {
+              if (Phaser.Math.Distance.Between(x, y, this.player.x, this.player.y) < 200) continue;
+              if (Math.random() < density) {
+                this.walls.create(x, y, wallType).setOrigin(0).refreshBody();
+                this.wallGrid.add(`${Math.floor(x / 64)},${Math.floor(y / 64)}`);
+              }
+            }
+          }
+        }
+        spawnEnemy() {
+          if (!this.gState.isPlaying || this.gState.isBossPhase) return;
+          if (this.gState.spawnedThisPhase >= this.gState.spawnLimit) return;
+          if (this.enemies.getLength() >= 15) return;
+          let x, y;
+          do {
+            x = Phaser.Math.Between(0, this.worldSize);
+            y = Phaser.Math.Between(0, this.worldSize);
+          } while (Phaser.Math.Distance.Between(x, y, this.player.x, this.player.y) < 400);
+          const types = [
+            { key: 'enemy_basic', hp: 3, speed: 120, score: 100, tint: 0xff4060 },
+            { key: 'enemy_tank', hp: 8, speed: 80, score: 250, tint: 0xff8030 },
+            { key: 'enemy_fast', hp: 1, speed: 160, score: 150, tint: 0xcc30ff }
+          ];
+          let pool = [0, 0, 0, 1, 2, 2];
+          if (this.gState.phase === 1) pool = [0, 1, 1, 1, 2];
+          if (this.gState.phase === 2) pool = [0, 2, 2, 2, 2];
+          const type = types[Phaser.Math.RND.pick(pool)];
+          const mult = 1 + (this.pState.score / 5000);
+          const enemy = this.enemies.create(x, y, type.key);
+          enemy.eType = type;
+          enemy.hp = type.hp * mult * (1 + (this.gState.level * 0.1));
+          enemy.maxHp = enemy.hp;
+          enemy.baseSpeed = type.speed * (1 + (this.pState.score / 120000)) * (1 + (this.gState.level * 0.04));
+          enemy.setCollideWorldBounds(true);
+          enemy.setBounce(0.5);
+          const hb = ENEMY_HITBOXES[type.key];
+          if (hb) enemy.setCircle(hb.r, hb.ox, hb.oy);
+
+          enemy.hasWeapon = Math.random() < (0.2 + (this.gState.level * 0.05));
+          if (enemy.hasWeapon) {
+            const aimRoll = Math.random() + (this.gState.level * 0.1);
+            if (aimRoll < 0.33) {
+              enemy.aimSpread = Math.max(0.05, 0.45 - (this.gState.level * 0.05));
+              enemy.aimTier = 'bad';
+            } else if (aimRoll < 0.66) {
+              enemy.aimSpread = Math.max(0.02, 0.15 - (this.gState.level * 0.02));
+              enemy.aimTier = 'good';
+            } else {
+              enemy.aimSpread = 0;
+              enemy.aimTier = 'excellent';
+            }
+            enemy.shootCooldown = Math.max(500, Phaser.Math.Between(1000, 2500) - (this.gState.level * 150));
+          }
+
+          this.gState.spawnedThisPhase++;
+        }
+        spawnBoss() {
+          let x, y;
+          do {
+            x = Phaser.Math.Between(100, this.worldSize - 100);
+            y = Phaser.Math.Between(100, this.worldSize - 100);
+          } while (Phaser.Math.Distance.Between(x, y, this.player.x, this.player.y) < 600);
+          const type = { key: 'enemy_boss', hp: 150, speed: 80, score: 5000, tint: 0xff1030 };
+          const mult = 1 + (this.pState.score / 5000);
+          const enemy = this.enemies.create(x, y, type.key);
+          enemy.mcDrainTimer = 0;
+          enemy.quirk = 'single';
+          enemy.quirkTimer = 3000;
+          enemy.dashCooldown = Phaser.Math.Between(5000, 8000);
+          enemy.teleportCooldown = Phaser.Math.Between(12000, 18000);
+          enemy.isDashing = false;
+          enemy.eType = type;
+          enemy.hp = Math.min(4000, type.hp * mult);
+          enemy.maxHp = enemy.hp;
+          enemy.baseSpeed = type.speed;
+          enemy.isBoss = true;
+          enemy.shootCooldown = 0;
+          enemy.mcCooldown = 60000;
+          enemy.isMindControlling = false;
+          enemy.setCollideWorldBounds(true);
+          enemy.setBounce(0.5);
+          const hb = ENEMY_HITBOXES[type.key];
+          if (hb) enemy.setCircle(hb.r, hb.ox, hb.oy);
+          this.logFeed('WARNING: ANOMALY ENTITY DETECTED');
+          this.cameras.main.shake(800, 0.02);
+        }
+        _getAimLineEnd(x, y, angle, maxDist) {
+          if (!this.wallGrid) return { x: x + Math.cos(angle) * maxDist, y: y + Math.sin(angle) * maxDist };
+          const steps = Math.ceil(maxDist / 16);
+          for (let i = 1; i <= steps; i++) {
+            const dist = (i / steps) * maxDist;
+            const px = x + Math.cos(angle) * dist;
+            const py = y + Math.sin(angle) * dist;
+            if (this.wallGrid.has(`${Math.floor(px / 64)},${Math.floor(py / 64)}`)) {
+              return { x: px, y: py };
+            }
+          }
+          return { x: x + Math.cos(angle) * maxDist, y: y + Math.sin(angle) * maxDist };
+        }
+        _makeBullet(group, x, y, key, angle, speed) {
+          const b = group.create(x, y, key);
+          this.physics.velocityFromRotation(angle, speed, b.body.velocity);
+          b.rotation = angle;
+          b.body.checkWorldBounds = true;
+          b.body.onWorldBounds = true;
+          return b;
+        }
+        _hasLineOfSight(x1, y1, x2, y2) {
+          if (!this.wallGrid) return true;
+          const steps = Math.ceil(Phaser.Math.Distance.Between(x1, y1, x2, y2) / 16);
+          for (let i = 1; i < steps; i++) {
+            const t = i / steps;
+            const x = x1 + (x2 - x1) * t;
+            const y = y1 + (y2 - y1) * t;
+            if (this.wallGrid.has(`${Math.floor(x / 64)},${Math.floor(y / 64)}`)) return false;
+          }
+          return true;
+        }
+        _findPath(startX, startY, endX, endY) {
+          if (!this.wallGrid) return null;
+          const start = { x: Math.floor(startX / 64), y: Math.floor(startY / 64) };
+          const end = { x: Math.floor(endX / 64), y: Math.floor(endY / 64) };
+          if (this.wallGrid.has(`${end.x},${end.y}`)) return null;
+          const open = [{ x: start.x, y: start.y, g: 0, h: 0, f: 0, parent: null }];
+          const closed = new Set();
+          const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+          let iterations = 0;
+          while (open.length > 0 && iterations < 400) {
+            iterations++;
+            open.sort((a, b) => a.f - b.f);
+            const current = open.shift();
+            const key = `${current.x},${current.y}`;
+            if (current.x === end.x && current.y === end.y) {
+              const path = [];
+              let node = current;
+              while (node) {
+                path.unshift({ x: node.x * 64 + 32, y: node.y * 64 + 32 });
+                node = node.parent;
+              }
+              return path;
+            }
+            closed.add(key);
+            for (const [dx, dy] of dirs) {
+              const nx = current.x + dx;
+              const ny = current.y + dy;
+              const nKey = `${nx},${ny}`;
+              if (closed.has(nKey) || this.wallGrid.has(nKey)) continue;
+              if (dx !== 0 && dy !== 0 && (this.wallGrid.has(`${current.x},${ny}`) || this.wallGrid.has(`${nx},${current.y}`))) continue;
+              const g = current.g + (dx !== 0 && dy !== 0 ? 1.4 : 1);
+              const existing = open.find(n => n.x === nx && n.y === ny);
+              const h = Math.abs(nx - end.x) + Math.abs(ny - end.y);
+              if (!existing) {
+                open.push({ x: nx, y: ny, g, h, f: g + h, parent: current });
+              } else if (g < existing.g) {
+                existing.g = g;
+                existing.f = g + h;
+                existing.parent = current;
+              }
+            }
+          }
+          return null;
+        }
+        playSfx(freq, type = 'sine', duration = 0.1, volDrop = 0.00001) {
+          if (!this._audioCtx) this._audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const ctx = this._audioCtx;
+          if (ctx.state === 'suspended') ctx.resume();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          gain.gain.setValueAtTime(1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(volDrop, ctx.currentTime + duration);
+          osc.stop(ctx.currentTime + duration);
+        }
+        shoot() {
+          if (this.pState.ammo <= 0) {
+            this.playSfx(150, 'square', 0.05);
+            if (!this.pState.reloading) this.startReload();
+            return;
+          }
+          const angle = this.player.rotation;
+          const wpnType = this.pState.currentWeapon;
+          const wpnData = this.pState.weapons[wpnType];
+          if (wpnType === 'zapper') {
+            this.cameras.main.shake(50, 0.002);
+            this.playSfx(900, 'square', 0.06);
+            const proj = this._makeBullet(this.bullets, this.player.x + Math.cos(angle) * 20, this.player.y + Math.sin(angle) * 20, 'bullet', angle, 800);
+            proj.wpnType = 'zapper';
+          } else if (wpnType === 'shotgun') {
+            this.cameras.main.shake(100, 0.005);
+            this.playSfx(180, 'sawtooth', 0.18);
+            [-0.2, -0.1, 0, 0.1, 0.2].forEach(s => {
+              const proj = this._makeBullet(this.bullets, this.player.x + Math.cos(angle + s) * 20, this.player.y + Math.sin(angle + s) * 20, 'bullet', angle + s, 700);
+              proj.wpnType = 'shotgun';
+            });
+          } else if (wpnType === 'bazooka') {
+            this.cameras.main.shake(150, 0.008);
+            this.playSfx(120, 'sawtooth', 0.3);
+            const proj = this._makeBullet(this.bullets, this.player.x + Math.cos(angle) * 20, this.player.y + Math.sin(angle) * 20, 'rocket', angle, 500);
+            proj.isRocket = true;
+            proj.wpnType = 'bazooka';
+          } else if (wpnType === 'grenade') {
+            this.cameras.main.shake(80, 0.004);
+            this.playSfx(300, 'triangle', 0.12);
+            const proj = this._makeBullet(this.bullets, this.player.x + Math.cos(angle) * 20, this.player.y + Math.sin(angle) * 20, 'grenade', angle, 400);
+            proj.isGrenade = true;
+            proj.wpnType = 'grenade';
+            this.time.delayedCall(1000, () => {
+              if (proj.active) {
+                const currentLvl = this.gState.level;
+                const dmgMultiplier = 1 + (currentLvl - 1) * 0.25;
+                const aoeMultiplier = 1 + (currentLvl - 1) * 0.15;
+                const upg = window._rrShopUpgrades || {};
+                const gDmg = 1 + (upg.grenadeDmg || 0) * 0.40;
+                const gAoE = 1 + (upg.grenadeAoEDmg || 0) * 0.40;
+                this.aoeExplode(proj.x, proj.y, 160 * aoeMultiplier, 8 * dmgMultiplier * gDmg * gAoE);
+                proj.destroy();
+              }
+            });
+          } else if (wpnType === 'nuke') {
+            this.cameras.main.shake(200, 0.015);
+            this.playSfx(60, 'sawtooth', 0.6);
+            const proj = this._makeBullet(this.bullets, this.player.x + Math.cos(angle) * 20, this.player.y + Math.sin(angle) * 20, 'nuke_proj', angle, 600);
+            proj.isNuke = true;
+          }
+          if (this.pState.infiniteAmmo <= 0) this.pState.ammo--;
+          this.pState.shootCooldown = wpnData.cooldown;
+          this.updateDOM();
+          if (wpnType === 'nuke') {
+            window.switchWpn('zapper');
+          } else if (this.pState.ammo <= 0) {
+            this.startReload();
+          }
+        }
+        startReload() {
+          this.playSfx(400, 'sine', 0.15);
+          this.pState.reloading = true;
+          const wpn = this.pState.weapons[this.pState.currentWeapon];
+          this.pState.reloadTimer = wpn.reloadTimer;
+          this.logFeed(`Reloading ${wpn.name}...`);
+        }
+        deployEcho() {
+          if (this.pState.echoCharges <= 0 || this.gState.history.length < 30) return;
+          const h = [...this.gState.history];
+          const echo = this.add.sprite(h[0].x, h[0].y, 'player');
+          echo.setTint(0xa080ff);
+          echo.setAlpha(0.6);
+          echo.history = h;
+          echo.idx = 0;
+          echo.life = 4000;
+          this.echoNodes.add(echo);
+          this.pState.echoCharges--;
+          this.pState.echoRechargeTimers.push(10000);
+          this.logFeed('Echo Protocol Deployed');
+          this.updateDOM();
+        }
+        hitEnemy(bullet, enemy) {
+          if (!bullet.active || !enemy.active) return;
+          const currentLvl = this.gState.level;
+          const dmgMultiplier = 1 + (currentLvl - 1) * 0.25;
+          const aoeMultiplier = 1 + (currentLvl - 1) * 0.15;
+          const upg = window._rrShopUpgrades || {};
+          if (bullet.isNuke) {
+            this.nukeExplode(bullet.x, bullet.y);
+            bullet.destroy();
+            return;
+          }
+          if (bullet.isRocket) {
+            const bDmg = 1 + (upg.bazookaDmg || 0) * 0.50;
+            const bAoE = 1 + (upg.bazookaAoEDmg || 0) * 0.50;
+            this.aoeExplode(bullet.x, bullet.y, 160 * aoeMultiplier, 8 * dmgMultiplier * bDmg * bAoE);
+            bullet.destroy();
+            return;
+          }
+          if (bullet.isGrenade) {
+            const gDmg = 1 + (upg.grenadeDmg || 0) * 0.40;
+            const gAoE = 1 + (upg.grenadeAoEDmg || 0) * 0.40;
+            this.aoeExplode(bullet.x, bullet.y, 140 * aoeMultiplier, 5 * dmgMultiplier * gDmg * gAoE);
+            bullet.destroy();
+            return;
+          }
+          bullet.destroy();
+          this.playSfx(500, 'square', 0.04);
+          let baseDmg = 1.5;
+          if (bullet.wpnType === 'zapper') {
+            baseDmg *= (1.5 + (upg.zapperDmg || 0) * 0.30);
+          } else if (bullet.wpnType === 'shotgun') {
+            baseDmg *= (1.7 + (upg.shotgunDmg || 0) * 0.25);
+          }
+          enemy.hp -= baseDmg * dmgMultiplier;
+          enemy.setTintFill(0xffffff);
+          this.time.delayedCall(50, () => { if (enemy.active) enemy.clearTint(); });
+          this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, 5);
+          if (enemy.hp <= 0) {
+            this.playSfx(enemy.isBoss ? 90 : 250, 'sawtooth', enemy.isBoss ? 0.8 : 0.15);
+            this.pState.score += enemy.eType.score;
+            this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, enemy.isBoss ? 100 : 15);
+            if (Math.random() < 0.15 && !enemy.isBoss) {
+              const roll = Math.random();
+              let pType = 'powerup_hp';
+              if (roll < 0.25) pType = 'powerup_freeze';
+              else if (roll < 0.50) pType = 'powerup_speed';
+              else if (roll < 0.75) pType = 'powerup_ammo';
+              this.powerups.create(enemy.x + Phaser.Math.Between(-30, 30), enemy.y + Phaser.Math.Between(-30, 30), pType);
+            } else if (Math.random() < 0.05 || enemy.isBoss) {
+              for (let i = 0; i < (enemy.isBoss ? 5 : 1); i++) {
+                this.powerups.create(enemy.x + Phaser.Math.Between(-30, 30), enemy.y + Phaser.Math.Between(-30, 30), 'powerup_hp');
+              }
+            }
+            enemy.destroy();
+            this.updateDOM();
+          }
+        }
+        aoeExplode(x, y, radius, damage) {
+          this.playSfx(200, 'sawtooth', 0.35);
+          this.spawnParticles(x, y, 0xffcc33, 25);
+          this.cameras.main.flash(100, 255, 200, 50, true);
+          this.enemies.getChildren().forEach(enemy => {
+            if (enemy.active && Phaser.Math.Distance.Between(x, y, enemy.x, enemy.y) <= radius) {
+              enemy.hp -= damage;
+              enemy.setTintFill(0xffffff);
+              this.time.delayedCall(50, () => { if (enemy.active) enemy.clearTint(); });
+              if (enemy.hp <= 0) {
+                this.pState.score += enemy.eType.score;
+                this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, enemy.isBoss ? 100 : 15);
+                if (Math.random() < 0.15 && !enemy.isBoss) {
+                  const roll = Math.random();
+                  let pType = 'powerup_hp';
+                  if (roll < 0.20) pType = 'powerup_freeze';
+                  else if (roll < 0.40) pType = 'powerup_speed';
+                  else if (roll < 0.60) pType = 'powerup_ammo';
+                  else if (roll < 0.65) pType = 'powerup_nuke';
+                  this.powerups.create(enemy.x + Phaser.Math.Between(-30, 30), enemy.y + Phaser.Math.Between(-30, 30), pType);
+                } else if (Math.random() < 0.05 || enemy.isBoss) {
+                  for (let i = 0; i < (enemy.isBoss ? 5 : 1); i++) {
+                    this.powerups.create(enemy.x + Phaser.Math.Between(-30, 30), enemy.y + Phaser.Math.Between(-30, 30), 'powerup_hp');
+                  }
+                }
+                enemy.destroy();
+                this.updateDOM();
+              }
+            }
+          });
+        }
+        nukeExplode(x, y) {
+          this.playSfx(50, 'sawtooth', 1.2);
+          this.spawnParticles(x, y, 0xffffff, 120);
+          this.cameras.main.flash(400, 255, 255, 255, true);
+          this.cameras.main.shake(800, 0.04);
+
+          const radius = 500;
+          const nukeDmg = 900;
+          const bossDmgMult = 0.4;
+
+          this.enemies.getChildren().forEach(enemy => {
+            if (enemy.active && Phaser.Math.Distance.Between(x, y, enemy.x, enemy.y) <= radius) {
+              const damage = enemy.isBoss ? (nukeDmg * bossDmgMult) : nukeDmg;
+              enemy.hp -= damage;
+              enemy.setTintFill(0xffffff);
+              this.time.delayedCall(50, () => { if (enemy.active) enemy.clearTint(); });
+
+              if (enemy.hp <= 0) {
+                this.pState.score += enemy.eType.score;
+                this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, enemy.isBoss ? 150 : 25);
+                if (Math.random() < 0.2 && !enemy.isBoss) {
+                  const roll = Math.random();
+                  let pType = 'powerup_hp';
+                  if (roll < 0.25) pType = 'powerup_freeze';
+                  else if (roll < 0.5) pType = 'powerup_speed';
+                  else if (roll < 0.75) pType = 'powerup_ammo';
+                  else if (roll < 0.85) pType = 'powerup_nuke';
+                  this.powerups.create(enemy.x + Phaser.Math.Between(-40, 40), enemy.y + Phaser.Math.Between(-40, 40), pType);
+                } else if (Math.random() < 0.1 || enemy.isBoss) {
+                  for (let i = 0; i < (enemy.isBoss ? 6 : 2); i++) {
+                    this.powerups.create(enemy.x + Phaser.Math.Between(-40, 40), enemy.y + Phaser.Math.Between(-40, 40), 'powerup_hp');
+                  }
+                }
+                enemy.destroy();
+                this.updateDOM();
+              }
+            }
+          });
+        }
+        _bossAoeHit(x, y, radius, damage) {
+          this.spawnParticles(x, y, 0xff4020, 30);
+          this.cameras.main.flash(120, 255, 100, 30, true);
+          this.cameras.main.shake(200, 0.012);
+          if (Phaser.Math.Distance.Between(x, y, this.player.x, this.player.y) <= radius) {
+            if (this.pState.invincible > 0 || this.pState.isDashing) return;
+
+            if (this.pState.shieldActive) {
+              this.pState.shieldHp -= damage;
+              if (this.pState.shieldHp <= 0) {
+                this.pState.shieldActive = false;
+                this.playSfx(80, 'sawtooth', 0.4);
+                this.logFeed('SHIELD SHATTERED');
+                this.pState.hp += this.pState.shieldHp;
+              }
+              this.updateDOM();
+              if (this.pState.hp <= 0) this.gameOver();
+              return;
+            }
+
+            this.pState.hp -= damage;
+            this.pState.invincible = 600;
+            this.flashRect.fillColor = 0xff0000;
+            this.flashRect.setAlpha(0.4);
+            this.tweens.add({ targets: this.flashRect, alpha: 0, duration: 300 });
+            this.spawnParticles(this.player.x, this.player.y, 0xff4060, 20);
+            this.updateDOM();
+            if (this.pState.hp <= 0) this.gameOver();
+          }
+        }
+        hitEnemyEcho(bullet, enemy) {
+          if (!bullet.active || !enemy.active) return;
+          bullet.destroy();
+          enemy.hp -= 0.5;
+          enemy.setTintFill(0xa080ff);
+          this.time.delayedCall(50, () => { if (enemy.active) enemy.clearTint(); });
+          if (enemy.hp <= 0) {
+            this.pState.score += enemy.eType.score;
+            this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, 15);
+            enemy.destroy();
+            this.updateDOM();
+          }
+        }
+        hitPlayer(player, enemy) {
+          if (this.pState.hp <= 0) return;
+          if (this.pState.invincible > 0 || this.pState.isDashing) return;
+          this.playSfx(120, 'sawtooth', 0.2);
+
+          const dmg = (enemy.isBoss ? 30 : 15) * (1 + (this.gState.level * 0.2));
+          this.cameras.main.shake(200, 0.01);
+
+          if (this.pState.shieldActive) {
+            this.pState.shieldHp -= dmg;
+            if (this.pState.shieldHp <= 0) {
+              this.pState.shieldActive = false;
+              this.logFeed('SHIELD SHATTERED');
+              this.pState.hp += this.pState.shieldHp;
+            }
+            this.pState.invincible = 800;
+            this.updateDOM();
+            if (this.pState.hp <= 0) this.gameOver();
+            return;
+          }
+
+          this.pState.hp -= dmg;
+          this.pState.invincible = 800;
+          this.flashRect.fillColor = 0xff0000;
+          this.flashRect.setAlpha(0.3);
+          this.tweens.add({ targets: this.flashRect, alpha: 0, duration: 300 });
+          this.spawnParticles(player.x, player.y, 0xff4060, 20);
+          this.updateDOM();
+          if (this.pState.hp <= 0) this.gameOver();
+        }
+        hitPlayerBossProj(player, bullet) {
+          if (this.pState.hp <= 0 || !bullet.active) return;
+          if (bullet.isRocket) {
+            bullet.destroy();
+            this._bossAoeHit(bullet.x, bullet.y, 160, 25);
+            return;
+          }
+          bullet.destroy();
+          if (this.pState.invincible > 0 || this.pState.isDashing) return;
+
+          const dmg = 20 * (1 + (this.gState.level * 0.2));
+          this.cameras.main.shake(200, 0.01);
+
+          if (this.pState.shieldActive) {
+            this.pState.shieldHp -= dmg;
+            if (this.pState.shieldHp <= 0) {
+              this.pState.shieldActive = false;
+              this.logFeed('SHIELD SHATTERED');
+              this.pState.hp += this.pState.shieldHp;
+            }
+            this.pState.invincible = 800;
+            this.updateDOM();
+            if (this.pState.hp <= 0) this.gameOver();
+            return;
+          }
+
+          this.pState.hp -= dmg;
+          this.pState.invincible = 800;
+          this.flashRect.fillColor = 0xff0000;
+          this.flashRect.setAlpha(0.3);
+          this.tweens.add({ targets: this.flashRect, alpha: 0, duration: 300 });
+          this.spawnParticles(player.x, player.y, 0xff4060, 20);
+          this.updateDOM();
+          if (this.pState.hp <= 0) this.gameOver();
+        }
+        collectPowerup(player, powerup) {
+          if (!powerup.active) return;
+          const key = powerup.texture.key;
+          powerup.destroy();
+          this.playSfx(key === 'powerup_nuke' ? 900 : 800, key === 'powerup_nuke' ? 'sawtooth' : 'sine', key === 'powerup_nuke' ? 0.3 : 0.15);
+          if (key === 'powerup_freeze') {
+            this.logFeed('RIFT OVERRIDE: CRYOGENIC FREEZE ACTIVATED');
+            this.enemies.getChildren().forEach(enemy => {
+              if (enemy.active) {
+                enemy.isFrozen = true;
+                this.time.delayedCall(4000, () => {
+                  if (enemy.active) {
+                    enemy.isFrozen = false;
+                    enemy.clearTint();
+                  }
+                });
+              }
+            });
+          } else if (key === 'powerup_ammo') {
+            this.pState.infiniteAmmo = 10000;
+            this.logFeed('OVERRIDE: INFINITE AMMO (10s)');
+          } else if (key === 'powerup_speed') {
+            this.pState.speedBoost = 10000;
+            this.logFeed('OVERRIDE: SPEED BOOST (10s)');
+          } else if (key === 'powerup_shield') {
+            this.pState.shieldActive = true;
+            this.pState.shieldHp = this.pState.shieldMaxHp;
+            this.logFeed('OVERRIDE: KINETIC SHIELD DEPLOYED');
+          } else if (key === 'powerup_nuke') {
+            this.pState.weapons['nuke'].ammo = 1;
+            this.pState.currentWeapon = 'nuke';
+            this.pState.ammo = 1;
+            this.pState.maxAmmo = 1;
+            document.querySelectorAll('.wpn-btn').forEach(b => b.classList.remove('active'));
+            this.logFeed('TACTICAL NUKE ARMED');
+          } else {
+            this.pState.hp = Math.min(this.pState.maxHp, this.pState.hp + 25);
+            this.logFeed('Integrity Restored +25');
+          }
+          this.updateDOM();
+        }
+        collectHealCircle(player, circle) {
+          if (!circle.active) return;
+          circle.destroy();
+          this.playSfx(650, 'sine', 0.15);
+          this.pState.hp = Math.min(this.pState.maxHp, this.pState.hp + 35);
+          this.logFeed('HEAL ENFORCED: Integrity Buffed +35');
+          this.updateDOM();
+        }
+        spawnParticles(x, y, tint = 0xffffff, count = 15) {
+          if (!this.pEmitters) this.pEmitters = {};
+
+          if (!this.pEmitters[tint] || !this.pEmitters[tint].active) {
+            this.pEmitters[tint] = this.add.particles(0, 0, 'particle', {
+              speed: { min: -150, max: 150 },
+              lifespan: 400,
+              scale: { start: 1, end: 0 },
+              alpha: { start: 1, end: 0 },
+              tint: tint,
+              emitting: false
+            });
+            this.pEmitters[tint].setDepth(2000);
+          }
+
+          this.pEmitters[tint].explode(count, x, y);
+        }
+        shiftPhase() {
+          this.gState.phase = (this.gState.phase + 1) % 4;
+          if (this.gState.phase === 0) this.gState.level++;
+          this.gState.phaseTimer = 60;
+          this.gState.spawnedThisPhase = 0;
+          this.gState.isBossPhase = (this.gState.phase === 3);
+          this.gState.bossSpawned = false;
+          this.cameras.main.shake(400, 0.015);
+          const colors = [0x80b0ff, 0xff8060, 0x60ff90, 0xff3050];
+          this.flashRect.fillColor = colors[this.gState.phase];
+          this.flashRect.setAlpha(0.4);
+          this.tweens.add({ targets: this.flashRect, alpha: 0, duration: 800 });
+          this.generateMap();
+          this.logFeed(`PHASE SHIFT: ${this.gState.phaseNames[this.gState.phase]}`);
+          if (this.gState.phase === 1) {
+            this.pState.hp = Math.min(this.pState.maxHp, this.pState.hp + 15);
+            this.logFeed('Stabilize Bonus: +15 HP');
+          }
+          this.pState.echoCharges = this.pState.maxEchoCharges;
+          this.updateDOM();
+        }
+        updateDOM() {
+          const hp = Math.max(0, Math.ceil(this.pState.hp));
+          const hpPct = Math.max(0, (this.pState.hp / this.pState.maxHp) * 100);
+          document.getElementById('hud-hp').innerText = hp;
+          document.getElementById('hud-shards').innerText = this.pState.shards;
+          document.getElementById('hud-score').innerText = this.pState.score;
+          document.getElementById('hud-level').innerText = this.gState.level;
+          const bar = document.getElementById('hp-bar');
+          bar.style.width = `${hpPct}%`;
+          bar.style.background = hpPct > 50 ? '#60ff90' : hpPct > 25 ? '#ffcc40' : '#ff4060';
+          const hpVal = document.getElementById('hud-hp');
+          hpVal.className = `hud-val${hpPct <= 25 ? ' danger' : ''}`;
+
+          const shieldContainer = document.getElementById('hud-shield-container');
+          if (this.pState.shieldActive) {
+            shieldContainer.style.display = 'block';
+            const sHp = Math.max(0, Math.ceil(this.pState.shieldHp));
+            document.getElementById('hud-shield-hp').innerText = sHp;
+            document.getElementById('shield-bar').style.width = `${Math.max(0, (this.pState.shieldHp / this.pState.shieldMaxHp) * 100)}%`;
+          } else {
+            shieldContainer.style.display = 'none';
+          }
+
+          const badge = document.getElementById('phase-badge');
+          badge.innerText = this.gState.phaseNames[this.gState.phase];
+          badge.className = `phase-badge ${this.gState.phaseClasses[this.gState.phase]}`;
+          let pips = '';
+          for (let i = 0; i < this.pState.maxEchoCharges; i++) {
+            pips += `<span class="echo-pip ${i < this.pState.echoCharges ? 'active' : 'inactive'}"></span>`;
+          }
+          document.getElementById('echo-pips').innerHTML = pips;
+        }
+        applyShopUpgrades() {
+          const _upg = window._rrShopUpgrades || { moreHp: 0, moreEchoes: 0, betterShield: 0 };
+          const newMaxHp = 100 + (_upg.moreHp * 50);
+          const newMaxEcho = 3 + _upg.moreEchoes;
+          const newShieldMax = 100 + (_upg.betterShield * 50);
+
+          if (newMaxHp > this.pState.maxHp) {
+            this.pState.hp += (newMaxHp - this.pState.maxHp);
+            this.pState.maxHp = newMaxHp;
+          }
+
+          if (newMaxEcho > this.pState.maxEchoCharges) {
+            this.pState.echoCharges += (newMaxEcho - this.pState.maxEchoCharges);
+            this.pState.maxEchoCharges = newMaxEcho;
+          }
+
+          if (newShieldMax > this.pState.shieldMaxHp) {
+            if (this.pState.shieldActive) {
+              this.pState.shieldHp += (newShieldMax - this.pState.shieldMaxHp);
+            }
+            this.pState.shieldMaxHp = newShieldMax;
+          }
+
+          this.updateDOM();
+        }
+        logFeed(msg) {
+          const kf = document.getElementById('kill-feed');
+          const el = document.createElement('div');
+          el.className = 'kf-item';
+          el.innerText = msg;
+          kf.appendChild(el);
+          setTimeout(() => el.remove(), 2500);
+        }
+        gameOver() {
+          this.playSfx(200, 'sawtooth', 1.2);
+          this.gState.isPlaying = false;
+          this.isShooting = false;
+          this.physics.pause();
+          document.querySelectorAll('.wpn-btn').forEach(b => b.classList.remove('active'));
+          document.getElementById('wpn-zapper').classList.add('active');
+          const ov = document.getElementById('rr-overlay');
+          if (!isFinite(this.pState.shards) || this.pState.shards < 0) {
+            this.pState.shards = window._rrShardCache ?? 0;
+          }
+          const earnedShards = Math.floor(this.pState.score / 100);
+          this.pState.shards += earnedShards;
+          window._rrShardCache = this.pState.shards;
+          localStorage.setItem('rr_shards', this.pState.shards);
+
+          if (typeof window._rrResetRunUpgrades === 'function') {
+            window._rrResetRunUpgrades();
+          }
+
+          ov.innerHTML = `
+            <div style="font-size:14px;letter-spacing:4px;color:#7060cc;">${NS}</div>
+            <h1 style="color:#ff6060;text-shadow:0 0 20px rgba(255,96,96,0.5);">SIGNAL LOST</h1>
+            <div style="font-size:18px;color:#9080cc;margin:10px 0;">Final Score: <span style="color:#fff;font-size:32px;font-weight:bold;">${this.pState.score}</span></div>
+            <div style="font-size:16px;color:#00ffff;margin-bottom:10px;text-shadow:0 0 10px rgba(0,255,255,0.5);">💎 +${earnedShards} SHARDS MERGED (Vault: ${this.pState.shards})</div>
+            <div style="font-size:12px;color:#5040aa;">Phase Reached: ${this.gState.phaseNames[this.gState.phase]}</div>
+            <button id="start-btn" style="margin-top:20px;">REBOOT SYSTEM</button>
+          `;
+          ov.style.display = 'flex';
+          document.getElementById('rr-hud').style.display = 'none';
+          document.getElementById('rr-bottom').style.display = 'none';
+          document.getElementById('ammo-counter').style.display = 'none';
+          document.getElementById('weapon-panel').style.display = 'none';
+          document.getElementById('boss-hud-hp').style.display = 'none';
+          document.getElementById('enemy-hud-count').style.display = 'none';
+          document.getElementById('start-btn').addEventListener('click', () => RiftRun.reboot(this));
+        }
+        update(time, delta) {
+          if (!this.gState.isPlaying) return;
+
+          const currentEnemies = this.enemies.getLength();
+          if (this.pState.echoRechargeTimers.length > 0) {
+            for (let i = this.pState.echoRechargeTimers.length - 1; i >= 0; i--) {
+              this.pState.echoRechargeTimers[i] -= delta;
+              if (this.pState.echoRechargeTimers[i] <= 0) {
+                this.pState.echoRechargeTimers.splice(i, 1);
+                if (this.pState.echoCharges < this.pState.maxEchoCharges) {
+                  this.pState.echoCharges++;
+                  this.updateDOM();
+                }
+              }
+            }
+          }
+          document.getElementById('enemy-curr-val').innerText = currentEnemies;
+          document.getElementById('enemy-limit-val').innerText = this.gState.isBossPhase ? '1' : this.gState.spawnLimit;
+
+          if (!this.gState.isBossPhase) {
+            this.gState.phaseTimer -= delta / 1000;
+            document.getElementById('shift-timer').innerText = Math.max(0, this.gState.phaseTimer).toFixed(1) + 's';
+          } else {
+            document.getElementById('shift-timer').innerText = 'ANOMALY DETECTED';
+          }
+          if (!this.gState.isBossPhase && this.gState.phaseTimer <= 0) {
+            this.shiftPhase();
+          } else if (!this.gState.isBossPhase && this.gState.spawnedThisPhase >= this.gState.spawnLimit && this.enemies.getLength() === 0) {
+            this.pState.shards += 100;
+            window._rrShardCache = this.pState.shards;
+            this.logFeed('PHASE CLEARED EARLY: +100 SHARDS 💎');
+            this.shiftPhase();
+          }
+          if (this.gState.isBossPhase) {
+            if (!this.gState.bossSpawned) {
+              this.spawnBoss();
+              this.gState.bossSpawned = true;
+            }
+
+            const bossNode = this.enemies.getChildren().find(e => e.isBoss && e.active);
+            const bossHud = document.getElementById('boss-hud-hp');
+            if (bossNode) {
+              bossHud.style.display = 'block';
+              document.getElementById('boss-hp-val').innerText = Math.max(0, Math.ceil(bossNode.hp));
+              document.getElementById('boss-max-hp-val').innerText = Math.ceil(bossNode.maxHp);
+            } else {
+              bossHud.style.display = 'none';
+            }
+
+            if (this.gState.bossSpawned && this.enemies.getLength() === 0) {
+              const bossShards = Phaser.Math.Between(100, 300);
+              this.pState.shards += bossShards;
+              window._rrShardCache = this.pState.shards;
+              this.logFeed(`BOSS DEFEATED: +${bossShards} SHARDS 💎`);
+              this.shiftPhase();
+            }
+          } else {
+            document.getElementById('boss-hud-hp').style.display = 'none';
+          }
+          if (this.pState.infiniteAmmo > 0) this.pState.infiniteAmmo -= delta;
+          if (this.pState.speedBoost > 0) this.pState.speedBoost -= delta;
+
+          if (this.pState.shieldActive) {
+            this.shieldSprite.setVisible(true);
+            this.shieldSprite.setPosition(this.player.x, this.player.y);
+          } else {
+            this.shieldSprite.setVisible(false);
+          }
+
+          let vx = 0, vy = 0;
+          if (this.pState.mindControlled) {
+            vx = 0;
+            vy = 0;
+            if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE)) {
+              this.pState.spaceSpamCount++;
+              if (this.pState.spaceSpamCount >= 5) {
+                this.pState.mindControlled = false;
+                this.pState.mcBoss.isMindControlling = false;
+                this.pState.mcBoss.mcDrainTimer = 0;
+                this.pState.mcBoss.body.setVelocity(0, 0);
+                this.pState.mcBoss.clearTint();
+                this.pState.mcBoss.isDashing = false;
+                this.mcText.setVisible(false);
+                this.flashRect.setAlpha(0);
+                this.logFeed('MIND CONTROL BROKEN – POISON CLEANSED');
+              }
+            }
+          } else {
+            if (this.keys.W.isDown) vy = -1;
+            if (this.keys.S.isDown) vy = 1;
+            if (this.keys.A.isDown) vx = -1;
+            if (this.keys.D.isDown) vx = 1;
+          }
+          if (vx !== 0 && vy !== 0) { vx *= 0.7071; vy *= 0.7071; }
+          if (this.pState.dashCooldown > 0) this.pState.dashCooldown -= delta;
+          if (
+            Phaser.Input.Keyboard.JustDown(this.keys.SPACE) &&
+            this.pState.dashCooldown <= 0 &&
+            (vx !== 0 || vy !== 0)
+          ) {
+            this.pState.isDashing = true;
+            this.pState.dashCooldown = 1500;
+            this.time.delayedCall(200, () => { this.pState.isDashing = false; });
+            this.playSfx(1000, 'sine', 0.1);
+            this.spawnParticles(this.player.x, this.player.y, 0xc8b8ff, 10);
+            this.cameras.main.shake(100, 0.005);
+          }
+          const baseS = this.pState.speedBoost > 0 ? this.pState.speed * 1.5 : this.pState.speed;
+          const currentSpeed = this.pState.isDashing ? this.pState.dashSpeed : baseS;
+          this.player.setVelocity(vx * currentSpeed, vy * currentSpeed);
+          if (!this.pState.mindControlled) {
+            const pointer = this.input.activePointer;
+            this.player.rotation = Phaser.Math.Angle.Between(
+              this.player.x, this.player.y, pointer.worldX, pointer.worldY
+            );
+          }
+          const aimEnd = this._getAimLineEnd(this.player.x, this.player.y, this.player.rotation, 500);
+          const aimStart = {
+            x: this.player.x + Math.cos(this.player.rotation) * 24,
+            y: this.player.y + Math.sin(this.player.rotation) * 24
+          };
+          this.aimLine.clear();
+          this.aimLine.lineStyle(2, 0xc8b8ff, 0.35);
+          this.aimLine.beginPath();
+          this.aimLine.moveTo(aimStart.x, aimStart.y);
+          this.aimLine.lineTo(aimEnd.x, aimEnd.y);
+          this.aimLine.strokePath();
+          this.aimLine.fillStyle(0xc8b8ff, 0.6);
+          this.aimLine.fillCircle(aimEnd.x, aimEnd.y, 3);
+          if (Phaser.Input.Keyboard.JustDown(this.keys.E)) this.deployEcho();
+          if (Phaser.Input.Keyboard.JustDown(this.keysWpn.ONE)) window.switchWpn('zapper');
+          if (Phaser.Input.Keyboard.JustDown(this.keysWpn.TWO)) window.switchWpn('shotgun');
+          if (Phaser.Input.Keyboard.JustDown(this.keysWpn.THREE)) window.switchWpn('bazooka');
+          if (Phaser.Input.Keyboard.JustDown(this.keysWpn.FOUR)) window.switchWpn('grenade');
+          if (
+            Phaser.Input.Keyboard.JustDown(this.keys.R) &&
+            !this.pState.reloading &&
+            this.pState.ammo < this.pState.maxAmmo
+          ) this.startReload();
+          const ammoCounter = document.getElementById('ammo-counter');
+          const pipsRow = document.getElementById('ammo-pips-row');
+
+          if (this.pState.reloading) {
+            this.pState.reloadTimer -= delta;
+            if (this.pState.reloadTimer <= 0) {
+              this.pState.reloading = false;
+              this.playSfx(700, 'sine', 0.1);
+              this.pState.ammo = this.pState.maxAmmo;
+              ammoCounter.dataset.prevAmmo = this.pState.maxAmmo;
+              this.logFeed('Ammo Replenished');
+            }
+          } else {
+            if (this.pState.shootCooldown > 0) this.pState.shootCooldown -= delta;
+            if (this.isShooting && this.pState.shootCooldown <= 0 && this.input.activePointer.isDown && !this.pState.mindControlled) this.shoot();
+          }
+
+          const isLow = !this.pState.reloading && this.pState.ammo > 0 && (this.pState.ammo / this.pState.maxAmmo) <= 0.25;
+          ammoCounter.classList.toggle('reloading', this.pState.reloading);
+          ammoCounter.classList.toggle('low-ammo', isLow);
+
+          if (this.pState.reloading) {
+            if (!document.getElementById('ammo-reload-text')) {
+              pipsRow.innerHTML = '<div id="ammo-reload-text">RELOADING...</div>';
+            }
+          } else {
+            const prevAmmo = parseInt(ammoCounter.dataset.prevAmmo ?? this.pState.maxAmmo);
+            const justReloaded = prevAmmo === 0 && this.pState.ammo === this.pState.maxAmmo;
+            const justFired = !justReloaded && this.pState.ammo < prevAmmo;
+            ammoCounter.dataset.prevAmmo = this.pState.ammo;
+
+            let pips = '';
+            for (let i = 0; i < this.pState.maxAmmo; i++) {
+              const filled = i < this.pState.ammo;
+              const fired = justFired && i === this.pState.ammo;
+              const low = filled && isLow;
+              let cls = 'ammo-pip';
+              if (!filled) cls += fired ? ' just-fired' : ' empty';
+              else if (low) cls += ' low';
+              pips += `<span class="${cls}"></span>`;
+            }
+            pipsRow.innerHTML = pips;
+
+            if (justReloaded) {
+              document.querySelectorAll('#ammo-pips-row .ammo-pip').forEach((pip, i) => {
+                pip.classList.add('refill-pop');
+                pip.style.animationDelay = `${i * 25}ms`;
+              });
+            }
+          }
+          if (this.pState.invincible > 0) {
+            this.pState.invincible -= delta;
+            this.player.setAlpha((Math.floor(time / 100) % 2 === 0) ? 0.5 : 1);
+          } else {
+            this.player.setAlpha(1);
+          }
+          if (!this.pState.isDashing) {
+            this.gState.history.unshift({ x: this.player.x, y: this.player.y, r: this.player.rotation, isShooting: this.isShooting, weapon: this.pState.currentWeapon });
+            if (this.gState.history.length > 300) this.gState.history.pop();
+          }
+          this.gState.enemySpawnTimer -= delta;
+          if (this.gState.enemySpawnTimer <= 0) {
+            this.spawnEnemy();
+            this.gState.enemySpawnRate = Math.max(500, 2000 - (this.pState.score / 5));
+            const mult = this.gState.phase === 2 ? 3 : this.gState.phase === 1 ? 2 : 1;
+            this.gState.enemySpawnTimer = this.gState.enemySpawnRate / mult;
+          }
+          this.enemies.getChildren().forEach(enemy => {
+            const targetAngle = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.player.x, this.player.y);
+            if (enemy.pathRecalcTimer === undefined) enemy.pathRecalcTimer = 0;
+            enemy.pathRecalcTimer -= delta;
+            const hasLOS = this._hasLineOfSight(enemy.x, enemy.y, this.player.x, this.player.y);
+            if (hasLOS) {
+              enemy.path = null;
+            } else if (enemy.pathRecalcTimer <= 0) {
+              enemy.path = this._findPath(enemy.x, enemy.y, this.player.x, this.player.y);
+              enemy.pathIndex = 0;
+              enemy.pathRecalcTimer = Phaser.Math.Between(500, 900);
+            }
+            let finalAngle = targetAngle;
+            if (enemy.path && enemy.path.length > 0) {
+              if (enemy.pathIndex >= enemy.path.length) enemy.pathIndex = enemy.path.length - 1;
+              let wp = enemy.path[enemy.pathIndex];
+              if (Phaser.Math.Distance.Between(enemy.x, enemy.y, wp.x, wp.y) < 36) {
+                enemy.pathIndex++;
+                wp = enemy.path[enemy.pathIndex] || wp;
+              }
+              finalAngle = Phaser.Math.Angle.Between(enemy.x, enemy.y, wp.x, wp.y);
+            }
+            if (enemy.isBoss) {
+              const dist = Phaser.Math.Distance.Between(enemy.x, enemy.y, this.player.x, this.player.y);
+
+              if (enemy.mcCooldown > 0) enemy.mcCooldown -= delta;
+              if (enemy.mcCooldown <= 0 && dist < 800 && !enemy.isMindControlling && !enemy.isFrozen && !enemy.isDashing) {
+                enemy.mcCooldown = 60000;
+                if (Math.random() < 0.5) {
+                  enemy.isMindControlling = true;
+                  this.pState.mindControlled = true;
+                  this.pState.spaceSpamCount = 0;
+                  this.pState.mcBoss = enemy;
+                  this.mcText.setVisible(true);
+                  this.flashRect.fillColor = 0xff0000;
+                  this.flashRect.setAlpha(0.6);
+                  this.logFeed('CRITICAL: MIND CONTROL LINK ESTABLISHED');
+                }
+              }
+
+              if (enemy.isMindControlling) {
+                enemy.body.setVelocity(0, 0);
+                enemy.isDashing = false;
+                enemy.clearTint();
+
+                this.flashRect.setAlpha((Math.floor(time / 150) % 2 === 0) ? 0.3 : 0.6);
+
+                if (enemy.mcDrainTimer <= 0) {
+                  if (!this.pState.isDashing && this.pState.invincible <= 0) {
+                    const dotDamage = 8 * (1 + (this.gState.level * 0.2));
+                    if (this.pState.shieldActive) {
+                      this.pState.shieldHp -= dotDamage;
+                      if (this.pState.shieldHp <= 0) {
+                        this.pState.shieldActive = false;
+                        this.logFeed('SHIELD SHATTERED');
+                        this.pState.hp += this.pState.shieldHp;
+                      }
+                    } else {
+                      this.pState.hp -= dotDamage;
+                    }
+                    this.pState.invincible = 200;
+                    this.spawnParticles(this.player.x, this.player.y, 0xff4060, 8);
+                    this.updateDOM();
+                    if (this.pState.hp <= 0) this.gameOver();
+                    this.flashRect.fillColor = 0xff0000;
+                    this.flashRect.setAlpha(0.5);
+                    this.tweens.add({ targets: this.flashRect, alpha: 0, duration: 200 });
+                  }
+                  enemy.mcDrainTimer = 800;
+                } else {
+                  enemy.mcDrainTimer -= delta;
+                }
+
+                return;
+              }
+
+              enemy.quirkTimer -= delta;
+              if (enemy.quirkTimer <= 0) {
+                enemy.quirk = Phaser.Math.RND.pick(['single', 'single', 'shotgun', 'bazooka', 'grenade']);
+                enemy.quirkTimer = Phaser.Math.Between(4000, 7000);
+                this.logFeed(`ANOMALY SHIFT: ${enemy.quirk.toUpperCase()} MODE`);
+              }
+
+              enemy.shootCooldown -= delta;
+              if (enemy.shootCooldown <= 0 && dist < 900 && !enemy.isFrozen && !enemy.isDashing) {
+                const bAng = targetAngle;
+                if (enemy.quirk === 'single') {
+                  this._makeBullet(this.bossBullets, enemy.x, enemy.y, 'boss_bullet', bAng, 460);
+                  enemy.shootCooldown = 600;
+                } else if (enemy.quirk === 'shotgun') {
+                  [-0.15, -0.07, 0, 0.07, 0.15].forEach(s => {
+                    this._makeBullet(this.bossBullets, enemy.x, enemy.y, 'boss_bullet', targetAngle + s, 400);
+                  });
+                  this.cameras.main.shake(120, 0.008);
+                  enemy.shootCooldown = 1200;
+                } else if (enemy.quirk === 'bazooka') {
+                  const rocket = this._makeBullet(this.bossBullets, enemy.x, enemy.y, 'rocket', bAng, 520);
+                  rocket.isRocket = true;
+                  this.cameras.main.shake(180, 0.012);
+                  enemy.shootCooldown = 1800;
+                } else if (enemy.quirk === 'grenade') {
+                  const gren = this._makeBullet(this.bossBullets, enemy.x, enemy.y, 'grenade', bAng, 340);
+                  gren.isGrenade = true;
+                  this.time.delayedCall(1500, () => {
+                    if (gren.active) {
+                      this._bossAoeHit(gren.x, gren.y, 150, 22);
+                      gren.destroy();
+                    }
+                  });
+                  enemy.shootCooldown = 1600;
+                }
+              }
+
+              enemy.dashCooldown -= delta;
+              if (enemy.dashCooldown <= 0 && !enemy.isFrozen && !enemy.isDashing) {
+                enemy.isDashing = true;
+                enemy.body.setVelocity(Math.cos(targetAngle) * 620, Math.sin(targetAngle) * 620);
+                enemy.setTint(0xff6600);
+                this.logFeed('ANOMALY: SURGE INCOMING');
+                this.cameras.main.shake(200, 0.01);
+                this.time.delayedCall(320, () => {
+                  if (enemy.active) { enemy.isDashing = false; enemy.clearTint(); }
+                });
+                enemy.dashCooldown = Phaser.Math.Between(5000, 9000);
+              }
+
+              enemy.teleportCooldown -= delta;
+              if (enemy.teleportCooldown <= 0 && !enemy.isFrozen) {
+                let tx, ty, safety = 0;
+                do {
+                  const ang = Phaser.Math.FloatBetween(0, Math.PI * 2);
+                  const rng = Phaser.Math.Between(280, 580);
+                  tx = Phaser.Math.Clamp(this.player.x + Math.cos(ang) * rng, 64, this.worldSize - 64);
+                  ty = Phaser.Math.Clamp(this.player.y + Math.sin(ang) * rng, 64, this.worldSize - 64);
+                  safety++;
+                } while (this.wallGrid && this.wallGrid.has(`${Math.floor(tx / 64)},${Math.floor(ty / 64)}`) && safety < 30);
+                this.spawnParticles(enemy.x, enemy.y, 0xff1030, 20);
+                enemy.setPosition(tx, ty);
+                enemy.body.reset(tx, ty);
+                this.spawnParticles(tx, ty, 0xff1030, 20);
+                this.cameras.main.shake(300, 0.015);
+                this.logFeed('ANOMALY: RIFT JUMP DETECTED');
+                enemy.teleportCooldown = Phaser.Math.Between(12000, 18000);
+              }
+            } else if (enemy.hasWeapon) {
+              enemy.shootCooldown -= delta;
+              const dist = Phaser.Math.Distance.Between(enemy.x, enemy.y, this.player.x, this.player.y);
+              if (enemy.shootCooldown <= 0 && dist < 650 && !enemy.isFrozen) {
+                const spread = Phaser.Math.FloatBetween(-enemy.aimSpread, enemy.aimSpread);
+                this._makeBullet(this.bossBullets, enemy.x, enemy.y, 'boss_bullet', targetAngle + spread, 350);
+                enemy.shootCooldown = enemy.aimTier === 'excellent' ? Phaser.Math.Between(1000, 1800) : Phaser.Math.Between(1600, 3000);
+              }
+            }
+            let pushX = 0;
+            let pushY = 0;
+            this.enemies.getChildren().forEach(neighbor => {
+              if (neighbor !== enemy) {
+                const dist = Phaser.Math.Distance.Between(enemy.x, enemy.y, neighbor.x, neighbor.y);
+                if (dist < (enemy.isBoss ? 80 : 48)) {
+                  pushX += enemy.x - neighbor.x;
+                  pushY += enemy.y - neighbor.y;
+                }
+              }
+            });
+            let finalVelX = Math.cos(finalAngle) * enemy.baseSpeed;
+            let finalVelY = Math.sin(finalAngle) * enemy.baseSpeed;
+            if (pushX !== 0 || pushY !== 0) {
+              const mag = Math.sqrt(pushX * pushX + pushY * pushY);
+              finalVelX += (pushX / mag) * (enemy.baseSpeed * 0.6);
+              finalVelY += (pushY / mag) * (enemy.baseSpeed * 0.6);
+            }
+            if (enemy.isFrozen) {
+              finalVelX = 0;
+              finalVelY = 0;
+              enemy.setTint(0x00dfff);
+            } else if (enemy.clearTintLater) {}
+            if (!enemy.isDashing) enemy.body.setVelocity(finalVelX, finalVelY);
+            enemy.rotation = Phaser.Math.Angle.RotateTo(enemy.rotation, targetAngle, 0.1);
+          });
+          this.gState.randomPowerupTimer -= delta;
+          if (this.gState.randomPowerupTimer <= 0) {
+            this.gState.randomPowerupTimer = Phaser.Math.Between(15000, 25000);
+            let sx, sy, s = 0;
+            do {
+              sx = Phaser.Math.Between(64, this.worldSize - 64);
+              sy = Phaser.Math.Between(64, this.worldSize - 64);
+              s++;
+            } while (this.wallGrid && this.wallGrid.has(`${Math.floor(sx / 64)},${Math.floor(sy / 64)}`) && s < 100);
+            const pRoll = Math.random();
+            let pType = 'powerup_shield';
+            if (pRoll < 0.4) pType = 'powerup_speed';
+            else if (pRoll < 0.5) pType = 'powerup_nuke';
+            this.powerups.create(sx, sy, pType);
+          }
+
+          this.gState.healSpawnTimer -= delta;
+          if (this.gState.healSpawnTimer <= 0) {
+            this.gState.healSpawnTimer = Phaser.Math.Between(14000, 22000);
+            let spawnX, spawnY;
+            let safety = 0;
+            do {
+              spawnX = Phaser.Math.Between(64, this.worldSize - 64);
+              spawnY = Phaser.Math.Between(64, this.worldSize - 64);
+              safety++;
+            } while (this.wallGrid && this.wallGrid.has(`${Math.floor(spawnX / 64)},${Math.floor(spawnY / 64)}`) && safety < 100);
+            const hCircle = this.healCircles.create(spawnX, spawnY, 'heal_circle');
+            hCircle.life = 10000;
+          }
+          this.healCircles.getChildren().forEach(circle => {
+            circle.life -= delta;
+            if (circle.life <= 0) {
+              circle.destroy();
+            } else if (circle.life <= 4000) {
+              if (Math.floor(time / 200) % 2 === 0) {
+                circle.setTint(0x555555);
+              } else {
+                circle.clearTint();
+              }
+            }
+          });
+          [...this.echoNodes.getChildren()].forEach(echo => {
+            echo.life -= delta;
+            if (echo.life <= 0) {
+              this.spawnParticles(echo.x, echo.y, 0xa080ff, 10);
+              echo.destroy();
+              return;
+            }
+            if (echo.idx < echo.history.length) {
+              const h = echo.history[echo.idx];
+              echo.x = h.x; echo.y = h.y;
+
+              let echoPushX = 0;
+              let echoPushY = 0;
+              this.echoNodes.getChildren().forEach(otherEcho => {
+                if (otherEcho !== echo) {
+                  const dist = Phaser.Math.Distance.Between(echo.x, echo.y, otherEcho.x, otherEcho.y);
+                  if (dist < 28) {
+                    const angle = dist === 0 ? Math.random() * Math.PI * 2 : Phaser.Math.Angle.Between(otherEcho.x, otherEcho.y, echo.x, echo.y);
+                    echoPushX += Math.cos(angle) * (28 - dist) * 0.5;
+                    echoPushY += Math.sin(angle) * (28 - dist) * 0.5;
+                  }
+                }
+              });
+              echo.x += echoPushX;
+              echo.y += echoPushY;
+
+              let targetEnemy = this.physics.closest(echo, this.enemies.getChildren().filter(e => e.active));
+              let aimAngle = h.r;
+              if (targetEnemy) {
+                aimAngle = Phaser.Math.Angle.Between(echo.x, echo.y, targetEnemy.x, targetEnemy.y);
+              }
+              echo.rotation = aimAngle;
+              if ((h.isShooting && echo.idx % 8 === 0) || echo.idx === 0) {
+                const wpnType = h.weapon || 'zapper';
+                const spawnX = echo.x + Math.cos(aimAngle) * 20;
+                const spawnY = echo.y + Math.sin(aimAngle) * 20;
+                if (wpnType === 'zapper') {
+                  this._makeBullet(this.echoBullets, spawnX, spawnY, 'bullet', aimAngle, 800);
+                } else if (wpnType === 'shotgun') {
+                  [-0.2, -0.1, 0, 0.1, 0.2].forEach(s => {
+                    this._makeBullet(this.echoBullets, spawnX, spawnY, 'bullet', aimAngle + s, 700);
+                  });
+                } else if (wpnType === 'bazooka') {
+                  const proj = this._makeBullet(this.echoBullets, spawnX, spawnY, 'rocket', aimAngle, 500);
+                  proj.isRocket = true;
+                } else if (wpnType === 'grenade') {
+                  const proj = this._makeBullet(this.echoBullets, spawnX, spawnY, 'grenade', aimAngle, 400);
+                  proj.isGrenade = true;
+                  this.time.delayedCall(1000, () => {
+                    if (proj.active) {
+                      this.aoeExplode(proj.x, proj.y, 140, 5);
+                      proj.destroy();
+                    }
+                  });
+                }
+              }
+              echo.idx++;
+            }
+          });
+        }
+      }
+      RiftRun.config = {
+        type: Phaser.AUTO,
+        parent: 'game-container',
+        width: window.innerWidth,
+        height: window.innerHeight,
+        physics: {
+          default: 'arcade',
+          arcade: { debug: false }
+        },
+        scene: [MainScene],
+        scale: {
+          mode: Phaser.Scale.RESIZE,
+          autoCenter: Phaser.Scale.CENTER_BOTH
+        }
+      };
+    })();
+  </script>
+  <script>
+    window.addEventListener('load', () => {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || document.documentElement.clientWidth < 900;
+      if (isMobile) {
+        document.body.innerHTML = '<div id="game-container"></div>';
+        const config = {
+          type: Phaser.AUTO,
+          parent: 'game-container',
+          width: window.innerWidth,
+          height: window.innerHeight,
+          scene: {
+            create: function () {
+              const text = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY,
+                'ERROR: RIFT INSTABILITY\nPC TERMINAL REQUIRED', {
+                fontFamily: 'monospace', fontSize: '24px', color: '#ff6060', align: 'center'
+              }).setOrigin(0.5);
+              this.time.addEvent({
+                delay: 100,
+                callback: () => {
+                  text.setAlpha(Math.random());
+                  text.setPosition(
+                    this.cameras.main.centerX + Phaser.Math.Between(-5, 5),
+                    this.cameras.main.centerY + Phaser.Math.Between(-5, 5)
+                  );
+                },
+                loop: true
+              });
+            }
+          }
+        };
+        new Phaser.Game(config);
+      }
+    })();
+  </script>
+</body>
+</html>

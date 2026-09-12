@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Not Found // NOCTURNE Studios</title>
+    <meta name="theme-color" content="#000000">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        :root {
+            --glass-bg: rgba(12, 12, 18, 0.55);
+            --glass-bg-heavy: rgba(8, 8, 14, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-hover: rgba(255, 255, 255, 0.18);
+            --glass-shine: rgba(255, 255, 255, 0.04);
+            --accent: #7c9ef7;
+            --accent-glow: rgba(124, 158, 247, 0.35);
+            --accent-2: #a78bfa;
+            --accent-2-glow: rgba(167, 139, 250, 0.25);
+            --text-primary: #f0f0f8;
+            --text-secondary: rgba(200, 200, 220, 0.6);
+            --text-muted: rgba(160, 160, 180, 0.4);
+            --surface-hover: rgba(30, 30, 48, 0.7);
+            --blur: blur(20px);
+            --blur-heavy: blur(32px);
+            --radius-pill: 100px;
+        }
+
+        * {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #030308;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, .label { font-family: 'Rajdhani', sans-serif; }
+
+        #bg-canvas {
+            position: fixed; inset: 0;
+            z-index: 0; pointer-events: none; overflow: hidden;
+        }
+
+        .bg-placeholder {
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(124, 158, 247, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(167, 139, 250, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 100% 100% at 50% 50%, #030308 0%, #05050f 100%);
+        }
+
+        .bg-overlay {
+            position: fixed; inset: 0;
+            background: rgba(3, 3, 12, 0.45);
+            z-index: 1; pointer-events: none;
+        }
+
+        .page-wrapper {
+            position: relative; z-index: 2;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center;
+            padding: 32px 16px 48px;
+        }
+
+        .topbar {
+            width: 100%; max-width: 480px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .topbar-brand {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none;
+        }
+
+        .topbar-logo {
+            width: 36px; height: 36px;
+            border-radius: 10px; object-fit: cover;
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .topbar-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px; font-weight: 700;
+            color: var(--text-primary); letter-spacing: 1.5px;
+        }
+
+        .topbar-pill {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--blur);
+            border-radius: var(--radius-pill);
+            padding: 6px 14px;
+            font-size: 11px; font-weight: 600;
+            color: #f87171;
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        .hero-card {
+            width: 100%; max-width: 480px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            backdrop-filter: var(--blur-heavy);
+            padding: 36px 28px 28px;
+            position: relative; overflow: hidden;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            text-align: center;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 0;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 16px; right: 16px; height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255,255,255,0.15) 30%,
+                rgba(255,255,255,0.25) 50%,
+                rgba(255,255,255,0.15) 70%,
+                transparent 100%
+            );
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            top: -40px; left: 50%; transform: translateX(-50%);
+            width: 300px; height: 200px;
+            background: radial-gradient(circle, rgba(248, 113, 113, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .bina-frame {
+            width: 148px; height: 148px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border-hover);
+            overflow: hidden;
+            margin-bottom: 24px;
+            position: relative;
+            box-shadow:
+                0 0 0 6px rgba(124, 158, 247, 0.06),
+                0 8px 32px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+            background: rgba(20, 20, 32, 0.6);
+        }
+
+        .bina-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .bina-frame:hover .bina-img { transform: scale(1.08); }
+
+        .error-code {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase;
+            color: #f87171;
+            margin-bottom: 10px;
+        }
+
+        .error-title {
+            font-size: 32px; font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.1;
+        }
+
+        .error-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            margin-bottom: 28px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 16px;
+            width: 100%;
+        }
+
+        .back-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            color: #080814;
+            padding: 15px 28px;
+            border-radius: var(--radius-pill);
+            text-decoration: none;
+            font-weight: 700; font-size: 15px;
+            letter-spacing: 0.5px;
+            transition: all 0.25s;
+            position: relative; overflow: hidden;
+            box-shadow: 0 4px 24px rgba(124, 158, 247, 0.3);
+        }
+
+        .back-btn::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(124, 158, 247, 0.45);
+        }
+
+        .back-btn:active { transform: translateY(0); }
+
+        .page-footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .ripple {
+            position: absolute; border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+        @media (min-width: 640px) {
+            .page-wrapper { padding: 48px 24px 64px; }
+            .error-title { font-size: 38px; }
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+        body.reduce-blur * {
+            --blur: blur(0px) !important;
+            --blur-heavy: blur(0px) !important;
+            backdrop-filter: none !important;
+        }
+
+        body.no-anim * {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        .bg-gif {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif') center / cover no-repeat;
+            opacity: 0.5s;
+            pointer-events: none;
+            filter: brightness(0.75) saturate(0.6);
+        }
+        body.no-gif .bg-gif { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="bg-canvas">
+        <div class="bg-placeholder"></div>
+    </div>
+    <div class="bg-overlay"></div>
+
+    <div class="bg-gif"></div>
+    <video id="bg-video" autoplay loop muted playsinline style="display: none; position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.5; pointer-events: none; filter: brightness(0.75) saturate(0.6);"></video>
+
+    <div class="page-wrapper">
+
+        <div class="topbar">
+            <a href="https://nocturnestu.pages.dev" class="topbar-brand">
+                <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png" alt="..." class="topbar-logo">
+                <span class="topbar-name">PRISM</span>
+            </a>
+            <div class="topbar-pill">NOT FOUND</div>
+        </div>
+
+        <div class="hero-card">
+
+            <div class="bina-frame">
+                <img class="bina-img" id="bina-img" src="" alt="Bina">
+            </div>
+
+            <div class="error-code">Error · Not Found</div>
+            <h1 class="error-title">Unavailable</h1>
+
+            <p class="error-desc">
+                Something's definitely missing here. We might be working on it — or not. Check back next time.<br>Bina is also wondering why it's gone.
+            </p>
+
+            <a href="https://nocturnestu.pages.dev" class="back-btn" onclick="createRipple(event)">
+                <i class="material-icons-round" style="font-size:20px;">arrow_back</i>
+                Return
+            </a>
+
+        </div>
+
+        <div class="page-footer">
+            <p>2025–2026 NOCTURNE Studios</p>
+        </div>
+
+    </div>
+
+    <script>
+        const errorGifs = [
+            'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmJhMXVueDBuMDY5eHB6eWdpN3dsMTI4ZWtob3FzOGNkcHBzZWl4ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xElKq0jcERjsYRnKtD/giphy.gif',
+            'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmJhMXVueDBuMDY5eHB6eWdpN3dsMTI4ZWtob3FzOGNkcHBzZWl4ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lpNMOKpm4fwtkwjc07/giphy.gif',
+            'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmJhMXVueDBuMDY5eHB6eWdpN3dsMTI4ZWtob3FzOGNkcHBzZWl4ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/0rJksQ8yiiw2vTHzPb/giphy.gif',
+            'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmJhMXVueDBuMDY5eHB6eWdpN3dsMTI4ZWtob3FzOGNkcHBzZWl4ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ZCYFabe54Y2iDSKGW6/giphy.gif',
+            'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmJhMXVueDBuMDY5eHB6eWdpN3dsMTI4ZWtob3FzOGNkcHBzZWl4ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/gbqPm96y9PmIp2n3hi/giphy.gif',
+            'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmJhMXVueDBuMDY5eHB6eWdpN3dsMTI4ZWtob3FzOGNkcHBzZWl4ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ZCYFabe54Y2iDSKGW6/giphy.gif'
+        ];
+
+        const img = document.getElementById('bina-img');
+        img.src = errorGifs[Math.floor(Math.random() * errorGifs.length)];
+
+        function createRipple(e) {
+            const btn = e.currentTarget;
+            const existing = btn.querySelector('.ripple');
+            if (existing) existing.remove();
+            const circle = document.createElement('span');
+            const d = Math.max(btn.clientWidth, btn.clientHeight);
+            const rect = btn.getBoundingClientRect();
+            circle.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - rect.left - d/2}px;top:${e.clientY - rect.top - d/2}px`;
+            circle.classList.add('ripple');
+            btn.appendChild(circle);
+        }
+    </script>
+    <script>
+        (function syncGlobalSettings() {
+            if (localStorage.getItem('reduce-blur') === 'true') {
+                document.body.classList.add('reduce-blur');
+            }
+            if (localStorage.getItem('no-anim') === 'true') {
+                document.body.classList.add('no-anim');
+            }
+            const savedTheme = localStorage.getItem('prism-theme');
+            if (savedTheme) {
+                const root = document.documentElement;
+                const themes = {
+                    blurple: { primary: '#7c9ef7', secondary: '#a78bfa' },
+                    amber: { primary: '#fbbf24', secondary: '#f59e0b' },
+                    emerald: { primary: '#34d399', secondary: '#10b981' },
+                    ruby: { primary: '#fb7185', secondary: '#e11d48' },
+                    mono: { primary: '#ffffff', secondary: '#a3a3a3' }
+                };
+                const selected = themes[savedTheme] || themes.blurple;
+                root.style.setProperty('--primary', selected.primary);
+                root.style.setProperty('--secondary', selected.secondary);
+                root.style.setProperty('--accent', selected.primary);
+                root.style.setProperty('--accent-2', selected.secondary);
+            }
+            if (localStorage.getItem('bg-gif-enabled') === 'false') {
+                document.body.classList.add('no-gif');
+            }
+        })();
+        (function initGifConnectivity() {
+            function applyGifState(enabled) {
+                if (!enabled || !navigator.onLine) {
+                    document.body.classList.add('no-gif');
+                } else {
+                    if (localStorage.getItem('bg-gif-enabled') !== 'false') {
+                        document.body.classList.remove('no-gif');
+                    }
+                }
+            }
+
+            applyGifState(localStorage.getItem('bg-gif-enabled') !== 'false');
+
+            window.addEventListener('offline', () => applyGifState(false));
+            window.addEventListener('online', () => applyGifState(true));
+        })();
+    </script>
+    <script>
+        (function () {
+            const GIF_PRESETS = {
+                gif1: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif',
+                gif2: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/32o1C0pz7HHC32ShtI/giphy.gif',
+                gif3: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hnq6UBZreLmGvwOtKH/giphy.gif',
+                gif4: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cCCWygFWkpChuiPlWi/giphy.gif',
+                gif5: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/djwyA3ChGKC5VkrmPy/giphy.gif',
+                gif6: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7rdCcxQDPuMgW61B1p/giphy.gif'
+            };
+
+            function applyGifBackground() {
+                const bgGif = document.querySelector('.bg-gif');
+                if (!bgGif) return;
+
+                const isEnabled = localStorage.getItem('bg-gif-enabled') !== 'false';
+                const isOffline = !navigator.onLine;
+                const shouldHide = !isEnabled || isOffline;
+
+                if (shouldHide) {
+                    document.body.classList.add('no-gif');
+                    return;
+                }
+
+                document.body.classList.remove('no-gif');
+
+                const preset = localStorage.getItem('bg-gif-preset') || 'gif1';
+                let gifUrl = '';
+
+                if (preset === 'custom') {
+                    gifUrl = localStorage.getItem('bg-gif-custom-url') || GIF_PRESETS.gif1;
+                } else {
+                    gifUrl = GIF_PRESETS[preset] || GIF_PRESETS.gif1;
+                }
+
+                if (gifUrl) {
+                    bgGif.style.background = `url('${gifUrl}') center / cover no-repeat`;
+                }
+            }
+
+            function handleChange() {
+                applyGifBackground();
+            }
+
+            window.addEventListener('online', handleChange);
+            window.addEventListener('offline', handleChange);
+            window.addEventListener('storage', handleChange);
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', handleChange);
+            } else {
+                handleChange();
+            }
+        })();
+
+        (function () {
+            const DB_NAME = 'PrismVideoCacheDB';
+            const STORE_NAME = 'videos';
+            const KEY = 'custom_bg_video';
+
+            function ensureVideoElement() {
+                let videoEl = document.getElementById('bg-video');
+                if (!videoEl) {
+                    videoEl = document.createElement('video');
+                    videoEl.id = 'bg-video';
+                    videoEl.autoplay = true;
+                    videoEl.loop = true;
+                    videoEl.muted = true;
+                    videoEl.playsInline = true;
+                    Object.assign(videoEl.style, {
+                        position: 'fixed',
+                        inset: '0',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        zIndex: '0',
+                        opacity: '0.5',
+                        pointerEvents: 'none',
+                        filter: 'brightness(0.75) saturate(0.6)',
+                        display: 'none'
+                    });
+                    const bgGif = document.querySelector('.bg-gif');
+                    if (bgGif && bgGif.parentNode) {
+                        bgGif.parentNode.insertBefore(videoEl, bgGif);
+                    } else {
+                        document.body.prepend(videoEl);
+                    }
+                }
+                return videoEl;
+            }
+
+            function openDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(DB_NAME, 1);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains(STORE_NAME)) {
+                            db.createObjectStore(STORE_NAME);
+                        }
+                    };
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function getVideoBlob() {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_NAME, 'readonly');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.get(KEY);
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function syncBackground() {
+                const videoEl = ensureVideoElement();
+                const gifEl = document.querySelector('.bg-gif');
+
+                try {
+                    const blob = await getVideoBlob();
+                    if (blob) {
+                        if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                        videoEl.src = URL.createObjectURL(blob);
+                        videoEl.style.display = 'block';
+                        if (gifEl) gifEl.style.display = 'none';
+                        videoEl.play().catch(() => { });
+                    } else {
+                        if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                        videoEl.removeAttribute('src');
+                        videoEl.style.display = 'none';
+                        if (gifEl && localStorage.getItem('bg-gif-enabled') !== 'false' && navigator.onLine) {
+                            gifEl.style.display = 'block';
+                        }
+                    }
+                } catch (e) {
+                    if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                    videoEl.style.display = 'none';
+                    if (gifEl && localStorage.getItem('bg-gif-enabled') !== 'false' && navigator.onLine) {
+                        gifEl.style.display = 'block';
+                    }
+                }
+            }
+
+            window.addEventListener('storage', syncBackground);
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', syncBackground);
+            } else {
+                syncBackground();
+            }
+        })();
+    </script>
+</body>
+</html>

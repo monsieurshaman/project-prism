@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Is My Computer On?</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --accent-color: #00ff41; /* Hacker Green */
+            --error-color: #ff3333;
+            --button-bg: #333;
+            --button-hover: #444;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 2rem;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background: #222;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            letter-spacing: -1px;
+        }
+
+        button {
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        button:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #log-output {
+            text-align: left;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #888;
+            height: 150px;
+            overflow: hidden;
+            display: none;
+            border-top: 1px dashed #444;
+            padding-top: 10px;
+        }
+
+        .log-line {
+            margin: 5px 0;
+        }
+
+        #final-result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .big-answer {
+            font-size: 5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+            animation: pulse 1s infinite alternate;
+        }
+
+        .sub-text {
+            font-size: 1rem;
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        @keyframes pulse {
+            from { text-shadow: 0 0 10px var(--accent-color); transform: scale(1); }
+            to { text-shadow: 0 0 20px var(--accent-color); transform: scale(1.05); }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1rem;
+            background-color: var(--accent-color);
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Is My Computer Really On?</h1>
+        
+        <div id="controls">
+            <p>Click below to check if it is really ON.</p>
+            <button id="checkBtn">Start Checking</button>
+        </div>
+
+        <div id="log-output"></div>
+
+        <div id="final-result">
+            <div class="big-answer">YES...</div>
+            <div class="sub-text">after sum really boring scans, your computer is legitimately active rn</div>
+            <br>
+            <button onclick="location.reload()" style="font-size: 0.8rem; padding: 0.5rem 1rem;">Check Again?</button>
+        </div>
+    </div>
+
+    <script>
+        const checkBtn = document.getElementById('checkBtn');
+        const controls = document.getElementById('controls');
+        const logOutput = document.getElementById('log-output');
+        const finalResult = document.getElementById('final-result');
+
+        // The "Fake" tasks intended to waste time and look cool
+        const tasks = [
+            "hmm...",
+            "something here...",
+            "okay someone's here...",
+            "checking if it is looking at the page...",
+            "okay it is looking at this...",
+            "runnin' sum checks on stuff idk...",
+            "eh, boring, next...",
+            "found smth...",
+			"okay, the comptuer is really on...",
+            "done wif the boring stuff."
+        ];
+
+        checkBtn.addEventListener('click', () => {
+            // Hide the button, show the log
+            controls.style.display = 'none';
+            logOutput.style.display = 'block';
+
+            let delay = 0;
+            
+            // Loop through tasks and create a fake delay for each
+            tasks.forEach((task, index) => {
+                // Randomize delay slightly to feel "human" and "processed"
+                const randomTime = Math.floor(Math.random() * 2500) + 2500; 
+                delay += randomTime;
+
+                setTimeout(() => {
+                    addLog(task);
+                    
+                    // If it's the last task, show the result
+                    if (index === tasks.length - 1) {
+                        setTimeout(showResult, 500);
+                    }
+                }, delay);
+            });
+        });
+
+        function addLog(text) {
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            div.innerHTML = `> ${text}`;
+            logOutput.appendChild(div);
+            logOutput.scrollTop = logOutput.scrollHeight; // Auto scroll to bottom
+        }
+
+        function showResult() {
+            logOutput.style.display = 'none';
+            finalResult.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">  
+  <g stroke="#4aa3df" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="64" y="80" width="128" height="128" />
+    
+    <rect x="48" y="64" width="128" height="128" />
+    
+    <line x1="64" y1="80" x2="48" y2="64" />
+    <line x1="192" y1="80" x2="176" y2="64" />
+    <line x1="192" y1="208" x2="176" y2="192" />
+    <line x1="64" y1="208" x2="48" y2="192" />
+  </g>
+  
+  <g stroke="#4aa3df" stroke-width="4" fill="none" opacity="0.6">
+    <!-- Front face grid dividers -->
+    <line x1="128" y1="80" x2="128" y2="208" />
+    <line x1="64" y1="144" x2="192" y2="144" />
+  </g>
+  
+  <g fill="#f1c40f">
+    <circle cx="64" cy="80" r="5" />
+    <circle cx="192" cy="80" r="5" />
+    <circle cx="192" cy="208" r="5" />
+    <circle cx="64" cy="208" r="5" />
+  </g>
+</svg>

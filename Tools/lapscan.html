@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LAP·SCAN — Image Sharpness Analyzer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0a0a0f;
+    --surface:   #111118;
+    --card:      #16161f;
+    --border:    #242433;
+    --accent:    #7c5cfc;
+    --accent2:   #c77dff;
+    --cyan:      #00e5ff;
+    --green:     #00e676;
+    --yellow:    #ffea00;
+    --red:       #ff1744;
+    --text:      #e8e8f0;
+    --muted:     #6b6b88;
+    --mono:      'Space Mono', monospace;
+    --sans:      'Space Grotesk', sans-serif;
+  }
+
+  html { background: var(--bg); color: var(--text); font-family: var(--sans); }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent2) 55%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  .sub {
+    font-size: 0.95rem;
+    color: var(--muted);
+    max-width: 440px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 860px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    padding: 56px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.dragging {
+    border-color: var(--accent);
+    background: #111128;
+    transform: scale(1.005);
+  }
+  .drop-zone input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .drop-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .drop-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .drop-hint {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .drop-btn {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 10px 28px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    pointer-events: none;
+  }
+  .drop-zone:hover .drop-btn { opacity: 0.85; }
+
+  #results-section { display: none; flex-direction: column; gap: 24px; }
+
+  .summary-bar {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .stat-chip {
+    flex: 1;
+    min-width: 130px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-chip .label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .stat-chip .val {
+    font-family: var(--mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+  }
+  .result-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+  .card-img-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+    background: #0d0d16;
+  }
+  .card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .card-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .badge-sharp   { background: rgba(0,230,118,0.18); color: var(--green);  border: 1px solid rgba(0,230,118,0.4); }
+  .badge-ok      { background: rgba(255,234,0,0.15);  color: var(--yellow); border: 1px solid rgba(255,234,0,0.35); }
+  .badge-blurry  { background: rgba(255,23,68,0.15);  color: var(--red);    border: 1px solid rgba(255,23,68,0.35); }
+
+  .card-body { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+  .card-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .ring-wrap {
+    flex-shrink: 0;
+    position: relative;
+    width: 60px;
+    height: 60px;
+  }
+  .ring-wrap svg { width: 60px; height: 60px; }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 5; }
+  .ring-fill {
+    fill: none;
+    stroke-width: 5;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1), stroke 0.5s;
+  }
+  .ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .score-info { flex: 1; min-width: 0; }
+  .score-label {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 3px;
+  }
+  .score-verdict { font-size: 0.78rem; color: var(--muted); line-height: 1.4; }
+
+  .metrics { display: flex; flex-direction: column; gap: 7px; }
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+  }
+  .metric-key { color: var(--muted); font-family: var(--mono); }
+  .metric-val { font-family: var(--mono); color: var(--text); font-weight: 700; }
+
+  .var-bar-wrap { margin-top: 4px; }
+  .var-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    font-family: var(--mono);
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .var-bar-track {
+    height: 5px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .var-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+  }
+
+  .heatmap-section { display: flex; flex-direction: column; gap: 6px; }
+  .heatmap-label { font-size: 0.72rem; font-family: var(--mono); color: var(--muted); }
+  .heatmap-canvas {
+    width: 100%;
+    aspect-ratio: 16/10;
+    border-radius: 8px;
+    image-rendering: pixelated;
+    background: #0d0d16;
+  }
+
+  .explainer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+  }
+  .explainer h2 {
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .explainer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .tier {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .tier-head {
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .tier-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .tier-body { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+  .paper-box {
+    margin-top: 22px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .paper-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+  .paper-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .paper-authors {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent2);
+  }
+  .paper-venue {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .paper-body {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-top: 4px;
+    padding: 12px 14px;
+    background: rgba(124,92,252,0.06);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+  }
+
+  .clear-btn {
+    align-self: flex-end;
+    padding: 8px 22px;
+    border-radius: 999px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .clear-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .spinner {
+    display: none;
+    margin: 24px auto;
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ring-fill, .var-bar-fill { transition: none; }
+  }
+
+  .rank-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(10,10,15,0.75);
+    color: var(--muted);
+    padding: 3px 8px;
+    border-radius: 999px;
+    backdrop-filter: blur(4px);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Variance of Laplacian · Edge Detection · Sharpness Analysis</div>
+  <h1>LAP·SCAN</h1>
+  <p class="sub">Upload any images and we'll run a Laplacian Variance analysis to score how sharp or blurry they are — pure client-side, zero uploads to any server.</p>
+</header>
+
+<div class="main">
+
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept="image/*" multiple>
+    <span class="drop-icon">🔬</span>
+    <div class="drop-title">Drop images here</div>
+    <div class="drop-hint">PNG, JPG, WEBP, GIF — up to 20 images at once</div>
+    <div class="drop-btn">Choose files</div>
+  </div>
+
+  <div class="spinner" id="spinner"></div>
+
+  <div id="results-section">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div class="results-grid" id="resultsGrid"></div>
+    <button class="clear-btn" id="clearBtn">✕ Clear all</button>
+  </div>
+
+  <div class="explainer">
+    <h2>How it works</h2>
+    <div class="explainer-grid">
+      <div class="tier">
+        <div class="tier-head"><span class="tier-dot" style="background:#7c5cfc"></span>The Math</div>
+        <div class="tier-body">Image → grayscale → 3×3 Laplacian kernel (2nd-order derivative, kernel: center×4 minus 4 neighbors). Variance of those values = sharpness score. High variance = many strong edges = sharp.</div>
+      </div>
+      <div class="tier">
+        <div class="tier-head"><span class="tier-dot" style="background:#00e676"></span>Sharp ≥ 500</div>
+        <div class="tier-body">Lots of edges, high-intensity pixel transitions. Clear photo, crisp text, detailed scene. Reliable for machine vision and analysis tasks.</div>
+      </div>
+      <div class="tier">
+        <div class="tier-head"><span class="tier-dot" style="background:#ffea00"></span>Okay 100–499</div>
+        <div class="tier-body">Moderate edge content. Usable but imperfect — could be intentional shallow DoF, mild motion blur, or compressed image.</div>
+      </div>
+      <div class="tier">
+        <div class="tier-head"><span class="tier-dot" style="background:#ff1744"></span>Blurry &lt; 100</div>
+        <div class="tier-body">Few edges, flat Laplacian response. Camera shake, defocus, or heavy filtering. Threshold of 100 is the canonical research benchmark — see paper below.</div>
+      </div>
+      <div class="tier">
+        <div class="tier-head"><span class="tier-dot" style="background:#00e5ff"></span>Score 0–100</div>
+        <div class="tier-body">Raw variance mapped to 0–100 via log₁₀ scale, since natural images span 0 to 100,000+. The heatmap visualizes exactly where the Laplacian response is strongest.</div>
+      </div>
+      <div class="tier">
+        <div class="tier-head"><span class="tier-dot" style="background:#c77dff"></span>Edge Heatmap</div>
+        <div class="tier-body">Purple = low Laplacian response (flat/blurry regions). Cyan/bright = high response (sharp edges, fine detail). Instantly reveals where focus landed in your image.</div>
+      </div>
+    </div>
+
+    <div class="paper-box">
+      <div class="paper-label">📄 FOUNDATIONAL PAPER</div>
+      <div class="paper-title">Diatom Autofocusing in Brightfield Microscopy: A Comparative Study</div>
+      <div class="paper-authors">Pech-Pacheco, J.L. · Cristóbal, G. · Chamorro-Martínez, J. · Fernández-Valdivia, J.</div>
+      <div class="paper-venue">Proceedings of the 15th International Conference on Pattern Recognition (ICPR 2000), pp. 3318–3321. IEEE Computer Society. DOI: 10.1109/ICPR.2000.903548</div>
+      <div class="paper-body">
+        Originally developed for autofocusing microscopes used to identify diatoms (single-cell silica algae), this 2000 paper established Variance of Laplacian as a reliable, fast focus measure. The authors showed it outperformed prior methods including Tenengrad on speed, sharpness accuracy, and noise robustness. The threshold of 100 for blur classification emerged from this lineage of research. Today, the exact same algorithm runs in browsers, phone cameras, and production CV pipelines worldwide.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<canvas id="workerCanvas" style="display:none"></canvas>
+
+<script>
+const dropZone   = document.getElementById('dropZone');
+const fileInput  = document.getElementById('fileInput');
+const spinner    = document.getElementById('spinner');
+const resultsSection = document.getElementById('results-section');
+const summaryBar = document.getElementById('summaryBar');
+const resultsGrid = document.getElementById('resultsGrid');
+const clearBtn   = document.getElementById('clearBtn');
+const workerCanvas = document.getElementById('workerCanvas');
+const workerCtx  = workerCanvas.getContext('2d', { willReadFrequently: true });
+
+let allResults = [];
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragging'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragging'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragging');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+clearBtn.addEventListener('click', () => {
+  allResults = [];
+  resultsSection.style.display = 'none';
+  resultsGrid.innerHTML = '';
+  summaryBar.innerHTML = '';
+  fileInput.value = '';
+});
+
+function applyLaplacian(grayData, w, h) {
+  const out = new Float32Array(w * h);
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      const i = y * w + x;
+      const val =
+        4 * grayData[i]
+        - grayData[(y - 1) * w + x]
+        - grayData[(y + 1) * w + x]
+        - grayData[y * w + (x - 1)]
+        - grayData[y * w + (x + 1)];
+      out[i] = val;
+    }
+  }
+  return out;
+}
+
+function computeVariance(arr) {
+  let sum = 0, sumSq = 0, n = arr.length;
+  for (let i = 0; i < n; i++) { sum += arr[i]; sumSq += arr[i] * arr[i]; }
+  const mean = sum / n;
+  return sumSq / n - mean * mean;
+}
+
+function toGray(data, w, h) {
+  const gray = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    const r = data[i * 4], g = data[i * 4 + 1], b = data[i * 4 + 2];
+    gray[i] = 0.299 * r + 0.587 * g + 0.114 * b;
+  }
+  return gray;
+}
+
+function analyzeImage(imgEl) {
+  const MAX_DIM = 1024;
+  let w = imgEl.naturalWidth, h = imgEl.naturalHeight;
+  if (w > MAX_DIM || h > MAX_DIM) {
+    const scale = MAX_DIM / Math.max(w, h);
+    w = Math.round(w * scale);
+    h = Math.round(h * scale);
+  }
+  workerCanvas.width = w;
+  workerCanvas.height = h;
+  workerCtx.drawImage(imgEl, 0, 0, w, h);
+  const imageData = workerCtx.getImageData(0, 0, w, h);
+  const gray = toGray(imageData.data, w, h);
+  const lap = applyLaplacian(gray, w, h);
+  const variance = computeVariance(lap);
+  return { variance, lap, w, h };
+}
+
+function buildHeatmap(lap, w, h) {
+  let maxAbs = 0;
+  for (let i = 0; i < lap.length; i++) {
+    const a = Math.abs(lap[i]);
+    if (a > maxAbs) maxAbs = a;
+  }
+  const hc = document.createElement('canvas');
+  hc.width = w; hc.height = h;
+  const hctx = hc.getContext('2d');
+  const id = hctx.createImageData(w, h);
+  for (let i = 0; i < w * h; i++) {
+    const norm = maxAbs > 0 ? Math.abs(lap[i]) / maxAbs : 0;
+    id.data[i * 4]     = Math.round(norm * 124 + (1 - norm) * 30);
+    id.data[i * 4 + 1] = Math.round(norm * 230 + (1 - norm) * 10);
+    id.data[i * 4 + 2] = Math.round(norm * 255 + (1 - norm) * 80);
+    id.data[i * 4 + 3] = 255;
+  }
+  hctx.putImageData(id, 0, 0);
+  return hc.toDataURL('image/png');
+}
+
+function varianceToScore(v) {
+  if (v <= 0) return 0;
+  const score = (Math.log10(v + 1) / Math.log10(20001)) * 100;
+  return Math.min(100, Math.round(score));
+}
+
+function tierOf(v) {
+  if (v >= 500) return { label: 'SHARP',  badge: 'badge-sharp',  color: '#00e676', text: 'Crisp edges, high detail. Suitable for analysis & processing.' };
+  if (v >= 100) return { label: 'OK',     badge: 'badge-ok',     color: '#ffea00', text: 'Moderate sharpness. Usable but imperfect — mild blur or compression.' };
+  return              { label: 'BLURRY', badge: 'badge-blurry', color: '#ff1744', text: 'Low edge content. Camera shake, defocus, or heavy filtering detected.' };
+}
+
+function fmtVariance(v) {
+  return v < 10 ? v.toFixed(2) : v < 1000 ? v.toFixed(1) : Math.round(v).toLocaleString();
+}
+
+function createCard(result, rank, total) {
+  const { name, src, variance, heatmapSrc } = result;
+  const score = varianceToScore(variance);
+  const tier  = tierOf(variance);
+  const circ  = 2 * Math.PI * 24;
+  const dashOffset = circ - (score / 100) * circ;
+  const barPct = Math.min(100, (Math.log10(variance + 1) / Math.log10(20001)) * 100).toFixed(1);
+
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.innerHTML = `
+    <div class="card-img-wrap">
+      <img src="${src}" alt="${name}" loading="lazy">
+      <span class="rank-badge">#${rank} of ${total}</span>
+      <span class="card-badge ${tier.badge}">${tier.label}</span>
+    </div>
+    <div class="card-body">
+      <div class="card-name" title="${name}">${name}</div>
+      <div class="score-row">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 60 60">
+            <circle class="ring-bg" cx="30" cy="30" r="24"/>
+            <circle class="ring-fill" cx="30" cy="30" r="24"
+              stroke="${tier.color}"
+              stroke-dasharray="${circ.toFixed(2)}"
+              stroke-dashoffset="${circ.toFixed(2)}"
+              data-target="${dashOffset.toFixed(2)}"/>
+          </svg>
+          <div class="ring-text" style="color:${tier.color}">${score}</div>
+        </div>
+        <div class="score-info">
+          <div class="score-label" style="color:${tier.color}">${tier.label}</div>
+          <div class="score-verdict">${tier.text}</div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric-row">
+          <span class="metric-key">LAP.VARIANCE</span>
+          <span class="metric-val">${fmtVariance(variance)}</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-key">THRESHOLD</span>
+          <span class="metric-val">${variance >= 100 ? '✓ PASS' : '✗ FAIL'} @ 100</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-key">SCORE</span>
+          <span class="metric-val">${score}/100</span>
+        </div>
+      </div>
+      <div class="var-bar-wrap">
+        <div class="var-bar-label"><span>0</span><span>Blurry ←→ Sharp</span><span>500+</span></div>
+        <div class="var-bar-track">
+          <div class="var-bar-fill" style="width:0%; background:${tier.color}" data-target="${barPct}%"></div>
+        </div>
+      </div>
+      <div class="heatmap-section">
+        <div class="heatmap-label">EDGE HEATMAP (Laplacian response)</div>
+        <img class="heatmap-canvas" src="${heatmapSrc}" alt="Edge heatmap">
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+function renderSummary(results) {
+  const avg = results.reduce((s, r) => s + r.variance, 0) / results.length;
+  const best = results.reduce((a, b) => a.variance > b.variance ? a : b);
+  const sharpCount = results.filter(r => r.variance >= 500).length;
+  const blurCount  = results.filter(r => r.variance < 100).length;
+  const okCount    = results.filter(r => r.variance >= 100 && r.variance < 500).length;
+  const bestScore  = varianceToScore(best.variance);
+
+  summaryBar.innerHTML = `
+    <div class="stat-chip">
+      <span class="label">Images</span>
+      <span class="val" style="color:var(--accent2)">${results.length}</span>
+    </div>
+    <div class="stat-chip">
+      <span class="label">Avg Variance</span>
+      <span class="val" style="color:var(--cyan)">${fmtVariance(avg)}</span>
+    </div>
+    <div class="stat-chip">
+      <span class="label">Sharp ≥500</span>
+      <span class="val" style="color:var(--green)">${sharpCount} <span style="font-size:0.85rem;opacity:0.6">/ ${results.length}</span></span>
+    </div>
+    <div class="stat-chip">
+      <span class="label">Blurry &lt;100</span>
+      <span class="val" style="color:var(--red)">${blurCount} <span style="font-size:0.85rem;opacity:0.6">/ ${results.length}</span></span>
+    </div>
+    <div class="stat-chip">
+      <span class="label">Best Score</span>
+      <span class="val" style="color:${bestScore >= 63 ? 'var(--green)' : bestScore >= 47 ? 'var(--yellow)' : 'var(--red)'}">${bestScore}<span style="font-size:0.85rem;opacity:0.6">/100</span></span>
+    </div>
+  `;
+}
+
+function animateCards() {
+  document.querySelectorAll('.ring-fill').forEach(el => {
+    const target = el.dataset.target;
+    requestAnimationFrame(() => { el.style.strokeDashoffset = target; });
+  });
+  document.querySelectorAll('.var-bar-fill').forEach(el => {
+    const target = el.dataset.target;
+    requestAnimationFrame(() => { el.style.width = target; });
+  });
+}
+
+async function handleFiles(files) {
+  if (!files || files.length === 0) return;
+  const batch = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, 20);
+  if (batch.length === 0) return;
+
+  spinner.style.display = 'block';
+  resultsSection.style.display = 'none';
+
+  const newResults = [];
+
+  for (const file of batch) {
+    await new Promise(resolve => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const { variance, lap, w, h } = analyzeImage(img);
+        const heatmapSrc = buildHeatmap(lap, w, h);
+        newResults.push({ name: file.name, src: url, variance, heatmapSrc });
+        resolve();
+      };
+      img.onerror = resolve;
+      img.src = url;
+    });
+  }
+
+  allResults = [...allResults, ...newResults];
+  allResults.sort((a, b) => b.variance - a.variance);
+
+  spinner.style.display = 'none';
+  resultsGrid.innerHTML = '';
+  renderSummary(allResults);
+
+  allResults.forEach((r, i) => {
+    const card = createCard(r, i + 1, allResults.length);
+    resultsGrid.appendChild(card);
+  });
+
+  resultsSection.style.display = 'flex';
+  resultsSection.style.flexDirection = 'column';
+
+  setTimeout(animateCards, 60);
+  fileInput.value = '';
+}
+</script>
+
+</body>
+</html>

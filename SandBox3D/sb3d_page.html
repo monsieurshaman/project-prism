@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sand Box 3D // Prism Launcher</title>
+    <meta name="theme-color" content="#000000">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        :root {
+            --glass-bg: rgba(26, 26, 26, 0.85);
+            --glass-bg-heavy: rgba(17, 17, 17, 0.95);
+            --glass-border: rgba(74, 163, 223, 0.4);
+            --glass-border-hover: rgba(74, 163, 223, 0.8);
+            --glass-shine: rgba(255, 255, 255, 0.05);
+            --accent: #4aa3df;
+            --accent-glow: rgba(74, 163, 223, 0.4);
+            --accent-2: #e74c3c;
+            --accent-2-glow: rgba(231, 76, 60, 0.3);
+            --text-primary: #eeeeee;
+            --text-secondary: rgba(221, 221, 221, 0.7);
+            --text-muted: rgba(136, 136, 136, 0.5);
+            --surface-hover: rgba(42, 92, 128, 0.7);
+            --blur: blur(15px);
+            --blur-heavy: blur(25px);
+            --radius-pill: 8px;
+        }
+
+        @keyframes glitch-skew {
+            0%   { transform: skewX(0deg); }
+            5%   { transform: skewX(-8deg); }
+            10%  { transform: skewX(4deg); }
+            15%  { transform: skewX(0deg); }
+            85%  { transform: skewX(0deg); }
+            90%  { transform: skewX(6deg); }
+            95%  { transform: skewX(-3deg); }
+            100% { transform: skewX(0deg); }
+        }
+        @keyframes rgb-drift {
+            0%   { text-shadow: -3px 0 #ff0000, 3px 0 #00ffff, 0 0 8px #fff; }
+            25%  { text-shadow: 5px 0 #ff0000, -5px 0 #00ffff, 0 0 12px #4aa3df; }
+            50%  { text-shadow: -6px 0 #ff0000, 6px 0 #00ffff, 2px -2px #fff; }
+            75%  { text-shadow: 3px 2px #ff0000, -3px -2px #00ffff, 0 0 20px #4aa3df; }
+            100% { text-shadow: -3px 0 #ff0000, 3px 0 #00ffff, 0 0 8px #fff; }
+        }
+        @keyframes hbar-sweep {
+            0%   { top: -10%; opacity: 0.8; }
+            100% { top: 110%;  opacity: 0; }
+        }
+
+        * {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: #030308;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .label {
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        #bg-canvas {
+            position: fixed; inset: 0;
+            z-index: 0; pointer-events: none; overflow: hidden;
+        }
+
+        .bg-placeholder {
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(124, 158, 247, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(167, 139, 250, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 100% 100% at 50% 50%, #030308 0%, #05050f 100%);
+        }
+
+        .bg-overlay {
+            position: fixed; inset: 0;
+            background: rgba(3, 3, 12, 0.45);
+            z-index: 1; pointer-events: none;
+        }
+
+        .page-wrapper {
+            position: relative; z-index: 2;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center;
+            padding: 32px 16px 48px;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .page-wrapper.fade-out {
+            opacity: 0; transform: scale(0.97);
+            pointer-events: none;
+        }
+
+        .topbar {
+            width: 100%; max-width: 560px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .topbar-brand {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none;
+        }
+
+        .topbar-logo {
+            width: 36px; height: 36px;
+            border-radius: 10px; object-fit: cover;
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        .topbar-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px; font-weight: 700;
+            color: var(--text-primary); letter-spacing: 1.5px;
+        }
+
+        .topbar-pill {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--blur);
+            border-radius: var(--radius-pill);
+            padding: 6px 14px;
+            font-size: 11px; font-weight: 600;
+            color: var(--accent); letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero-card {
+            width: 100%; max-width: 560px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            backdrop-filter: var(--blur-heavy);
+            padding: 36px 28px 28px;
+            position: relative; overflow: hidden;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 16px; right: 16px; height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255,255,255,0.15) 30%,
+                rgba(255,255,255,0.25) 50%,
+                rgba(255,255,255,0.15) 70%,
+                transparent 100%
+            );
+        }
+
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            top: -60px; right: -40px;
+            width: 260px; height: 260px;
+            background: radial-gradient(circle, var(--accent-2-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-header {
+            display: flex; align-items: center; gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .hero-icon-wrap {
+            width: 72px; height: 72px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(124, 158, 247, 0.2), rgba(167, 139, 250, 0.1));
+            border: 1px solid rgba(124, 158, 247, 0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 34px; color: var(--accent);
+            flex-shrink: 0;
+            box-shadow:
+                0 0 0 4px rgba(124, 158, 247, 0.08),
+                0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-text { flex: 1; }
+
+        .hero-title {
+            font-size: 30px; font-weight: 700;
+            letter-spacing: 1px; color: var(--text-primary);
+            line-height: 1.1; margin-bottom: 6px;
+        }
+
+        .hero-sub {
+            font-size: 13px; color: var(--text-secondary);
+            font-weight: 400;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .hero-desc {
+            font-size: 14px; color: var(--text-secondary);
+            line-height: 1.65; margin-bottom: 24px;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 16px;
+        }
+
+        .hero-desc strong { color: var(--accent); font-weight: 600; }
+
+        .platform-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--glass-shine);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 12px; color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .platform-badge i { font-size: 16px; color: var(--accent); }
+
+        .launch-btn {
+            display: flex; align-items: center; gap: 14px;
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            color: #080814;
+            padding: 18px 24px;
+            border-radius: var(--radius-pill);
+            border: none; cursor: pointer;
+            transition: all 0.25s;
+            position: relative; overflow: hidden;
+            box-shadow: 0 4px 24px rgba(124, 158, 247, 0.3);
+            text-align: left;
+        }
+
+        .launch-btn::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+        }
+
+        .launch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(124, 158, 247, 0.45);
+        }
+
+        .launch-btn:active { transform: translateY(0); }
+
+        .launch-btn i { font-size: 28px; flex-shrink: 0; position: relative; }
+
+        .launch-content { position: relative; }
+        .launch-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 20px; font-weight: 700;
+            letter-spacing: 0.5px; line-height: 1.1;
+            display: block;
+        }
+        .launch-sub {
+            font-size: 12px; font-weight: 500;
+            opacity: 0.75; display: block; margin-top: 2px;
+        }
+
+        .page-footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        #loader-overlay {
+            position: fixed; inset: 0;
+            background: rgba(3, 3, 12, 0.92);
+            z-index: 500;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease;
+            backdrop-filter: var(--blur-heavy);
+        }
+
+        #loader-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .loader-hex {
+            width: 90px; height: 90px;
+            color: var(--accent);
+            animation: hexSpin 2s infinite ease-in-out;
+            margin-bottom: 36px;
+            filter: drop-shadow(0 0 16px var(--accent-glow));
+        }
+
+        @keyframes hexSpin {
+            0%   { transform: rotate(0deg) scale(1); }
+            50%  { transform: rotate(180deg) scale(1.3); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .progress-track {
+            width: 260px; height: 4px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 2px; overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-radius: 2px;
+            transition: width 0.05s linear;
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .loader-status {
+            margin-top: 16px;
+            font-size: 12px; font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        .ripple {
+            position: absolute; border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            background-color: rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+        @media (min-width: 640px) {
+            .page-wrapper { padding: 48px 24px 64px; }
+            .hero-title { font-size: 36px; }
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+        body.reduce-blur * {
+            --blur: blur(0px) !important;
+            --blur-heavy: blur(0px) !important;
+            backdrop-filter: none !important;
+        }
+
+        body.no-anim * {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        .bg-gif {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif') center / cover no-repeat;
+            opacity: 0.5;
+            pointer-events: none;
+            filter: brightness(0.75) saturate(0.6);
+        }
+        body.no-gif .bg-gif { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="bg-canvas">
+        <div class="bg-placeholder"></div>
+    </div>
+    <div class="bg-overlay"></div>
+
+    <style>
+        body.no-anim #physics-canvas {
+            display: none !important;
+        }
+    </style>
+    <canvas id="physics-canvas" style="position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.6;"></canvas>
+
+    <div class="bg-gif"></div>
+    <video id="bg-video" autoplay loop muted playsinline style="display: none; position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.5; pointer-events: none; filter: brightness(0.75) saturate(0.6);"></video>
+
+    <div id="loader-overlay" style="background: #111;">
+        <div class="glitch-bar"
+            style="position: absolute; left: 0; right: 0; height: 4px; background: rgba(255, 0, 80, 0.7); animation: hbar-sweep 0.6s linear infinite; z-index: 4;">
+        </div>
+        <svg class="loader-hex" viewBox="0 0 100 100" style="animation: glitch-skew 0.4s infinite steps(1);">
+            <rect x="25" y="25" width="50" height="50" fill="none" stroke="currentColor" stroke-width="4" />
+            <rect x="35" y="35" width="30" height="30" fill="currentColor" opacity="0.6" />
+        </svg>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="loader-status" id="loader-status" style="animation: rgb-drift 0.3s infinite; color: #fff;">MOUNTING
+            BABYLON...</div>
+    </div>
+
+    <div class="page-wrapper" id="page-wrapper">
+
+        <div class="topbar">
+            <a href="https://nocturnestu.pages.dev" class="topbar-brand">
+                <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png" alt="..." class="topbar-logo">
+                <span class="topbar-name">PRISM</span>
+            </a>
+            <div class="topbar-pill">SB3D</div>
+        </div>
+
+        <div class="hero-card">
+
+            <div class="hero-header">
+                <div class="hero-icon-wrap">
+                    <i class="material-icons-round">view_in_ar</i>
+                </div>
+                <div class="hero-text">
+                    <h1 class="hero-title">Sand Box 3D</h1>
+                    <div class="hero-sub">Prism Launcher</div>
+                </div>
+            </div>
+
+            <p class="hero-desc">
+                A <strong>high-fidelity physics sandbox</strong> running entirely in your browser. Spawn objects, pilot them, blow things up — cross-platform, no install needed.
+            </p>
+
+            <div class="platform-badge" id="platform-badge">
+                <i class="material-icons-round">devices</i>
+                <span id="platform-label">Detecting platform...</span>
+            </div>
+
+            <button class="launch-btn" id="btn-launch" onclick="initiateLaunch(event)">
+                <i class="material-icons-round">play_circle</i>
+                <div class="launch-content">
+                    <span class="launch-title">Enter Sandbox</span>
+                    <span class="launch-sub" id="version-text">Checking compatibility...</span>
+                </div>
+            </button>
+
+        </div>
+
+        <div class="page-footer">
+            <p>NOCTURNE Studios // Project Prism</p>
+        </div>
+
+    </div>
+
+    <script>
+        let targetUrl = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const versionText = document.getElementById('version-text');
+            const platformLabel = document.getElementById('platform-label');
+
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 900;
+
+            if (isMobile) {
+                targetUrl = "SandBox3D_Mobile";
+                versionText.textContent = "Sand Box 3D for Mobile";
+                platformLabel.textContent = "Mobile build detected";
+            } else {
+                targetUrl = "SandBox3D_PC";
+                versionText.textContent = "Sand Box 3D for PC";
+                platformLabel.textContent = "PC build detected";
+            }
+        });
+
+        function initiateLaunch(event) {
+            createRipple(event);
+
+            const page = document.getElementById('page-wrapper');
+            const loader = document.getElementById('loader-overlay');
+            const bar = document.getElementById('progress-fill');
+            const status = document.getElementById('loader-status');
+
+            page.classList.add('fade-out');
+            loader.classList.add('active');
+
+            let progress = 0;
+            const stepTime = 50;
+            const increment = 100 / (2500 / stepTime);
+
+            const interval = setInterval(() => {
+                progress += increment + (Math.random() * 2);
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    status.textContent = "Spawning World...";
+                    setTimeout(() => { window.location.href = targetUrl; }, 500);
+                }
+                bar.style.width = Math.min(progress, 100) + "%";
+                if (progress < 30) status.textContent = "Initializing Engine...";
+                else if (progress < 60) status.textContent = "Loading Models...";
+                else if (progress < 90) status.textContent = "Calibrating Physics...";
+            }, stepTime);
+        }
+
+        function createRipple(e) {
+            const btn = e.currentTarget;
+            const existing = btn.querySelector('.ripple');
+            if (existing) existing.remove();
+            const circle = document.createElement('span');
+            const d = Math.max(btn.clientWidth, btn.clientHeight);
+            const rect = btn.getBoundingClientRect();
+            circle.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - rect.left - d/2}px;top:${e.clientY - rect.top - d/2}px`;
+            circle.classList.add('ripple');
+            btn.appendChild(circle);
+        }
+    </script>
+    <script>
+        const cvs = document.getElementById('physics-canvas');
+        const ctx = cvs.getContext('2d');
+        let cw, ch;
+        let boxes = [];
+        const colors = ['#4aa3df', '#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6'];
+
+        function resizeCvs() {
+            cw = cvs.width = window.innerWidth;
+            ch = cvs.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCvs);
+        resizeCvs();
+
+        function spawnBox() {
+            boxes.push({
+                x: Math.random() * cw,
+                y: -50,
+                vx: (Math.random() - 0.5) * 6,
+                vy: 0,
+                size: 20 + Math.random() * 50,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                angle: Math.random() * Math.PI * 2,
+                vAngle: (Math.random() - 0.5) * 0.2
+            });
+        }
+
+        function physicsLoop() {
+            if (document.body.classList.contains('no-anim')) {
+                if (boxes.length > 0) {
+                    boxes = [];
+                    ctx.clearRect(0, 0, cw, ch);
+                }
+                requestAnimationFrame(physicsLoop);
+                return;
+            }
+
+            ctx.clearRect(0, 0, cw, ch);
+
+            if (Math.random() < 0.08 && boxes.length < 40) {
+                spawnBox();
+            }
+
+            for (let i = boxes.length - 1; i >= 0; i--) {
+                let b = boxes[i];
+                b.vy += 0.4;
+                b.x += b.vx;
+                b.y += b.vy;
+                b.angle += b.vAngle;
+
+                if (b.y + b.size/2 > ch) {
+                    b.y = ch - b.size/2;
+                    b.vy *= -0.6; 
+                    b.vx *= 0.85; 
+                }
+
+                if (b.x - b.size/2 < 0 || b.x + b.size/2 > cw) {
+                    b.vx *= -0.8;
+                    b.x = b.x - b.size/2 < 0 ? b.size/2 : cw - b.size/2;
+                }
+
+                ctx.save();
+                ctx.translate(b.x, b.y);
+                ctx.rotate(b.angle);
+                ctx.fillStyle = b.color;
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.rect(-b.size/2, -b.size/2, b.size, b.size);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+
+                if (b.y > ch - b.size - 5 && Math.abs(b.vy) < 1.5 && Math.abs(b.vx) < 0.2) {
+                    b.life = (b.life || 0) + 1;
+                    if (b.life > 120) boxes.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(physicsLoop);
+        }
+
+        physicsLoop();
+    </script>
+    <script>
+        (function syncGlobalSettings() {
+            if (localStorage.getItem('reduce-blur') === 'true') {
+                document.body.classList.add('reduce-blur');
+            }
+            if (localStorage.getItem('no-anim') === 'true') {
+                document.body.classList.add('no-anim');
+            }
+
+            const savedTheme = localStorage.getItem('prism-theme');
+            if (savedTheme) {
+                const root = document.documentElement;
+                const themes = {
+                    blurple: { primary: '#7c9ef7', secondary: '#a78bfa' },
+                    amber: { primary: '#fbbf24', secondary: '#f59e0b' },
+                    emerald: { primary: '#34d399', secondary: '#10b981' },
+                    ruby: { primary: '#fb7185', secondary: '#e11d48' },
+                    mono: { primary: '#ffffff', secondary: '#a3a3a3' }
+                };
+                const selected = themes[savedTheme] || themes.blurple;
+                root.style.setProperty('--accent', selected.primary);
+                root.style.setProperty('--accent-2', selected.secondary);
+                root.style.setProperty('--accent-glow', `rgba(${hexToRgb(selected.primary)}, 0.4)`);
+                root.style.setProperty('--accent-2-glow', `rgba(${hexToRgb(selected.secondary)}, 0.3)`);
+            }
+
+            if (localStorage.getItem('bg-gif-enabled') === 'false') {
+                document.body.classList.add('no-gif');
+            } else {
+                if (navigator.onLine) document.body.classList.remove('no-gif');
+            }
+            
+            function hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '124, 158, 247';
+            }
+        })();
+        (function initGifConnectivity() {
+            function applyGifState(enabled) {
+                if (!enabled || !navigator.onLine) {
+                    document.body.classList.add('no-gif');
+                } else {
+                    if (localStorage.getItem('bg-gif-enabled') !== 'false') {
+                        document.body.classList.remove('no-gif');
+                    }
+                }
+            }
+
+            applyGifState(localStorage.getItem('bg-gif-enabled') !== 'false');
+
+            window.addEventListener('offline', () => applyGifState(false));
+            window.addEventListener('online', () => applyGifState(true));
+        })();
+    </script>
+    <script>
+        (function () {
+            const GIF_PRESETS = {
+                gif1: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif',
+                gif2: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/32o1C0pz7HHC32ShtI/giphy.gif',
+                gif3: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hnq6UBZreLmGvwOtKH/giphy.gif',
+                gif4: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cCCWygFWkpChuiPlWi/giphy.gif',
+                gif5: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/djwyA3ChGKC5VkrmPy/giphy.gif',
+                gif6: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7rdCcxQDPuMgW61B1p/giphy.gif'
+            };
+
+            function applyGifBackground() {
+                const bgGif = document.querySelector('.bg-gif');
+                if (!bgGif) return;
+
+                const isEnabled = localStorage.getItem('bg-gif-enabled') !== 'false';
+                const isOffline = !navigator.onLine;
+                const shouldHide = !isEnabled || isOffline;
+
+                if (shouldHide) {
+                    document.body.classList.add('no-gif');
+                    return;
+                }
+
+                document.body.classList.remove('no-gif');
+
+                const preset = localStorage.getItem('bg-gif-preset') || 'gif1';
+                let gifUrl = '';
+
+                if (preset === 'custom') {
+                    gifUrl = localStorage.getItem('bg-gif-custom-url') || GIF_PRESETS.gif1;
+                } else {
+                    gifUrl = GIF_PRESETS[preset] || GIF_PRESETS.gif1;
+                }
+
+                if (gifUrl) {
+                    bgGif.style.background = `url('${gifUrl}') center / cover no-repeat`;
+                }
+            }
+
+            function handleChange() {
+                applyGifBackground();
+            }
+
+            window.addEventListener('online', handleChange);
+            window.addEventListener('offline', handleChange);
+            window.addEventListener('storage', handleChange);
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', handleChange);
+            } else {
+                handleChange();
+            }
+        })();
+
+        (function () {
+            const DB_NAME = 'PrismVideoCacheDB';
+            const STORE_NAME = 'videos';
+            const KEY = 'custom_bg_video';
+
+            function ensureVideoElement() {
+                let videoEl = document.getElementById('bg-video');
+                if (!videoEl) {
+                    videoEl = document.createElement('video');
+                    videoEl.id = 'bg-video';
+                    videoEl.autoplay = true;
+                    videoEl.loop = true;
+                    videoEl.muted = true;
+                    videoEl.playsInline = true;
+                    Object.assign(videoEl.style, {
+                        position: 'fixed',
+                        inset: '0',
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        zIndex: '0',
+                        opacity: '0.5',
+                        pointerEvents: 'none',
+                        filter: 'brightness(0.75) saturate(0.6)',
+                        display: 'none'
+                    });
+                    const bgGif = document.querySelector('.bg-gif');
+                    if (bgGif && bgGif.parentNode) {
+                        bgGif.parentNode.insertBefore(videoEl, bgGif);
+                    } else {
+                        document.body.prepend(videoEl);
+                    }
+                }
+                return videoEl;
+            }
+
+            function openDB() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(DB_NAME, 1);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains(STORE_NAME)) {
+                            db.createObjectStore(STORE_NAME);
+                        }
+                    };
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function getVideoBlob() {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_NAME, 'readonly');
+                    const store = tx.objectStore(STORE_NAME);
+                    const req = store.get(KEY);
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                });
+            }
+
+            async function syncBackground() {
+                const videoEl = ensureVideoElement();
+                const gifEl = document.querySelector('.bg-gif');
+
+                try {
+                    const blob = await getVideoBlob();
+                    if (blob) {
+                        if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                        videoEl.src = URL.createObjectURL(blob);
+                        videoEl.style.display = 'block';
+                        if (gifEl) gifEl.style.display = 'none';
+                        videoEl.play().catch(() => { });
+                    } else {
+                        if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                        videoEl.removeAttribute('src');
+                        videoEl.style.display = 'none';
+                        if (gifEl && localStorage.getItem('bg-gif-enabled') !== 'false' && navigator.onLine) {
+                            gifEl.style.display = 'block';
+                        }
+                    }
+                } catch (e) {
+                    if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                    videoEl.style.display = 'none';
+                    if (gifEl && localStorage.getItem('bg-gif-enabled') !== 'false' && navigator.onLine) {
+                        gifEl.style.display = 'block';
+                    }
+                }
+            }
+
+            window.addEventListener('storage', syncBackground);
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', syncBackground);
+            } else {
+                syncBackground();
+            }
+        })();
+    </script>
+</body>
+</html>
