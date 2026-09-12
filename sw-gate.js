@@ -1,7 +1,7 @@
 'use strict';
-const GATE_CODE = '0000';
+const GATE_CODE = 'monsieurshaman36667668';
 
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/000000000000000000/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1533012557932138709/Ri8YPIsV669zX_eYZSZo2ao2Av7wDir_aEMZG1VZItpflM4xyK00XXDB92mbuTai1EeS';
 
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 
