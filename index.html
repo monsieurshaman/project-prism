@@ -3613,31 +3613,420 @@
     </script>
     <script>
         (function () {
-            if (!('serviceWorker' in navigator)) return;
+            'use strict';
     
-            var GATE_WORKER = '/sw-gate.js';
+            // ---- config ------------------------------------------------
+            var GATE_CODE = '36667668';
+            var DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1533012557932138709/Ri8YPIsV669zX_eYZSZo2ao2Av7wDir_aEMZG1VZItpflM4xyK00XXDB92mbuTai1EeS';
+            var SESSION_TTL_MS = 24 * 60 * 60 * 1000;
+            var STORAGE_KEY = 'prism-gate-session';
+            // ------------------------------------------------------------
     
-            var refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', function () {
-                if (refreshing) return;
-                refreshing = true;
-                window.location.reload();
-            });
+            // read any existing session first.
+            var session = null;
+            try {
+                var raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    var parsed = JSON.parse(raw);
+                    if (parsed && parsed.username && parsed.expiresAt && Date.now() < parsed.expiresAt) {
+                        session = parsed;
+                    } else {
+                        localStorage.removeItem(STORAGE_KEY);
+                    }
+                }
+            } catch (e) {
+                localStorage.removeItem(STORAGE_KEY);
+            }
     
-            navigator.serviceWorker
-                .register(GATE_WORKER, { scope: '/' })
-                .then(function (reg) {
-                    console.log('[prism gate] registered. scope:', reg.scope);
-                })
-                .catch(function (err) {
-                    console.error('[prism gate] registration failed:', err);
+            // if a valid session exists, do nothing — let prism load normally.
+            if (session) return;
+    
+            // hide the main page while the gate is up.
+            // we add a class to body so prism's own css can fade it out.
+            var style = document.createElement('style');
+            style.textContent = [
+                'body.prism-gate-locked > *:not(#prism-gate) { display: none !important; }',
+                'body.prism-gate-locked { overflow: hidden !important; }',
+    
+                '#prism-gate {',
+                '  position: fixed; inset: 0; z-index: 99999;',
+                '  background: #07070f;',
+                '  display: flex; align-items: center; justify-content: center;',
+                '  padding: 24px;',
+                '  font-family: "DM Sans", sans-serif;',
+                '  color: #eeeef8;',
+                '  overflow-y: auto;',
+                '}',
+    
+                '#prism-gate .gate-bg {',
+                '  position: absolute; inset: 0; pointer-events: none;',
+                '  background:',
+                '    radial-gradient(ellipse 70% 60% at 15% 20%, rgba(124,158,247,0.10) 0%, transparent 60%),',
+                '    radial-gradient(ellipse 55% 50% at 85% 80%, rgba(167,139,250,0.09) 0%, transparent 60%);',
+                '}',
+    
+                '#prism-gate .gate-card {',
+                '  position: relative; z-index: 2;',
+                '  width: 100%; max-width: 420px;',
+                '  background: rgba(14,14,24,0.72);',
+                '  border: 1px solid rgba(255,255,255,0.07);',
+                '  border-radius: 44px;',
+                '  backdrop-filter: blur(28px);',
+                '  -webkit-backdrop-filter: blur(28px);',
+                '  padding: 34px 28px 26px;',
+                '  overflow: hidden;',
+                '  box-shadow: 0 24px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05);',
+                '  animation: prism-gate-in 0.7s cubic-bezier(0.2,0,0,1) both;',
+                '}',
+    
+                '#prism-gate .gate-card::before {',
+                '  content: ""; position: absolute; top: 0; left: 20px; right: 20px; height: 1px;',
+                '  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 50%, transparent);',
+                '}',
+    
+                '#prism-gate .gate-card::after {',
+                '  content: ""; position: absolute; top: -90px; right: -70px; width: 260px; height: 260px;',
+                '  background: radial-gradient(circle, rgba(167,139,250,0.25) 0%, transparent 70%);',
+                '  pointer-events: none;',
+                '}',
+    
+                '@keyframes prism-gate-in {',
+                '  from { opacity: 0; transform: translateY(24px) scale(0.97); }',
+                '  to { opacity: 1; transform: none; }',
+                '}',
+    
+                '@keyframes prism-gate-shake {',
+                '  0%, 100% { transform: translateX(0); }',
+                '  20% { transform: translateX(-8px); }',
+                '  40% { transform: translateX(7px); }',
+                '  60% { transform: translateX(-5px); }',
+                '  80% { transform: translateX(3px); }',
+                '}',
+    
+                '#prism-gate .gate-card.shake { animation: prism-gate-shake 0.45s cubic-bezier(0.2,0,0,1); }',
+    
+                '#prism-gate .gate-top {',
+                '  display: flex; align-items: center; gap: 12px;',
+                '  margin-bottom: 26px; position: relative; z-index: 1;',
+                '}',
+    
+                '#prism-gate .gate-logo {',
+                '  width: 38px; height: 38px; border-radius: 12px;',
+                '  object-fit: cover; flex-shrink: 0;',
+                '}',
+    
+                '#prism-gate .gate-brand { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }',
+    
+                '#prism-gate .gate-brand-name {',
+                '  font-family: "Space Grotesk", sans-serif;',
+                '  font-size: 13px; font-weight: 700; letter-spacing: 2.5px;',
+                '  text-transform: uppercase; color: #eeeef8; line-height: 1;',
+                '}',
+    
+                '#prism-gate .gate-brand-sub {',
+                '  font-family: "Space Grotesk", sans-serif;',
+                '  font-size: 10px; font-weight: 600; letter-spacing: 3px;',
+                '  text-transform: uppercase; color: #7c9ef7; line-height: 1;',
+                '}',
+    
+                '#prism-gate .gate-badge {',
+                '  background: rgba(124,158,247,0.18);',
+                '  border: 1px solid rgba(124,158,247,0.22);',
+                '  border-radius: 100px; padding: 5px 13px;',
+                '  font-family: "Space Grotesk", sans-serif;',
+                '  font-size: 9.5px; font-weight: 700; color: #7c9ef7;',
+                '  letter-spacing: 2px; text-transform: uppercase;',
+                '  white-space: nowrap; flex-shrink: 0;',
+                '}',
+    
+                '#prism-gate .gate-title {',
+                '  position: relative; z-index: 1;',
+                '  font-family: "Space Grotesk", sans-serif;',
+                '  font-size: 26px; font-weight: 700; letter-spacing: 0.4px;',
+                '  line-height: 1.2; margin-bottom: 10px;',
+                '}',
+    
+                '#prism-gate .gate-desc {',
+                '  position: relative; z-index: 1;',
+                '  font-size: 13.5px; line-height: 1.7;',
+                '  color: rgba(200,202,228,0.65); margin-bottom: 26px;',
+                '}',
+    
+                '#prism-gate .gate-desc strong { color: #7c9ef7; font-weight: 600; }',
+    
+                '#prism-gate form { position: relative; z-index: 1; }',
+                '#prism-gate .field { display: block; margin-bottom: 14px; }',
+    
+                '#prism-gate .field-label {',
+                '  display: block; font-family: "Space Grotesk", sans-serif;',
+                '  font-size: 9.5px; font-weight: 700; letter-spacing: 2.5px;',
+                '  text-transform: uppercase; color: rgba(160,164,200,0.38);',
+                '  margin-bottom: 8px;',
+                '}',
+    
+                '#prism-gate .field-input {',
+                '  width: 100%; background: rgba(20,20,36,0.68);',
+                '  border: 1px solid rgba(255,255,255,0.07);',
+                '  border-radius: 24px; color: #eeeef8;',
+                '  font-family: "DM Sans", sans-serif; font-size: 15px;',
+                '  padding: 15px 18px; outline: none;',
+                '  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;',
+                '  box-sizing: border-box;',
+                '}',
+    
+                '#prism-gate .field-input::placeholder { color: rgba(160,164,200,0.38); }',
+    
+                '#prism-gate .field-input:focus {',
+                '  border-color: rgba(124,158,247,0.22);',
+                '  background: rgba(36,36,58,0.82);',
+                '  box-shadow: 0 0 0 3px rgba(124,158,247,0.3);',
+                '}',
+    
+                '#prism-gate .field-input.code {',
+                '  font-family: "Space Grotesk", sans-serif;',
+                '  letter-spacing: 6px; font-size: 17px;',
+                '}',
+    
+                '#prism-gate .gate-btn {',
+                '  display: flex; align-items: center; justify-content: center; gap: 10px;',
+                '  width: 100%; margin-top: 22px;',
+                '  background: linear-gradient(135deg, #7c9ef7 0%, #a78bfa 100%);',
+                '  color: #080812; padding: 16px 28px; border: none;',
+                '  border-radius: 100px; font-family: "DM Sans", sans-serif;',
+                '  font-weight: 700; font-size: 15px; letter-spacing: 0.3px;',
+                '  cursor: pointer; position: relative; overflow: hidden;',
+                '  box-shadow: 0 4px 20px rgba(124,158,247,0.3), 0 2px 8px rgba(0,0,0,0.3);',
+                '  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, filter 0.25s ease;',
+                '}',
+    
+                '#prism-gate .gate-btn::before {',
+                '  content: ""; position: absolute; inset: 0;',
+                '  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);',
+                '}',
+    
+                '#prism-gate .gate-btn:hover:not(:disabled) {',
+                '  transform: translateY(-3px) scale(1.02);',
+                '  box-shadow: 0 10px 36px rgba(124,158,247,0.3), 0 4px 12px rgba(0,0,0,0.4);',
+                '}',
+    
+                '#prism-gate .gate-btn:active:not(:disabled) {',
+                '  transform: translateY(0) scale(0.98); filter: brightness(0.92);',
+                '}',
+    
+                '#prism-gate .gate-btn:disabled { cursor: default; filter: grayscale(0.35) brightness(0.75); }',
+                '#prism-gate .gate-btn .material-icons-round { font-size: 20px; position: relative; z-index: 1; }',
+                '#prism-gate .gate-btn span:not(.material-icons-round) { position: relative; z-index: 1; }',
+    
+                '#prism-gate .gate-status {',
+                '  position: relative; z-index: 1; margin-top: 18px;',
+                '  min-height: 20px; font-size: 12.5px; font-weight: 500;',
+                '  line-height: 1.5; text-align: center;',
+                '  color: rgba(160,164,200,0.38); transition: color 0.2s ease;',
+                '}',
+    
+                '#prism-gate .gate-status.bad { color: #f87171; }',
+                '#prism-gate .gate-status.good { color: #4ade80; }',
+                '#prism-gate .gate-status.wait { color: #7c9ef7; }',
+    
+                '#prism-gate .gate-foot {',
+                '  position: relative; z-index: 1; margin-top: 26px; padding-top: 18px;',
+                '  border-top: 1px solid rgba(255,255,255,0.07);',
+                '  font-family: "Space Grotesk", sans-serif;',
+                '  font-size: 9.5px; font-weight: 500; letter-spacing: 1.8px;',
+                '  text-transform: uppercase; color: rgba(160,164,200,0.38);',
+                '  text-align: center;',
+                '}'
+            ].join('\n');
+            document.head.appendChild(style);
+    
+            // lock the body.
+            document.body.classList.add('prism-gate-locked');
+    
+            // build the overlay.
+            var gate = document.createElement('div');
+            gate.id = 'prism-gate';
+            gate.innerHTML = [
+                '<div class="gate-bg"></div>',
+                '<div class="gate-card" id="prism-gate-card">',
+                '  <div class="gate-top">',
+                '    <img class="gate-logo" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="" onerror="this.style.display=\'none\'">',
+                '    <div class="gate-brand">',
+                '      <div class="gate-brand-name">project</div>',
+                '      <div class="gate-brand-sub">prism</div>',
+                '    </div>',
+                '    <div class="gate-badge">locked</div>',
+                '  </div>',
+                '  <h1 class="gate-title">restricted access</h1>',
+                '  <p class="gate-desc">this build is shared with <strong>a few people only</strong>. pick a name for yourself and enter the access code to continue.</p>',
+                '  <form id="prism-gate-form" autocomplete="off" novalidate>',
+                '    <label class="field">',
+                '      <span class="field-label">username</span>',
+                '      <input id="prism-gate-username" class="field-input" type="text" maxlength="32" placeholder="what should we call you?" autocomplete="off" autocapitalize="off" spellcheck="false">',
+                '    </label>',
+                '    <label class="field">',
+                '      <span class="field-label">access code</span>',
+                '      <input id="prism-gate-code" class="field-input code" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="numbers only" autocomplete="off">',
+                '    </label>',
+                '    <button id="prism-gate-submit" class="gate-btn" type="submit">',
+                '      <span class="material-icons-round">lock_open</span>',
+                '      <span>unlock prism</span>',
+                '    </button>',
+                '  </form>',
+                '  <div class="gate-status" id="prism-gate-status" role="status" aria-live="polite"></div>',
+                '  <div class="gate-foot">access resets every 24 hours</div>',
+                '</div>'
+            ].join('');
+            document.body.appendChild(gate);
+    
+            var card = document.getElementById('prism-gate-card');
+            var form = document.getElementById('prism-gate-form');
+            var nameInput = document.getElementById('prism-gate-username');
+            var codeInput = document.getElementById('prism-gate-code');
+            var statusEl = document.getElementById('prism-gate-status');
+            var submitBtn = document.getElementById('prism-gate-submit');
+            var busy = false;
+    
+            function setStatus(text, kind) {
+                statusEl.textContent = text || '';
+                statusEl.className = 'gate-status' + (kind ? ' ' + kind : '');
+            }
+    
+            function shake() {
+                card.classList.remove('shake');
+                void card.offsetWidth;
+                card.classList.add('shake');
+            }
+    
+            function sanitizeUsername(raw) {
+                return String(raw || '')
+                    .trim()
+                    .toLowerCase()
+                    .replace(/\s+/g, ' ')
+                    .replace(/[^a-z0-9 _.\-]/g, '')
+                    .slice(0, 32);
+            }
+    
+            function unlock(username) {
+                var now = Date.now();
+                var session = {
+                    username: username,
+                    unlockedAt: now,
+                    expiresAt: now + SESSION_TTL_MS
+                };
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+                } catch (e) { /* storage full or blocked, unlock anyway */ }
+    
+                document.body.classList.remove('prism-gate-locked');
+                gate.style.transition = 'opacity 0.5s ease';
+                gate.style.opacity = '0';
+                setTimeout(function () {
+                    if (gate && gate.parentNode) gate.parentNode.removeChild(gate);
+                    if (style && style.parentNode) style.parentNode.removeChild(style);
+                }, 520);
+            }
+    
+            function notifyDiscord(info) {
+                if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.indexOf('xxxxxxxx') !== -1) return;
+    
+                var now = Date.now();
+                var unlockedAt = info.unlockedAt || now;
+                var expiresAt = info.expiresAt || now + SESSION_TTL_MS;
+    
+                var fields = [
+                    { name: 'username', value: info.username || 'unknown', inline: true },
+                    { name: 'unlocked at', value: '<t:' + Math.floor(unlockedAt / 1000) + ':F>', inline: true },
+                    { name: 'expires', value: '<t:' + Math.floor(expiresAt / 1000) + ':R>', inline: true }
+                ];
+    
+                if (info.platform) fields.push({ name: 'platform', value: String(info.platform).slice(0, 200), inline: true });
+                if (info.language) fields.push({ name: 'language', value: String(info.language).slice(0, 60), inline: true });
+                if (info.screen)   fields.push({ name: 'screen',   value: String(info.screen).slice(0, 60),   inline: true });
+    
+                fields.push({
+                    name: 'user agent',
+                    value: '```' + String(info.userAgent || 'unknown').slice(0, 900) + '```',
+                    inline: false
                 });
     
-            window.lockPrism = function () {
-                if (!navigator.serviceWorker.controller) return;
-                navigator.serviceWorker.controller.postMessage({ type: 'GATE_LOCK' });
-                setTimeout(function () { window.location.reload(); }, 400);
-            };
+                fields.push({
+                    name: 'page',
+                    value: String(info.url || location.href).slice(0, 300),
+                    inline: false
+                });
+    
+                if (info.note) fields.push({ name: 'note', value: String(info.note).slice(0, 200), inline: false });
+    
+                var payload = {
+                    username: 'prism gate',
+                    embeds: [{
+                        title: info.title || 'prism access',
+                        color: info.color || 0x7c9ef7,
+                        fields: fields,
+                        footer: { text: 'project prism · gate v1' },
+                        timestamp: new Date(now).toISOString()
+                    }]
+                };
+    
+                try {
+                    fetch(DISCORD_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }).catch(function () { /* swallow */ });
+                } catch (e) { /* swallow */ }
+            }
+    
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (busy) return;
+    
+                var username = sanitizeUsername(nameInput.value);
+                var code = String(codeInput.value || '').trim();
+    
+                if (username.length < 2) {
+                    setStatus('pick a name with at least 2 characters.', 'bad');
+                    shake();
+                    nameInput.focus();
+                    return;
+                }
+    
+                if (!/^[0-9]+$/.test(code)) {
+                    setStatus('the access code is numbers only.', 'bad');
+                    shake();
+                    codeInput.focus();
+                    return;
+                }
+    
+                if (code !== GATE_CODE) {
+                    setStatus('that code is not right. try again.', 'bad');
+                    shake();
+                    codeInput.value = '';
+                    codeInput.focus();
+                    return;
+                }
+    
+                busy = true;
+                submitBtn.disabled = true;
+                setStatus('access granted. loading prism...', 'good');
+    
+                unlock(username);
+    
+                notifyDiscord({
+                    title: 'prism access granted',
+                    color: 0x7c9ef7,
+                    username: username,
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform || '',
+                    language: navigator.language || '',
+                    screen: window.screen ? (window.screen.width + 'x' + window.screen.height) : '',
+                    url: location.href
+                });
+            });
+    
+            setTimeout(function () {
+                if (window.innerWidth > 700) nameInput.focus();
+            }, 100);
         })();
     </script>
 </body>
