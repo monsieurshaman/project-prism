@@ -346,41 +346,61 @@
                 backdrop-filter: var(--blur-md);
                 -webkit-backdrop-filter: var(--blur-md);
                 border-bottom: 1px solid var(--border);
+                transition: padding 0.3s var(--spring);
             }
 
-            .topbar-expand-btn {
-                background: var(--surface-1);
-                border: 1px solid var(--border);
-                color: var(--text-sub);
-                padding: 8px;
-                border-radius: 12px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                transition: all 0.2s ease;
-            }
-            .topbar-expand-btn:hover { background: var(--surface-hover); color: var(--text); }
-            .topbar-expand-btn .material-icons-round {
-                transition: transform 0.3s var(--spring);
-            }
-            .topbar.expanded .topbar-expand-btn .material-icons-round {
-                transform: rotate(180deg);
-            }
-
-            .topbar-accordion {
+            .topbar-card-slot {
                 max-height: 0;
                 overflow: hidden;
-                transition: max-height 0.35s var(--spring);
-            }
-            .topbar.expanded .topbar-accordion {
-                max-height: 160px;
+                opacity: 0;
+                transition: max-height 0.35s var(--spring), opacity 0.25s ease;
             }
 
-            .topbar-accordion-inner {
+            .topbar.card-docked .topbar-card-slot {
+                max-height: 120px;
+                opacity: 1;
+                margin-top: 12px;
+            }
+
+            .topbar-card-slot-inner {
                 display: flex;
                 align-items: center;
                 gap: 14px;
-                padding-top: 14px;
+            }
+
+            .topbar-card-slot .hero-avatar-wrap .hero-avatar {
+                width: 44px;
+                height: 44px;
+                border-radius: 14px;
+            }
+
+            .topbar-card-slot .hero-title {
+                font-size: 16px;
+                margin-bottom: 3px;
+            }
+
+            .topbar-card-slot .hero-status {
+                font-size: 11px;
+            }
+
+            .hero-card-lite {
+                background: var(--surface-0);
+                border: 1px solid var(--border);
+                border-radius: var(--r-xl);
+                backdrop-filter: var(--blur-md);
+                padding: 20px 22px;
+                margin-bottom: 14px;
+                transition: max-height 0.35s var(--spring), opacity 0.25s ease, padding 0.3s ease, margin 0.3s ease;
+                overflow: hidden;
+            }
+
+            .hero-card-lite.docked {
+                max-height: 0;
+                opacity: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin-bottom: 0;
+                border-width: 0;
             }
 
             .bottombar {
@@ -401,6 +421,7 @@
             }
 
             .bottombar-item {
+                position: relative;
                 width: 42px;
                 height: 42px;
                 display: flex;
@@ -423,13 +444,15 @@
                 transform: translateY(0) scale(0.95);
             }
 
-            .hero-card-lite {
-                background: var(--surface-0);
-                border: 1px solid var(--border);
-                border-radius: var(--r-xl);
-                backdrop-filter: var(--blur-md);
-                padding: 20px 22px;
-                margin-bottom: 14px;
+            .bottombar-item .notif-dot {
+                position: absolute;
+                top: 6px;
+                right: 6px;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #4ade80;
+                box-shadow: 0 0 6px rgba(74, 222, 128, 0.65);
             }
         }
 
@@ -1861,24 +1884,13 @@
     <div class="page" id="page">
 
         <div class="mobile-layout">
-            <div class="topbar">
+            <div class="topbar" id="mobile-topbar">
                 <a href="#" class="topbar-brand">
                     <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo2.png" alt="..." class="topbar-logo">
                     <span class="topbar-name" style="text-transform: lowercase;">prism</span>
                 </a>
-                <div class="topbar-badge" style="text-transform: lowercase;">home base</div>
-            </div>
-
-            <div class="topbar">
-                <a href="#" class="topbar-brand">
-                    <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo2.png" alt="..." class="topbar-logo">
-                    <span class="topbar-name" style="text-transform: lowercase;">prism</span>
-                </a>
-                <div class="topbar-expand-btn" onclick="toggleTopbarAccordion()">
-                    <i class="material-icons-round">expand_more</i>
-                </div>
-                <div class="topbar-accordion" id="topbar-accordion">
-                    <div class="topbar-accordion-inner">
+                <div class="topbar-card-slot" id="topbar-card-slot">
+                    <div class="topbar-card-slot-inner">
                         <div class="hero-avatar-wrap">
                             <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="..." class="hero-avatar">
                         </div>
@@ -1893,8 +1905,21 @@
                 </div>
             </div>
 
-            <div class="hero-card-lite">
-                <p class="hero-desc" style="margin-bottom: 16px;">
+            <div class="hero-card-lite" id="hero-card-lite">
+                <div class="hero-header">
+                    <div class="hero-avatar-wrap">
+                        <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="..." class="hero-avatar">
+                    </div>
+                    <div class="hero-text">
+                        <h1 class="hero-title" style="text-transform: lowercase;">project prism</h1>
+                        <div class="hero-status">
+                            <span class="status-dot"></span>
+                            cooking up stuff
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-divider"></div>
+                <p class="hero-desc">
                     welcome to <strong>prism</strong>. this is our central hub where all our experiments, games, and handy tools live together.
                 </p>
                 <a href="https://github.com/nocturnestu" target="_blank" class="cta-btn" onclick="createRipple(event)">
@@ -1912,7 +1937,8 @@
                 </button>
                 <a href="#" class="bottombar-item" id="changelog-trigger-mobile"
                     onclick="openModal('modal-changelog'); createRipple(event); return false;" style="display:none;" title="what's fresh?">
-                    <i class="material-icons-round">new_releases</i>
+                    <i class="material-icons-round">notifications</i>
+                    <span class="notif-dot" id="changelog-notif-dot" style="display:none;"></span>
                 </a>
                 <a href="https://www.instagram.com/da.real.mastershaman?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="bottombar-item" title="master shaman instagram">
                     <i class="material-icons-round">construction</i>
