@@ -597,6 +597,59 @@
             filter: brightness(0.92);
         }
 
+        .notifs-btn {
+            display: none;                     
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: var(--surface-1);
+            color: var(--text-sub);
+            padding: 16px 28px;
+            border-radius: var(--r-pill);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+            margin-top: 10px;
+            transition: transform 0.25s var(--spring), box-shadow 0.25s var(--ease-out),
+                        background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .notifs-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
+        }
+
+        .notifs-btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-strong);
+            color: var(--text);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .notifs-btn:active {
+            transform: translateY(0) scale(0.98);
+        } 
+
+        .notifs-btn .material-icons-round {
+            font-size: 20px;
+        }
+
+        @media (display-mode: standalone) {
+            .notifs-btn {
+                display: flex;
+            }
+        }
+
         .install-btn {
             display: flex;
             align-items: center;
@@ -2085,9 +2138,8 @@
                     <i class="material-icons-round">download</i>
                     grab the app
                 </button>
-                <button class="install-btn" id="changelog-trigger-desktop"
-                    onclick="dismissChangelogBubble(); openModal('modal-changelog'); createRipple(event);"
-                    style="display:none; position:relative;">
+                <button class="notifs-btn" id="changelog-trigger-desktop"
+                    onclick="dismissChangelogBubble(); openModal('modal-changelog'); createRipple(event);">
                     <i class="material-icons-round">notifications</i>
                     prism updates
                     <div class="changelog-bubble" id="changelog-bubble-desktop" style="display:none;">
@@ -3319,7 +3371,6 @@
                 const mobileTrigger = document.getElementById('changelog-trigger-mobile');
                 const desktopTrigger = document.getElementById('changelog-trigger-desktop');
                 if (mobileTrigger) mobileTrigger.style.display = 'flex';
-                if (desktopTrigger) desktopTrigger.style.display = 'inline-flex';
 
                 fetch('changelog.json?t=' + Date.now(), { cache: 'no-store' })
                     .then(res => {
