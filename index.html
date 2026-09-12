@@ -1887,6 +1887,40 @@
             #dev-preview-toggle { display: flex; }
         }
 
+        @media (min-width: 1024px) {
+            #changelog-trigger-desktop .changelog-bubble {
+                position: absolute;
+                bottom: calc(100% + 10px);
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--surface-1);
+                border: 1px solid var(--border-accent);
+                color: var(--text);
+                font-family: 'DM Sans', sans-serif;
+                font-size: 12px;
+                font-weight: 500;
+                white-space: nowrap;
+                padding: 9px 14px;
+                border-radius: var(--r-md);
+                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+                animation: bubble-pop 0.4s var(--spring);
+                pointer-events: none;
+            }
+
+            #changelog-trigger-desktop .changelog-bubble-arrow {
+                position: absolute;
+                bottom: -5px;
+                left: 50%;
+                margin-left: -5px;
+                width: 10px;
+                height: 10px;
+                background: var(--surface-1);
+                border-right: 1px solid var(--border-accent);
+                border-bottom: 1px solid var(--border-accent);
+                transform: rotate(45deg);
+            }
+        }
+
     </style>
 </head>
 
@@ -2051,11 +2085,16 @@
                     <i class="material-icons-round">download</i>
                     grab the app
                 </button>
-                <a href="#" class="changelog-trigger" id="changelog-trigger-desktop"
-                    onclick="openModal('modal-changelog'); createRipple(event); return false;" style="display:none; margin-top:20px;">
-                    <i class="material-icons-round">new_releases</i>
-                    <span>what's fresh?</span>
-                </a>
+                <button class="install-btn" id="changelog-trigger-desktop"
+                    onclick="dismissChangelogBubble(); openModal('modal-changelog'); createRipple(event);"
+                    style="display:none; position:relative;">
+                    <i class="material-icons-round">notifications</i>
+                    prism updates
+                    <div class="changelog-bubble" id="changelog-bubble-desktop" style="display:none;">
+                        new update dropped 👀
+                        <div class="changelog-bubble-arrow"></div>
+                    </div>
+                </button>
                 <div class="settings-trigger" onclick="toggleSettings()" style="top: 40px; right: 40px;">
                     <i class="material-icons-round">settings</i>
                 </div>
@@ -3615,14 +3654,11 @@
         (function () {
             'use strict';
     
-            // ---- config ------------------------------------------------
             var GATE_CODE = '36667668';
             var DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1533012557932138709/Ri8YPIsV669zX_eYZSZo2ao2Av7wDir_aEMZG1VZItpflM4xyK00XXDB92mbuTai1EeS';
             var SESSION_TTL_MS = 24 * 60 * 60 * 1000;
             var STORAGE_KEY = 'prism-gate-session';
-            // ------------------------------------------------------------
     
-            // read any existing session first.
             var session = null;
             try {
                 var raw = localStorage.getItem(STORAGE_KEY);
@@ -3638,11 +3674,8 @@
                 localStorage.removeItem(STORAGE_KEY);
             }
     
-            // if a valid session exists, do nothing — let prism load normally.
             if (session) return;
     
-            // hide the main page while the gate is up.
-            // we add a class to body so prism's own css can fade it out.
             var style = document.createElement('style');
             style.textContent = [
                 'body.prism-gate-locked > *:not(#prism-gate) { display: none !important; }',
@@ -3839,10 +3872,8 @@
             ].join('\n');
             document.head.appendChild(style);
     
-            // lock the body.
             document.body.classList.add('prism-gate-locked');
     
-            // build the overlay.
             var gate = document.createElement('div');
             gate.id = 'prism-gate';
             gate.innerHTML = [
@@ -3915,7 +3946,7 @@
                 };
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-                } catch (e) { /* storage full or blocked, unlock anyway */ }
+                } catch (e) {  }
     
                 document.body.classList.remove('prism-gate-locked');
                 gate.style.transition = 'opacity 0.5s ease';
@@ -3950,7 +3981,7 @@
                 });
     
                 fields.push({
-                    name: 'page',
+                    name: 'current page',
                     value: String(info.url || location.href).slice(0, 300),
                     inline: false
                 });
@@ -3973,8 +4004,8 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
-                    }).catch(function () { /* swallow */ });
-                } catch (e) { /* swallow */ }
+                    }).catch(function () {});
+                } catch (e) {}
             }
     
             form.addEventListener('submit', function (e) {
