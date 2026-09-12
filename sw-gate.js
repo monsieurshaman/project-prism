@@ -1,5 +1,5 @@
 'use strict';
-const GATE_CODE = 'monsieurshaman36667668';
+const GATE_CODE = '36667668';
 
 const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1533012557932138709/Ri8YPIsV669zX_eYZSZo2ao2Av7wDir_aEMZG1VZItpflM4xyK00XXDB92mbuTai1EeS';
 
