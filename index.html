@@ -2581,6 +2581,8 @@
         function dismissChangelogBubble() {
             const bubble = document.getElementById('changelog-bubble');
             if (bubble) bubble.style.display = 'none';
+            const bubbleDesktop = document.getElementById('changelog-bubble-desktop');
+            if (bubbleDesktop) bubbleDesktop.style.display = 'none';
 
             fetch('changelog.json?t=' + Date.now(), { cache: 'no-store' })
                 .then(res => res.ok ? res.json() : null)
@@ -2662,6 +2664,16 @@
             localStorage.setItem(DEV_PREVIEW_KEY, value);
             window.dispatchEvent(new CustomEvent('dev-preview-change', { detail: { enabled: value === 'true' } }));
         }
+
+        (function syncDevPreviewToInstallState() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+            const currentValue = localStorage.getItem(DEV_PREVIEW_KEY);
+            const desiredValue = isStandalone ? 'true' : 'false';
+
+            if (currentValue !== desiredValue) {
+                setDevPreviewMode(desiredValue);
+            }
+        })();
 
         function toggleDevPreviewMode() {
             const isCurrentlyOn = localStorage.getItem(DEV_PREVIEW_KEY) === 'true';
@@ -2804,11 +2816,11 @@
                 clearTimeout(watchdogTimer);
                 watchdogTimer = setTimeout(() => {
                     if (finished) return;
-                    console.warn('[Prism Download Mode]: No progress after 20s, proceeding restart...');
+                    console.warn('[Prism Download Mode]: no progress after 30 seconds, restarting anyway...');
                     finished = true;
                     clearInterval(tipInterval);
-                    dlTitle.textContent = 'Stalled';
-                    dlSub.textContent = 'Reloading anyway...';
+                    dlTitle.textContent = 'stalled';
+                    dlSub.textContent = 'update error, cancelling anyway...';
                     setTimeout(() => { window.location.reload(); }, 1500);
                 }, 30000);
             }
@@ -2826,8 +2838,8 @@
                     dlBar.style.transition = 'width 0.15s linear';
                     setPhase('dl-phase-download', 'active', `0 / ${total}`, 'sync');
                     setPhase('dl-phase-cache', 'active', 'Writing', 'sync');
-                    dlTitle.textContent = 'Downloading';
-                    dlSub.textContent = `Fetching ${total} assets`;
+                    dlTitle.textContent = 'dowloading';
+                    dlSub.textContent = `fetching ${total} assets`;
                     return;
                 }
 
@@ -2843,7 +2855,7 @@
 
                     if (progress > 0 && progress < 100) {
                         setPhase('dl-phase-download', 'active', `${processed} / ${total}`, 'sync');
-                        dlTitle.textContent = 'PROCESSING';
+                        dlTitle.textContent = 'working on it';
                         dlSub.textContent = `${progress}%${errors > 0 ? ` · ${errors} skipped` : ''}`;
                     }
 
@@ -2854,8 +2866,8 @@
                         navigator.serviceWorker.removeEventListener('message', _cacheProgressHandler);
                         setPhase('dl-phase-download', 'done', 'Done', 'check_circle');
                         setPhase('dl-phase-cache', errors > 0 ? 'error' : 'done', errors > 0 ? `${errors} skipped` : 'Done', errors > 0 ? 'warning' : 'check_circle');
-                        dlTitle.textContent = 'Complete';
-                        dlSub.textContent = errors > 0 ? `Done with ${errors} skip${errors !== 1 ? 's' : ''}` : 'Finished, proceeding restart...';
+                        dlTitle.textContent = 'update finished';
+                        dlSub.textContent = errors > 0 ? `done with ${errors} skip${errors !== 1 ? 's' : ''}` : 'update complete, restarting now...';
                         if (freshVersion) localStorage.setItem('PRISM_SW_VERSION', freshVersion);
                         setTimeout(() => { window.location.reload(); }, 2500);
                     }
@@ -2866,8 +2878,8 @@
             resetWatchdog();
 
             try {
-                dlTitle.textContent = 'Purging';
-                dlSub.textContent = 'Deleting old IDB/Cache content...';
+                dlTitle.textContent = 'purging';
+                dlSub.textContent = 'deleting previous IDB/Cache....';
                 setPhase('dl-phase-clear', 'active', 'Running', 'sync');
 
                 const CORE_URLS = [
@@ -2983,8 +2995,8 @@
                 });
 
                 setPhase('dl-phase-clear', 'done', 'Done', 'check_circle');
-                dlTitle.textContent = 'DOWNLOADING';
-                dlSub.textContent = 'Starting up...';
+                dlTitle.textContent = 'downloading';
+                dlSub.textContent = 'cranking stuff';
                 setPhase('dl-phase-download', 'active', 'Starting', 'sync');
 
                 try {
@@ -3391,22 +3403,26 @@
                         if (data.release && data.release !== seenRelease) {
                             const bubble = document.getElementById('changelog-bubble');
                             if (bubble) bubble.style.display = 'block';
+                            const bubbleDesktop = document.getElementById('changelog-bubble-desktop');
+                            if (bubbleDesktop) bubbleDesktop.style.display = 'block';
                         }
                     })
                     .catch(err => {
-                        console.error('[Prism Logs]: Could not fetch the latest Prism changelogs...', err);
+                        console.error('[Prism Logs]: cannot fetch new logs due to network error...', err);
                         document.getElementById('cl-modal-msg').textContent =
-                            'Prism is unable to fetch new contents for changelogs, try again next time when you have internet connection...';
+                            'something is missing here...';
                     });
             }
         });
 
         document.addEventListener('click', (e) => {
-            const bubble = document.getElementById('changelog-bubble');
-            if (!bubble || bubble.style.display === 'none') return;
-            if (!e.target.closest('#changelog-trigger-mobile')) {
-                dismissChangelogBubble();
-            }
+            const bubbleMobile = document.getElementById('changelog-bubble');
+            const bubbleDesktop = document.getElementById('changelog-bubble-desktop');
+            const mobileOpen = bubbleMobile && bubbleMobile.style.display !== 'none';
+            const desktopOpen = bubbleDesktop && bubbleDesktop.style.display !== 'none';
+            if (!mobileOpen && !desktopOpen) return;
+            if (e.target.closest('#changelog-trigger-mobile') || e.target.closest('#changelog-trigger-desktop')) return;
+            dismissChangelogBubble();
         });
 
         (function initCardPhysics() {
@@ -3710,10 +3726,55 @@
         (function () {
             'use strict';
     
-            var GATE_CODE = '36667668';
             var DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1533012557932138709/Ri8YPIsV669zX_eYZSZo2ao2Av7wDir_aEMZG1VZItpflM4xyK00XXDB92mbuTai1EeS';
             var SESSION_TTL_MS = 24 * 60 * 60 * 1000;
             var STORAGE_KEY = 'prism-gate-session';
+
+            // a pool of blacklisted words to prevent any users from entering with these words in a username
+            var BLACKLISTED_WORDS = [
+                "nigga",
+                "nigger",
+                "adolf",
+                "hitler",
+                "adolfhitler",
+                "monsieurshaman"
+            ];
+
+            function squish(str) {
+                return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            }
+
+            function findBlacklisted(raw) {
+                var squished = squish(raw);
+                if (!squished) return null;
+                for (var i = 0; i < BLACKLISTED_WORDS.length; i++) {
+                    var bw = squish(BLACKLISTED_WORDS[i]);
+                    if (bw && squished.indexOf(bw) !== -1) return BLACKLISTED_WORDS[i];
+                }
+                return null;
+            }
+
+            function pad2(n) { return String(n).padStart(2, '0'); }
+
+            function buildGateCode(d) {
+                return pad2(d.getHours()) + pad2(d.getMinutes()) + '-' +
+                    pad2(d.getMonth() + 1) + pad2(d.getDate()) + pad2(d.getFullYear() % 100);
+            }
+
+            function normalizeGateCode(raw) {
+                var digits = String(raw || '').replace(/[^0-9]/g, '');
+                if (digits.length !== 10) return null;
+                return digits.slice(0, 4) + '-' + digits.slice(4);
+            }
+
+            function isValidGateCode(normalized) {
+                if (!normalized) return false;
+                var now = Date.now();
+                for (var offset = -1; offset <= 1; offset++) {
+                    if (buildGateCode(new Date(now + offset * 60000)) === normalized) return true;
+                }
+                return false;
+            }
     
             var session = null;
             try {
@@ -3952,7 +4013,7 @@
                 '    </label>',
                 '    <label class="field">',
                 '      <span class="field-label">access code</span>',
-                '      <input id="prism-gate-code" class="field-input code" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="numbers only" autocomplete="off">',
+                '      <input id="prism-gate-code" class="field-input code" type="password" inputmode="numeric" pattern="[0-9-]*" maxlength="11" placeholder="hhmm-mmddyy" autocomplete="off">',
                 '    </label>',
                 '    <button id="prism-gate-submit" class="gate-btn" type="submit">',
                 '      <span class="material-icons-round">lock_open</span>',
@@ -4028,7 +4089,9 @@
     
                 if (info.platform) fields.push({ name: 'platform', value: String(info.platform).slice(0, 200), inline: true });
                 if (info.language) fields.push({ name: 'language', value: String(info.language).slice(0, 60), inline: true });
-                if (info.screen)   fields.push({ name: 'screen',   value: String(info.screen).slice(0, 60),   inline: true });
+                if (info.screen) fields.push({ name: 'screen', value: String(info.screen).slice(0, 60), inline: true });
+                if (info.timezone) fields.push({ name: 'timezone', value: String(info.timezone).slice(0, 80), inline: true });
+                if (info.utcOffset) fields.push({ name: 'utc offset', value: String(info.utcOffset).slice(0, 20), inline: true });
     
                 fields.push({
                     name: 'user agent',
@@ -4070,23 +4133,32 @@
     
                 var username = sanitizeUsername(nameInput.value);
                 var code = String(codeInput.value || '').trim();
-    
+
                 if (username.length < 2) {
                     setStatus('pick a name with at least 2 characters.', 'bad');
                     shake();
                     nameInput.focus();
                     return;
                 }
+
+                var blacklistedHit = findBlacklisted(nameInput.value);
+                if (blacklistedHit) {
+                    setStatus('that name is not allowed. pick another one.', 'bad');
+                    shake();
+                    nameInput.focus();
+                    return;
+                }
     
-                if (!/^[0-9]+$/.test(code)) {
-                    setStatus('the access code is numbers only.', 'bad');
+                var normalizedCode = normalizeGateCode(code);
+                if (!normalizedCode) {
+                    setStatus('the code is hhmm-mmddyy, digits only.', 'bad');
                     shake();
                     codeInput.focus();
                     return;
                 }
-    
-                if (code !== GATE_CODE) {
-                    setStatus('that code is not right. try again.', 'bad');
+
+                if (!isValidGateCode(normalizedCode)) {
+                    setStatus('that code is not right for this minute. try again.', 'bad');
                     shake();
                     codeInput.value = '';
                     codeInput.focus();
@@ -4099,6 +4171,16 @@
     
                 unlock(username);
     
+                var tz = 'unknown';
+                try {
+                    tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown';
+                } catch (e) { }
+
+                var offsetMin = -new Date().getTimezoneOffset();
+                var offsetSign = offsetMin >= 0 ? '+' : '-';
+                var offsetAbs = Math.abs(offsetMin);
+                var utcOffset = 'UTC' + offsetSign + pad2(Math.floor(offsetAbs / 60)) + ':' + pad2(offsetAbs % 60);
+
                 notifyDiscord({
                     title: 'prism access granted',
                     color: 0x7c9ef7,
@@ -4107,6 +4189,8 @@
                     platform: navigator.platform || '',
                     language: navigator.language || '',
                     screen: window.screen ? (window.screen.width + 'x' + window.screen.height) : '',
+                    timezone: tz,
+                    utcOffset: utcOffset,
                     url: location.href
                 });
             });
