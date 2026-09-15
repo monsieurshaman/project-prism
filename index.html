@@ -2667,11 +2667,16 @@
 
         (function syncDevPreviewToInstallState() {
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-            const currentValue = localStorage.getItem(DEV_PREVIEW_KEY);
-            const desiredValue = isStandalone ? 'true' : 'false';
 
-            if (currentValue !== desiredValue) {
-                setDevPreviewMode(desiredValue);
+            if (!isStandalone) {
+                if (localStorage.getItem(DEV_PREVIEW_KEY) !== 'false') {
+                    setDevPreviewMode('false');
+                }
+                return;
+            }
+
+            if (localStorage.getItem(DEV_PREVIEW_KEY) === null) {
+                setDevPreviewMode('true');
             }
         })();
 
