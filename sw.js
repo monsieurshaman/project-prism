@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v3.0-26.9.12';
+const CACHE_NAME = 'v3.1-26.9.15';
 
 const CORE_URLS = [
     '/',
@@ -64,7 +64,14 @@ self.addEventListener('install', e => {
 
     const params = new URLSearchParams(self.location.search);
     const isStandalone = params.get('standalone') === 'true';
+    const forceInstall = params.get('forceInstall') === 'true';
     const includeGames = params.get('includeGames') === 'true';
+
+    if (!isStandalone && !forceInstall) {
+        e.waitUntil(Promise.resolve());
+        return;
+    }
+
     const urlsToCache = includeGames ? [...CORE_URLS, ...GAME_URLS] : CORE_URLS;
 
     e.waitUntil(

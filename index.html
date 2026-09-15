@@ -3278,7 +3278,7 @@
 
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register(
-                    `/sw.js?standalone=${isStandalone}&includeGames=true`
+                    `/sw.js?standalone=${isStandalone}&includeGames={isStandalone}`
                 );
             }
 
@@ -3685,7 +3685,7 @@
 
                     if (savedVersion !== liveVersion) {
                         if (isStandalone) {
-                            const ok = confirm(`Prism Download Mode\n\nPrism found a new version: ${liveVersion}\n\nDo you want to update now?\n\nYes, update my Prism. (OK)\nNo, do not update my Prism yet. (Cancel)`);
+                            const ok = confirm(`Prism Download Mode\n\nPrism found a new version: ${liveVersion}\n\nDo you want to update now?`);
                             if (ok) {
                                 killStartupLoader();
                                 localStorage.setItem(SW_VERSION_KEY, liveVersion);
@@ -3693,10 +3693,10 @@
                             }
                         } else {
                             localStorage.setItem(SW_VERSION_KEY, liveVersion);
-                            navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=true`);
+                            navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=${isStandalone}`);
                         }
                     } else {
-                        navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=true`);
+                        navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=${isStandalone}`);
                     }
                 });
         }
