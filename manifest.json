@@ -16,12 +16,5 @@
             "sizes": "512x512",
             "type": "image/png"
         }
-    ],
-    "related_applications": [
-        {
-            "platform": "webapp",
-            "url": "https://nocturnestu.pages.dev/manifest.json"
-        }
-    ],
-    "prefer_related_applications": false
+    ]
 }
