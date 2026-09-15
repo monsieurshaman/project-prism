@@ -3756,24 +3756,61 @@
 
             function pad2(n) { return String(n).padStart(2, '0'); }
 
-            function buildGateCode(d) {
-                return pad2(d.getHours()) + pad2(d.getMinutes()) + '-' +
-                    pad2(d.getMonth() + 1) + pad2(d.getDate()) + pad2(d.getFullYear() % 100);
+            var OTP_KEY = 'prism-gate-otp';
+            var OTP_TTL_MS = 20 * 60 * 1000;
+            var OTP_COOLDOWN_MS = 30 * 1000;
+
+            function generateOTP() {
+                var code = '';
+                for (var i = 0; i < 10; i++) code += Math.floor(Math.random() * 10);
+                return code;
             }
 
-            function normalizeGateCode(raw) {
-                var digits = String(raw || '').replace(/[^0-9]/g, '');
-                if (digits.length !== 10) return null;
-                return digits.slice(0, 4) + '-' + digits.slice(4);
-            }
-
-            function isValidGateCode(normalized) {
-                if (!normalized) return false;
+            function saveOTP(code) {
                 var now = Date.now();
-                for (var offset = -1; offset <= 1; offset++) {
-                    if (buildGateCode(new Date(now + offset * 60000)) === normalized) return true;
-                }
-                return false;
+                var payload = { code: code, requestedAt: now, expiresAt: now + OTP_TTL_MS };
+                try { localStorage.setItem(OTP_KEY, JSON.stringify(payload)); } catch (e) { }
+                return payload;
+            }
+
+            function getActiveOTP() {
+                try {
+                    var raw = localStorage.getItem(OTP_KEY);
+                    if (!raw) return null;
+                    var parsed = JSON.parse(raw);
+                    if (!parsed || !parsed.code) return null;
+                    if (Date.now() >= parsed.expiresAt) {
+                        localStorage.removeItem(OTP_KEY);
+                        return null;
+                    }
+                    return parsed;
+                } catch (e) { return null; }
+            }
+
+            function clearOTP() {
+                try { localStorage.removeItem(OTP_KEY); } catch (e) { }
+            }
+
+            function normalizeOTP(raw) {
+                var digits = String(raw || '').replace(/[^0-9]/g, '');
+                return digits.length === 10 ? digits : null;
+            }
+
+            function getClientMeta() {
+                var tz = 'unknown';
+                try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown'; } catch (e) { }
+                var offsetMin = -new Date().getTimezoneOffset();
+                var sign = offsetMin >= 0 ? '+' : '-';
+                var abs = Math.abs(offsetMin);
+                return {
+                    timezone: tz,
+                    utcOffset: 'UTC' + sign + pad2(Math.floor(abs / 60)) + ':' + pad2(abs % 60),
+                    platform: navigator.platform || '',
+                    language: navigator.language || '',
+                    screen: window.screen ? (window.screen.width + 'x' + window.screen.height) : '',
+                    userAgent: navigator.userAgent,
+                    url: location.href
+                };
             }
     
             var session = null;
@@ -3977,6 +4014,17 @@
                 '#prism-gate .gate-status.bad { color: #f87171; }',
                 '#prism-gate .gate-status.good { color: #4ade80; }',
                 '#prism-gate .gate-status.wait { color: #7c9ef7; }',
+
+                '#prism-gate .gate-link {',
+                '  display: block; margin: -4px auto 0; padding: 6px 10px;',
+                '  background: none; border: none;',
+                '  font-family: "DM Sans", sans-serif;',
+                '  font-size: 12px; font-weight: 600; letter-spacing: 0.2px;',
+                '  color: #7c9ef7; cursor: pointer;',
+                '  transition: color 0.2s ease, opacity 0.2s ease;',
+                '}',
+                '#prism-gate .gate-link:hover:not(:disabled) { color: #a78bfa; }',
+                '#prism-gate .gate-link:disabled { opacity: 0.4; cursor: default; }',
     
                 '#prism-gate .gate-foot {',
                 '  position: relative; z-index: 1; margin-top: 26px; padding-top: 18px;',
@@ -4005,7 +4053,7 @@
                 '    <div class="gate-badge">locked</div>',
                 '  </div>',
                 '  <h1 class="gate-title">restricted access</h1>',
-                '  <p class="gate-desc">this build is shared with <strong>a few people only</strong>. pick a name for yourself and enter the access code to continue.</p>',
+                '  <p class="gate-desc">this build is shared with <strong>a few people only</strong>. pick a name, request a code, and enter it to continue.</p>',
                 '  <form id="prism-gate-form" autocomplete="off" novalidate>',
                 '    <label class="field">',
                 '      <span class="field-label">username</span>',
@@ -4013,15 +4061,16 @@
                 '    </label>',
                 '    <label class="field">',
                 '      <span class="field-label">access code</span>',
-                '      <input id="prism-gate-code" class="field-input code" type="password" inputmode="numeric" pattern="[0-9-]*" maxlength="11" placeholder="hhmm-mmddyy" autocomplete="off">',
+                '      <input id="prism-gate-code" class="field-input code" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="10-digit code" autocomplete="off">',
                 '    </label>',
+                '    <button type="button" id="prism-gate-request" class="gate-link">request code via discord →</button>',
                 '    <button id="prism-gate-submit" class="gate-btn" type="submit">',
                 '      <span class="material-icons-round">lock_open</span>',
                 '      <span>unlock prism</span>',
                 '    </button>',
                 '  </form>',
                 '  <div class="gate-status" id="prism-gate-status" role="status" aria-live="polite"></div>',
-                '  <div class="gate-foot">access resets every 24 hours</div>',
+                '  <div class="gate-foot">access resets every 24 hours, codes expire 20 minutes after they are requested</div>',
                 '</div>'
             ].join('');
             document.body.appendChild(gate);
@@ -4032,6 +4081,7 @@
             var codeInput = document.getElementById('prism-gate-code');
             var statusEl = document.getElementById('prism-gate-status');
             var submitBtn = document.getElementById('prism-gate-submit');
+            var requestBtn = document.getElementById('prism-gate-request');
             var busy = false;
     
             function setStatus(text, kind) {
@@ -4126,6 +4176,100 @@
                     }).catch(function () {});
                 } catch (e) {}
             }
+
+            function sendOTPToDiscord(info) {
+                return new Promise(function (resolve) {
+                    if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.indexOf('xxxxxxxx') !== -1) {
+                        resolve(false);
+                        return;
+                    }
+                    var now = Date.now();
+                    var fields = [
+                        { name: 'access code', value: '```' + info.code + '```', inline: false },
+                        { name: 'username', value: info.username || 'unknown', inline: true },
+                        { name: 'expires', value: '<t:' + Math.floor(info.expiresAt / 1000) + ':R>', inline: true },
+                        { name: 'platform', value: String(info.platform || '').slice(0, 200) || 'unknown', inline: true },
+                        { name: 'language', value: String(info.language || '').slice(0, 60) || 'unknown', inline: true },
+                        { name: 'screen', value: String(info.screen || '').slice(0, 60) || 'unknown', inline: true },
+                        { name: 'timezone', value: String(info.timezone || '').slice(0, 80) || 'unknown', inline: true },
+                        { name: 'utc offset', value: String(info.utcOffset || '').slice(0, 20) || 'unknown', inline: true },
+                        { name: 'user agent', value: '```' + String(info.userAgent || 'unknown').slice(0, 900) + '```', inline: false },
+                        { name: 'current page', value: String(info.url || location.href).slice(0, 300), inline: false }
+                    ];
+                    var payload = {
+                        username: 'prism gate',
+                        embeds: [{
+                            title: '🔐 prism access code requested',
+                            description: 'a user is requesting access to prism. share the code below with them.',
+                            color: 0x7c9ef7,
+                            fields: fields,
+                            footer: { text: 'project prism · gate v2' },
+                            timestamp: new Date(now).toISOString()
+                        }]
+                    };
+                    try {
+                        fetch(DISCORD_WEBHOOK_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        }).then(function (res) { resolve(res.ok); })
+                            .catch(function () { resolve(false); });
+                    } catch (e) { resolve(false); }
+                });
+            }
+
+            async function requestOTP() {
+                if (busy) return;
+
+                var username = sanitizeUsername(nameInput.value);
+                if (username.length < 2) {
+                    setStatus('pick a name first so we know who is requesting.', 'bad');
+                    shake();
+                    nameInput.focus();
+                    return;
+                }
+
+                var blacklistedHit = findBlacklisted(nameInput.value);
+                if (blacklistedHit) {
+                    setStatus('that name is not allowed. pick another one.', 'bad');
+                    shake();
+                    nameInput.focus();
+                    return;
+                }
+
+                var now = Date.now();
+                var existing = getActiveOTP();
+                if (existing && now - existing.requestedAt < OTP_COOLDOWN_MS) {
+                    var wait = Math.ceil((OTP_COOLDOWN_MS - (now - existing.requestedAt)) / 1000);
+                    setStatus('wait ' + wait + 's before requesting again.', 'wait');
+                    return;
+                }
+
+                requestBtn.disabled = true;
+                setStatus('sending code to discord...', 'wait');
+
+                var code = generateOTP();
+                var payload = saveOTP(code);
+
+                var meta = getClientMeta();
+                meta.code = code;
+                meta.username = username;
+                meta.expiresAt = payload.expiresAt;
+
+                var sent = await sendOTPToDiscord(meta);
+
+                requestBtn.disabled = false;
+
+                if (sent) {
+                    setStatus('code sent. check discord with shaman, then type it above.', 'good');
+                    codeInput.focus();
+                } else {
+                    clearOTP();
+                    setStatus('could not send the code. try again.', 'bad');
+                }
+            }
+
+            requestBtn.addEventListener('click', requestOTP);
     
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
@@ -4149,21 +4293,30 @@
                     return;
                 }
     
-                var normalizedCode = normalizeGateCode(code);
+                var normalizedCode = normalizeOTP(code);
                 if (!normalizedCode) {
-                    setStatus('the code is hhmm-mmddyy, digits only.', 'bad');
+                    setStatus('the access code is 10 digits.', 'bad');
                     shake();
                     codeInput.focus();
                     return;
                 }
 
-                if (!isValidGateCode(normalizedCode)) {
-                    setStatus('that code is not right for this minute. try again.', 'bad');
+                var activeOTP = getActiveOTP();
+                if (!activeOTP) {
+                    setStatus('no active code. request one first.', 'bad');
+                    shake();
+                    return;
+                }
+
+                if (activeOTP.code !== normalizedCode) {
+                    setStatus('that code is not right. try again.', 'bad');
                     shake();
                     codeInput.value = '';
                     codeInput.focus();
                     return;
                 }
+
+                clearOTP();
     
                 busy = true;
                 submitBtn.disabled = true;
@@ -4181,17 +4334,18 @@
                 var offsetAbs = Math.abs(offsetMin);
                 var utcOffset = 'UTC' + offsetSign + pad2(Math.floor(offsetAbs / 60)) + ':' + pad2(offsetAbs % 60);
 
+                var meta = getClientMeta();
                 notifyDiscord({
                     title: 'prism access granted',
-                    color: 0x7c9ef7,
+                    color: 0x4ade80,
                     username: username,
-                    userAgent: navigator.userAgent,
-                    platform: navigator.platform || '',
-                    language: navigator.language || '',
-                    screen: window.screen ? (window.screen.width + 'x' + window.screen.height) : '',
-                    timezone: tz,
-                    utcOffset: utcOffset,
-                    url: location.href
+                    userAgent: meta.userAgent,
+                    platform: meta.platform,
+                    language: meta.language,
+                    screen: meta.screen,
+                    timezone: meta.timezone,
+                    utcOffset: meta.utcOffset,
+                    url: meta.url
                 });
             });
     
