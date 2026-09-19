@@ -2164,6 +2164,12 @@
             background: rgba(20, 20, 36, 0.5);
             border: 1px solid var(--border);
             border-radius: var(--r-md);
+            text-decoration: none;
+            color: var(--text);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.25s var(--spring);
         }
 
         .credits-avatar {
@@ -2252,9 +2258,9 @@
                 <p class="hero-desc">
                     welcome to <strong>prism</strong>. this is our central hub where all our experiments, games, and handy tools live together.
                 </p>
-                <a href="https://github.com/monsieurshaman" target="_blank" class="cta-btn" onclick="createRipple(event)">
+                <a href="https://github.com/monsieurshaman/project-prism" target="_blank" class="cta-btn" onclick="createRipple(event)">
                     <i class="material-icons-round">code</i>
-                    browse github repos
+                    browse prism's repo
                 </a>
             </div>
 
@@ -2715,41 +2721,41 @@
         <div class="credits-dialog-title" style="text-transform: lowercase;">credits</div>
         <div class="credits-dialog-sub">the people behind project prism</div>
         <div class="credits-list">
-            <div class="credits-entry">
+            <a class="credits-entry" href="https://github.com/monsieurshaman" target="_blank" rel="noopener noreferrer">
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/monsieurshaman.png" alt="">
                 <div>
                     <div class="credits-name">monsieurshaman</div>
-                    <div class="credits-role">creator, lead dev, ragebaiter</div>
+                    <div class="credits-role">creator, lead dev, ragebaiter, exists on github</div>
                 </div>
-            </div>
-            <div class="credits-entry">
+            </a>
+            <a class="credits-entry" href="https://www.youtube.com/@ShinobiAkiraGD" target="_blank" rel="noopener noreferrer">
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/shinobiakira.png" alt="">
                 <div>
                     <div class="credits-name">ShinobiAkira</div>
-                    <div class="credits-role">icon artist, youtuber, tester</div>
+                    <div class="credits-role">youtuber, tester, GD player</div>
                 </div>
-            </div>
-            <div class="credits-entry">
+            </a>
+            <a class="credits-entry" href="https://github.com/nokkum" target="_blank" rel="noopener noreferrer">
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/haku.png" alt="">
                 <div>
                     <div class="credits-name">Hakuシ</div>
-                    <div class="credits-role">tester</div>
+                    <div class="credits-role">tester, exists on github</div>
                 </div>
-            </div>
-            <div class="credits-entry">
+            </a>
+            <a class="credits-entry">
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="">
                 <div>
                     <div class="credits-name">Leo Alexis</div>
                     <div class="credits-role">honorable mention</div>
                 </div>
-            </div>
-            <div class="credits-entry">
+            </a>
+            <a class="credits-entry">
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="">
                 <div>
                     <div class="credits-name">friends at college!</div>
                     <div class="credits-role">honorable mention</div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 
