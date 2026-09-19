@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3dfavicon.svg">
+    <link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dfavicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sand Box 3D for Mobile</title>
     
@@ -10,9 +10,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
     <script src="https://cdn.babylonjs.com/ammo.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/babylonjs-loaders@9.11.0/babylonjs.loaders.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3duianim_mobile.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3dmatyou.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/sb3dammo.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3duianim_mobile.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dmatyou.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dammo.js"></script>
 
     <style>
         html, body {
@@ -405,7 +405,6 @@
             grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 5px;
         }
         #move-controls { left: 20px; }
-        #look-controls { right: 20px; }
         .d-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -720,6 +719,7 @@
             }
         }
 
+
     </style>
 </head>
 <body>
@@ -730,7 +730,7 @@
         <div class="loader-content">
             <div class="loader-spinner"></div>
             <div class="loader-text">Sand Box 3D for Mobile</div>
-            <div class="loader-subtext-version">Version: v26.07.24</div>
+            <div class="loader-subtext-version">Version: v26.09.19</div>
             <div class="loader-subtext">Setting up your sandbox...</div>
             <button id="skip-loading-btn" onclick="skipLoading()">Skip Setup</button>
         </div>
@@ -741,44 +741,44 @@
     <div id="flash-layer">
         <video id="flash-meme-vid" playsinline preload="auto"
             style="width:100%; height:100%; object-fit:fill; display:none;">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/blind.mp4" type="video/mp4">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/blind.mp4" type="video/mp4">
         </video>
     </div>
 
     <audio id="explosion-snd" preload="auto">
-        <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/explode.mp3" type="audio/mpeg">
+        <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/explode.mp3" type="audio/mpeg">
     </audio>
 
     <div id="audio-preload-layer" style="display: none;">
         <audio id="snd_neu1" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/neutral/neu1.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/neutral/neu1.mp3" type="audio/mpeg">
         </audio>
         <audio id="snd_neu2" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/neutral/neu2.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/neutral/neu2.mp3" type="audio/mpeg">
         </audio>
         <audio id="snd_neu3" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/neutral/neu3.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/neutral/neu3.mp3" type="audio/mpeg">
         </audio>
         <audio id="snd_eve1" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/evening/eve1.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/evening/eve1.mp3" type="audio/mpeg">
         </audio>
         <audio id="snd_eve2" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/evening/eve2.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/evening/eve2.mp3" type="audio/mpeg">
         </audio>
         <audio id="snd_eve3" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/evening/eve3.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/evening/eve3.mp3" type="audio/mpeg">
         </audio>
         <audio id="snd_mid1" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid1.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid1.mp3" type="audio/mpeg">
         </audio>
         <audio id="snd_mid2" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid2.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid2.mp3" type="audio/mpeg">
         </audio>
         <audio id="snd_mid3" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid3.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid3.mp3" type="audio/mpeg">
         </audio>
         <audio id="snd_mid4" preload="auto">
-            <source src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/midnight/mid4.mp3" type="audio/mpeg">
+            <source src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid4.mp3" type="audio/mpeg">
         </audio>
     </div>
 
@@ -1531,14 +1531,6 @@
         <div class="d-btn btn-d" id="btn-move-down">▼</div>
     </div>
 
-    <div id="look-controls" class="mobile-pad">
-        <div class="d-btn btn-u" id="btn-look-up">▲</div>
-        <div class="d-btn btn-l" id="btn-look-left">◀</div>
-        <div class="pad-label">Look</div>
-        <div class="d-btn btn-r" id="btn-look-right">▶</div>
-        <div class="d-btn btn-d" id="btn-look-down">▼</div>
-    </div>
-
     <button id="btn-action-throw" class="action-btn-overlay" onclick="triggerThrow()" style="display: none;">THROW</button>
     <canvas id="renderCanvas"></canvas>
 
@@ -1618,7 +1610,6 @@
         };
 
         const moveState = { up: false, down: false, left: false, right: false };
-        const lookState = { up: false, down: false, left: false, right: false };
         const SB3D_LANGS = {
             en: {
                 pageTitle: "Sand Box 3D for Mobile",
@@ -2151,11 +2142,11 @@
         };
 
         const MAP_TEXTURE_CATEGORIES = {
-            ground: 'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/ground.png',
-            ramp: 'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/ramp.png',
-            stairs: 'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/stairs.png',
-            pool: 'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/pool.png',
-            pillars: 'https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/SandBox3D/asset/pillars.png',
+            ground: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ground.png',
+            ramp: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ramp.png',
+            stairs: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/stairs.png',
+            pool: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pool.png',
+            pillars: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pillars.png',
         };
 
         const customModelTemplates = [null, null, null];
@@ -3200,7 +3191,7 @@
             lines.push(`  Average Draw Calls  : ${avgDc}`)
             lines.push(``);
             lines.push(`==========================================================`);
-            lines.push(`  ${SB3D_EDITION} by NOCTURNE Studios`);
+            lines.push(`  ${SB3D_EDITION} by monsieurshaman`);
             lines.push(`==========================================================`);
 
             return lines.join('\n');
@@ -3793,8 +3784,8 @@
                 `Babylon.js: v${babylonVersion}\n` +
                 `Cannon.js: v${cannonVersion}\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `Under NOCTURNE Studios\n` +
-                `Lead by Master Shaman`
+                `Under project prism\n` +
+                `Lead by monsieurshaman`
             );
         }
 
@@ -4336,29 +4327,87 @@
         }
 
         function setupMobileButtons() {
-            const bindBtn = (id, targetState, key) => {
-                const el = document.getElementById(id);
-                if(!el) return;
-                const set = (active) => { targetState[key] = active; };
-                
-                el.addEventListener('touchstart', (e) => { e.preventDefault(); set(true); }, {passive: false});
-                el.addEventListener('touchend', (e) => { e.preventDefault(); set(false); });
-                el.addEventListener('touchcancel', (e) => { e.preventDefault(); set(false); });
-                
-                el.addEventListener('mousedown', (e) => { e.preventDefault(); set(true); });
-                el.addEventListener('mouseup', (e) => { e.preventDefault(); set(false); });
-                el.addEventListener('mouseleave', () => { set(false); });
+                const bindBtn = (id, targetState, key) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const set = (active) => { targetState[key] = active; };
+
+                    el.addEventListener('touchstart', (e) => { e.preventDefault(); set(true); }, { passive: false });
+                    el.addEventListener('touchend', (e) => { e.preventDefault(); set(false); });
+                    el.addEventListener('touchcancel', (e) => { e.preventDefault(); set(false); });
+
+                    el.addEventListener('mousedown', (e) => { e.preventDefault(); set(true); });
+                    el.addEventListener('mouseup', (e) => { e.preventDefault(); set(false); });
+                    el.addEventListener('mouseleave', () => { set(false); });
+                };
+                bindBtn('btn-move-up', moveState, 'up');
+                bindBtn('btn-move-down', moveState, 'down');
+                bindBtn('btn-move-left', moveState, 'left');
+                bindBtn('btn-move-right', moveState, 'right');
+            }
+            setupMobileButtons();
+
+        function setupTouchLook() {
+            const canvas = document.getElementById('renderCanvas');
+            if (!canvas) return;
+
+            const TOUCH_LOOK_SENSITIVITY = 0.005;
+            const DRAG_THRESHOLD = 4;
+
+            let activeTouchId = null;
+            let lastX = 0;
+            let lastY = 0;
+            let dragStarted = false;
+
+            canvas.addEventListener('touchstart', (e) => {
+                if (activeTouchId !== null) return;
+                const t = e.changedTouches[0];
+                activeTouchId = t.identifier;
+                lastX = t.clientX;
+                lastY = t.clientY;
+                dragStarted = false;
+            }, { passive: true });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (activeTouchId === null) return;
+                const cam = workshop.shaman.sandbox3d.cameraFree;
+                if (!cam) return;
+
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const t = e.changedTouches[i];
+                    if (t.identifier !== activeTouchId) continue;
+
+                    const dx = t.clientX - lastX;
+                    const dy = t.clientY - lastY;
+                    lastX = t.clientX;
+                    lastY = t.clientY;
+
+                    if (!dragStarted && (Math.abs(dx) + Math.abs(dy)) > DRAG_THRESHOLD) {
+                        dragStarted = true;
+                    }
+                    if (!dragStarted) return;
+
+                    cam.rotation.y += dx * TOUCH_LOOK_SENSITIVITY;
+                    cam.rotation.x += dy * TOUCH_LOOK_SENSITIVITY;
+                    cam.rotation.x = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, cam.rotation.x));
+                    break;
+                }
+            }, { passive: true });
+
+            const endHandler = (e) => {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === activeTouchId) {
+                        activeTouchId = null;
+                        dragStarted = false;
+                        break;
+                    }
+                }
             };
-            bindBtn('btn-move-up', moveState, 'up');
-            bindBtn('btn-move-down', moveState, 'down');
-            bindBtn('btn-move-left', moveState, 'left');
-            bindBtn('btn-move-right', moveState, 'right');
-            bindBtn('btn-look-up', lookState, 'up');
-            bindBtn('btn-look-down', lookState, 'down');
-            bindBtn('btn-look-left', lookState, 'left');
-            bindBtn('btn-look-right', lookState, 'right');
+            canvas.addEventListener('touchend', endHandler, { passive: true });
+            canvas.addEventListener('touchcancel', endHandler, { passive: true });
         }
-        setupMobileButtons();
+
+        setupTouchLook();
 
         function toggleMapTextures() {
             isMapTexturesEnabled = !isMapTexturesEnabled;
@@ -4977,18 +5026,11 @@
                         }
                     },
 
-                    handleInput: function() {
-                        if(!this.cameraFree) return;
-                        
-                        const cam = this.cameraFree;
-                        const lookSpeed = 0.03;
-                        const moveSpeed = 0.5;
+                    handleInput: function () {
+                        if (!this.cameraFree) return;
 
-                        if(lookState.left) cam.rotation.y -= lookSpeed;
-                        if(lookState.right) cam.rotation.y += lookSpeed;
-                        if(lookState.up) cam.rotation.x -= lookSpeed;
-                        if(lookState.down) cam.rotation.x += lookSpeed;
-                        cam.rotation.x = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, cam.rotation.x));
+                        const cam = this.cameraFree;
+                        const moveSpeed = 0.5;
 
                         if (selectedShape === 'view' && viewTargetMesh && viewTargetMesh.physicsImpostor) {
                             cam.position.copyFrom(viewTargetMesh.position);
@@ -5211,6 +5253,7 @@
                                 if (heldMesh.physicsImpostor) {
                                     heldMesh.physicsImpostor.setLinearVelocity(BABYLON.Vector3.Zero());
                                     heldMesh.physicsImpostor.setAngularVelocity(BABYLON.Vector3.Zero());
+                                    heldMesh.physicsImpostor.forceUpdate();
                                 }
                             } else if (heldMesh) {
                                 if (heldMesh.physicsImpostor && heldMesh.metadata && heldMesh.metadata.gravGunMass !== undefined) {
@@ -5231,23 +5274,18 @@
                         });
 
                         scene.onPointerObservable.add((pointerInfo) => {
-                            if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERDOWN) {
-                                if(pointerInfo.event.button !== 0 && pointerInfo.event.type !== 'touchstart') return; 
-                                if(selectedShape === 'none') return; 
+                            if (pointerInfo.type === BABYLON.PointerEventTypes.POINTERTAP) {
+                                if (selectedShape === 'none') return;  
 
                                 if (selectedShape === 'gravgun') {
                                     if (heldMesh) {
                                         if (heldMesh.physicsImpostor && heldMesh.metadata && heldMesh.metadata.gravGunMass !== undefined) {
                                             const releaseMesh = heldMesh;
+                                            releaseMesh.physicsImpostor.wakeUp();
                                             releaseMesh.physicsImpostor.setMass(releaseMesh.metadata.gravGunMass);
-
-                                            setTimeout(() => {
-                                                if (releaseMesh && releaseMesh.physicsImpostor) {
-                                                    releaseMesh.physicsImpostor.setLinearVelocity(BABYLON.Vector3.Zero());
-                                                    releaseMesh.physicsImpostor.setAngularVelocity(BABYLON.Vector3.Zero());
-                                                    releaseMesh.physicsImpostor.wakeUp();
-                                                }
-                                            }, 10);
+                                            releaseMesh.physicsImpostor.setLinearVelocity(BABYLON.Vector3.Zero());
+                                            releaseMesh.physicsImpostor.setAngularVelocity(BABYLON.Vector3.Zero());
+                                            releaseMesh.physicsImpostor.forceUpdate();
                                         }
                                         heldMesh = null;
                                         if (typeof updateGravgunRotationUI === 'function') updateGravgunRotationUI();
@@ -5263,7 +5301,10 @@
                                             heldMesh = mesh;
                                             if (!heldMesh.metadata) heldMesh.metadata = {};
                                             heldMesh.metadata.gravGunMass = heldMesh.physicsImpostor.mass;
+                                            heldMesh.physicsImpostor.setLinearVelocity(BABYLON.Vector3.Zero());
+                                            heldMesh.physicsImpostor.setAngularVelocity(BABYLON.Vector3.Zero());
                                             heldMesh.physicsImpostor.setMass(0);
+                                            heldMesh.physicsImpostor.sleep();
                                             if (typeof updateGravgunRotationUI === 'function') updateGravgunRotationUI();
                                         }
                                     }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sand Box 3D // Prism Launcher</title>
+    <title>sand box 3d</title>
     <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -400,11 +400,11 @@
     <div class="page-wrapper" id="page-wrapper">
 
         <div class="topbar">
-            <a href="https://nocturnestu.pages.dev" class="topbar-brand">
-                <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png" alt="..." class="topbar-logo">
-                <span class="topbar-name">PRISM</span>
+            <a href="https://proprism.pages.dev" class="topbar-brand">
+                <img src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo2.png" alt="..." class="topbar-logo">
+                <span class="topbar-name">prism</span>
             </a>
-            <div class="topbar-pill">SB3D</div>
+            <div class="topbar-pill">sb3d</div>
         </div>
 
         <div class="hero-card">
@@ -414,32 +414,32 @@
                     <i class="material-icons-round">view_in_ar</i>
                 </div>
                 <div class="hero-text">
-                    <h1 class="hero-title">Sand Box 3D</h1>
-                    <div class="hero-sub">Prism Launcher</div>
+                    <h1 class="hero-title">sand box 3d</h1>
+                    <div class="hero-sub">prism launchpad</div>
                 </div>
             </div>
 
             <p class="hero-desc">
-                A <strong>high-fidelity physics sandbox</strong> running entirely in your browser. Spawn objects, pilot them, blow things up — cross-platform, no install needed.
+                prism's top-tier html-based 3d sandbox game based on babylon.js, cannon,js, and ammo.js
             </p>
 
             <div class="platform-badge" id="platform-badge">
                 <i class="material-icons-round">devices</i>
-                <span id="platform-label">Detecting platform...</span>
+                <span id="platform-label">...</span>
             </div>
 
             <button class="launch-btn" id="btn-launch" onclick="initiateLaunch(event)">
                 <i class="material-icons-round">play_circle</i>
                 <div class="launch-content">
-                    <span class="launch-title">Enter Sandbox</span>
-                    <span class="launch-sub" id="version-text">Checking compatibility...</span>
+                    <span class="launch-title">go play</span>
+                    <span class="launch-sub" id="version-text">initialize sandbox</span>
                 </div>
             </button>
 
         </div>
 
         <div class="page-footer">
-            <p>NOCTURNE Studios // Project Prism</p>
+            <p>project prism by monsieurshaman on github/discord!!</p>
         </div>
 
     </div>
@@ -456,11 +456,11 @@
             if (isMobile) {
                 targetUrl = "SandBox3D_Mobile";
                 versionText.textContent = "Sand Box 3D for Mobile";
-                platformLabel.textContent = "Mobile build detected";
+                platformLabel.textContent = "playable for you on your phone";
             } else {
                 targetUrl = "SandBox3D_PC";
                 versionText.textContent = "Sand Box 3D for PC";
-                platformLabel.textContent = "PC build detected";
+                platformLabel.textContent = "playable for you on pc";
             }
         });
 
@@ -484,13 +484,13 @@
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
-                    status.textContent = "Spawning World...";
+                    status.textContent = "generating world...";
                     setTimeout(() => { window.location.href = targetUrl; }, 500);
                 }
                 bar.style.width = Math.min(progress, 100) + "%";
-                if (progress < 30) status.textContent = "Initializing Engine...";
-                else if (progress < 60) status.textContent = "Loading Models...";
-                else if (progress < 90) status.textContent = "Calibrating Physics...";
+                if (progress < 30) status.textContent = "cranking up babylon...";
+                else if (progress < 60) status.textContent = "initiating launch...";
+                else if (progress < 90) status.textContent = "get ready!";
             }, stepTime);
         }
 

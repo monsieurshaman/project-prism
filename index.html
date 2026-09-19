@@ -767,6 +767,70 @@
             box-shadow: 0 10px 36px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.07);
         }
 
+        .cards-grid.tile-layout,
+        .dt-cards-grid.tile-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            grid-auto-rows: 130px;
+            gap: 12px;
+        }
+
+        .tile-layout .glass-card,
+        .tile-layout .dt-glass-card {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            padding: 16px 12px;
+            overflow: hidden;
+        }
+
+        .card-icon-wrap,
+        .card-title,
+        .card-desc {
+            transition: font-size 0.4s var(--spring), width 0.4s var(--spring), height 0.4s var(--spring), margin 0.3s ease;
+        }
+
+        .tile-layout .card-icon-wrap {
+            width: 46px;
+            height: 46px;
+            font-size: 22px;
+        }
+
+        .tile-layout .card-body {
+            flex: none;
+            width: 100%;
+        }
+
+        .tile-layout .card-title {
+            font-size: 13px;
+            margin-bottom: 0;
+            white-space: normal;
+        }
+
+        .tile-layout .card-desc {
+            display: block;
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            font-size: 10px;
+            line-height: 1.35;
+            white-space: normal;
+            transition: max-height 0.3s var(--spring), opacity 0.25s ease, margin-top 0.25s ease;
+        }
+
+        .tile-layout .glass-card:hover .card-desc,
+        .tile-layout .dt-glass-card:hover .card-desc {
+            max-height: 50px;
+            opacity: 1;
+            margin-top: 4px;
+        }
+
+        .tile-layout .card-arrow {
+            display: none;
+        }
+
         .glass-card:active {
             transform: translateY(0) scale(0.99);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -846,6 +910,21 @@
                 transform: scale(4);
                 opacity: 0;
             }
+        }
+
+        .theme-transition-veil {
+            position: fixed;
+            inset: 0;
+            background: #050508;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+
+        .theme-transition-veil.active {
+            opacity: 1;
+            pointer-events: all;
         }
 
         .app-library-page {
@@ -1974,6 +2053,138 @@
             }
         }
 
+        .credits-bubble-trigger {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            backdrop-filter: var(--blur-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 550;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+            transform: translateY(20px) scale(0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.35s var(--spring), opacity 0.3s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        #settings-page.open ~ .credits-bubble-trigger {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: all;
+            transition-delay: 0.2s;
+        }
+
+        .credits-bubble-trigger:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-strong);
+            transform: scale(1.08);
+        }
+
+        .credits-bubble-trigger .material-icons-round {
+            font-size: 20px;
+            color: var(--text-sub);
+        }
+
+        .credits-dialog-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 10, 0.55);
+            backdrop-filter: var(--blur-sm);
+            z-index: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .credits-dialog-backdrop.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .credits-dialog {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 340px;
+            max-width: calc(100vw - 40px);
+            max-height: 70vh;
+            background: var(--surface-0);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--r-lg);
+            backdrop-filter: var(--blur-lg);
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.5);
+            z-index: 601;
+            padding: 24px;
+            overflow-y: auto;
+            transform: translateY(16px) scale(0.94);
+            opacity: 0;
+            pointer-events: none;
+            transform-origin: bottom right;
+            transition: transform 0.35s var(--spring), opacity 0.25s ease;
+        }
+
+        .credits-dialog.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .credits-dialog-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .credits-dialog-sub {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-bottom: 18px;
+        }
+
+        .credits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .credits-entry {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: rgba(20, 20, 36, 0.5);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+        }
+
+        .credits-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: var(--surface-1);
+        }
+
+        .credits-name {
+            font-size: 13.5px;
+            font-weight: 600;
+        }
+
+        .credits-role {
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+
     </style>
 </head>
 
@@ -1982,6 +2193,7 @@
     <video id="bg-video" autoplay loop muted playsinline style="display: none; position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.5; pointer-events: none; filter: brightness(0.75) saturate(0.6);"></video>
     <div class="bg-overlay"></div>
     <div id="cursor-glow"></div>
+    <div class="theme-transition-veil" id="theme-veil"></div>
 
     <div id="startup-loader">
         <div class="loader-bg-pulse"></div>
@@ -2104,7 +2316,7 @@
                 </div>
             </div>
 
-            <div class="fs-footer" style="text-transform: lowercase;">by monsieurshaman on GitHub!</div>
+            <div class="fs-footer" style="text-transform: lowercase;">project prism by monsieurshaman on github/discord!!</div>
         </div>
 
         <div class="desktop-layout">
@@ -2150,7 +2362,7 @@
                 <div class="settings-trigger" onclick="toggleSettings()" style="top: 40px; right: 40px;">
                     <i class="material-icons-round">settings</i>
                 </div>
-                <div class="dt-footer" style="text-transform: lowercase;">by monsieurshaman on GitHub!</div>
+                <div class="dt-footer" style="text-transform: lowercase;">project prism by monsieurshaman on github/discord!!</div>
             </div>
 
             <div class="desktop-right">
@@ -2430,6 +2642,12 @@
             <option value="mono">nostalgia</option>
         </select>
 
+        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 8px;">card style</h3>
+        <select id="card-layout-selector" class="setting-select" onchange="changeCardLayout(this.value)">
+            <option value="bar">bar style (default)</option>
+            <option value="tile">tile style</option>
+        </select>
+
         <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">performance</h3>
         <div class="list-group">
             <div class="list-item" style="cursor: pointer; justify-content: space-between;"
@@ -2485,6 +2703,54 @@
         </div>
 
         <div id="sw-version-display" style="display: none; position: absolute; top: 16px; right: 20px; font-size: 11px; opacity: 0.35; font-family: 'Space Grotesk', sans-serif; pointer-events: none; user-select: none;"></div>
+    </div>
+
+    <div class="credits-bubble-trigger" onclick="toggleCredits()" title="credits">
+        <i class="material-icons-round">favorite</i>
+    </div>
+
+    <div class="credits-dialog-backdrop" id="credits-backdrop" onclick="toggleCredits()"></div>
+
+    <div class="credits-dialog" id="credits-dialog">
+        <div class="credits-dialog-title" style="text-transform: lowercase;">credits</div>
+        <div class="credits-dialog-sub">the people behind project prism</div>
+        <div class="credits-list">
+            <div class="credits-entry">
+                <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/monsieurshaman.png" alt="">
+                <div>
+                    <div class="credits-name">monsieurshaman</div>
+                    <div class="credits-role">creator, lead dev, ragebaiter</div>
+                </div>
+            </div>
+            <div class="credits-entry">
+                <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/shinobiakira.png" alt="">
+                <div>
+                    <div class="credits-name">ShinobiAkira</div>
+                    <div class="credits-role">icon artist, youtuber, tester</div>
+                </div>
+            </div>
+            <div class="credits-entry">
+                <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/haku.png" alt="">
+                <div>
+                    <div class="credits-name">Hakuシ</div>
+                    <div class="credits-role">tester</div>
+                </div>
+            </div>
+            <div class="credits-entry">
+                <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="">
+                <div>
+                    <div class="credits-name">Leo Alexis</div>
+                    <div class="credits-role">honorable mention</div>
+                </div>
+            </div>
+            <div class="credits-entry">
+                <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="">
+                <div>
+                    <div class="credits-name">friends at college!</div>
+                    <div class="credits-role">honorable mention</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="download-page">
@@ -2599,7 +2865,7 @@
             return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '124, 158, 247';
         }
 
-        function changeTheme(theme) {
+        function applyThemeVars(theme) {
             const root = document.documentElement;
             const themes = {
                 blurple: { primary: '#7c9ef7', secondary: '#a78bfa' },
@@ -2628,11 +2894,79 @@
             localStorage.setItem('prism-theme', theme);
         }
 
+        function changeTheme(theme, animate = true) {
+            if (!animate) {
+                applyThemeVars(theme);
+                return;
+            }
+
+            const veil = document.getElementById('theme-veil');
+            veil.classList.add('active');
+
+            setTimeout(() => {
+                applyThemeVars(theme);
+
+                setTimeout(() => {
+                    veil.classList.remove('active');
+                }, 300);
+            }, 500);
+        }
+
         (function loadSavedTheme() {
             const saved = localStorage.getItem('prism-theme');
             if (saved) {
-                changeTheme(saved);
+                changeTheme(saved, false);
                 document.getElementById('theme-selector').value = saved;
+            }
+        })();
+
+        function changeCardLayout(layout) {
+            const grids = [document.querySelector('.cards-grid'), document.querySelector('.dt-cards-grid')];
+
+            grids.forEach(grid => {
+                if (!grid) return;
+                const cards = Array.from(grid.querySelectorAll('.glass-card, .dt-glass-card'));
+
+                const first = cards.map(c => c.getBoundingClientRect());
+
+                grid.classList.toggle('tile-layout', layout === 'tile');
+
+                const last = cards.map(c => c.getBoundingClientRect());
+
+                cards.forEach((card, i) => {
+                    const dx = first[i].left - last[i].left;
+                    const dy = first[i].top - last[i].top;
+                    const dw = first[i].width / last[i].width;
+                    const dh = first[i].height / last[i].height;
+
+                    card.style.transition = 'none';
+                    card.style.transformOrigin = 'top left';
+                    card.style.transform = `translate(${dx}px, ${dy}px) scale(${dw}, ${dh})`;
+
+                    requestAnimationFrame(() => {
+                        card.style.transition = 'transform 0.5s var(--spring, cubic-bezier(0.34, 1.56, 0.64, 1))';
+                        card.style.transform = 'translate(0, 0) scale(1, 1)';
+                        card.style.transitionDelay = `${i * 30}ms`;
+                    });
+
+                    card.addEventListener('transitionend', function cleanup() {
+                        card.style.transition = '';
+                        card.style.transform = '';
+                        card.style.transformOrigin = '';
+                        card.style.transitionDelay = '';
+                        card.removeEventListener('transitionend', cleanup);
+                    });
+                });
+            });
+
+            localStorage.setItem('prism-card-layout', layout);
+        }
+
+        (function loadSavedCardLayout() {
+            const saved = localStorage.getItem('prism-card-layout');
+            if (saved) {
+                changeCardLayout(saved);
+                document.getElementById('card-layout-selector').value = saved;
             }
         })();
 
@@ -2904,6 +3238,9 @@
                     './Other/websend',
                     './Tools/lapscan',
                     './Tools/pixelpeek',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/monsieurshaman.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/shinobiakira.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/haku.png',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo2.png',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo192.png',
@@ -3236,6 +3573,18 @@
             }
         }
 
+        function toggleCredits() {
+            document.getElementById('credits-dialog').classList.toggle('open');
+            document.getElementById('credits-backdrop').classList.toggle('open');
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.getElementById('credits-dialog').classList.remove('open');
+                document.getElementById('credits-backdrop').classList.remove('open');
+            }
+        });
+
         function handleOverlayClick(e) { return; }
 
         document.addEventListener('keydown', function (e) {
@@ -3266,11 +3615,11 @@
             const isStandalone = window.__PRISM_ENV__.isStandalone;
 
             const taglines = [
-                'Making thoughts...',
-                'Progressing...',
-                'Deeply thinking...',
-                'Waking up...',
-                'Thinking...',
+                'editing videos for you...',
+                'heating up your sandwich...',
+                'beating the meat...',
+                'testing stuff..',
+                'cooking rice...',
             ];
 
             function setStatus(text) {

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rift Runners 2D // Prism Launcher</title>
+    <title>rift runners 2d</title>
     <meta name="theme-color" content="#0a0a12">
     <link
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap"
@@ -514,9 +514,9 @@
         <div class="topbar">
             <a href="https://nocturnestu.pages.dev" class="topbar-brand">
                 <img src="https://cdn.jsdelivr.net/gh/nocturnestu/NOCTURNE_Library@main/nocturneassets/logo2.png" alt="..." class="topbar-logo">
-                <span class="topbar-name">PRISM</span>
+                <span class="topbar-name">prism</span>
             </a>
-            <div class="topbar-pill">RR2D</div>
+            <div class="topbar-pill">rr2d</div>
         </div>
 
         <div class="hero-card">
@@ -526,33 +526,32 @@
                     <i class="material-icons-round">track_changes</i>
                 </div>
                 <div class="hero-text">
-                    <h1 class="hero-title">Rift Runners 2D</h1>
-                    <div class="hero-sub">ECHO PROTOCOL</div>
+                    <h1 class="hero-title">rift runners 2d</h1>
+                    <div class="hero-sub">echo protocol</div>
                 </div>
             </div>
 
             <p class="hero-desc">
-                Engage in <strong>high-velocity extraction</strong> within shifting geometry. Survive the collapse,
-                deploy echoes, and secure integrity in this intensive top-down trial.
+                prism's top-down arcade game built using phaser.js
             </p>
 
             <div class="platform-badge" id="platform-badge">
                 <i class="material-icons-round">radar</i>
-                <span id="platform-label">System Stable</span>
+                <span id="platform-label">system stable</span>
             </div>
 
             <button class="launch-btn" id="btn-launch" onclick="initiateLaunch(event)">
                 <i class="material-icons-round">play_arrow</i>
                 <div class="launch-content">
-                    <span class="launch-title">Initialize Run</span>
-                    <span class="launch-sub" id="version-text">Connect to Matrix</span>
+                    <span class="launch-title">go play</span>
+                    <span class="launch-sub" id="version-text">launch the protocol</span>
                 </div>
             </button>
 
         </div>
 
         <div class="page-footer">
-            <p>NOCTURNE Studios // Project Prism</p>
+            <p>project prism by monsieurshaman on github/discord!!</p>
         </div>
 
     </div>
@@ -566,12 +565,12 @@
             const launchBtn = document.getElementById('btn-launch');
 
             if (isMobile) {
-                platformLabel.textContent = "PC Required for Rift";
+                platformLabel.textContent = "your phone/tablet can't play this";
                 launchBtn.style.opacity = "0.3";
                 launchBtn.style.cursor = "not-allowed";
                 launchBtn.classList.add('disabled');
             } else {
-                platformLabel.textContent = "Desktop Node Secured";
+                platformLabel.textContent = "your pc can play this";
             }
             syncGlobalSettings();
         });
@@ -598,12 +597,12 @@
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
-                    status.textContent = "SHIFTING GEOMETRY...";
+                    status.textContent = "generating world...";
                     setTimeout(() => { window.location.href = targetUrl; }, 400);
                 }
                 bar.style.width = Math.min(progress, 100) + "%";
-                if (progress < 40) status.textContent = "STABILIZING RIFT...";
-                else if (progress < 80) status.textContent = "LOADING ECHOES...";
+                if (progress < 40) status.textContent = "rift running...";
+                else if (progress < 80) status.textContent = "echoes stabilized...";
             }, stepTime);
         }
 
