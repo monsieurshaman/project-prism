@@ -730,7 +730,7 @@
         <div class="loader-content">
             <div class="loader-spinner"></div>
             <div class="loader-text">Sand Box 3D for Mobile</div>
-            <div class="loader-subtext-version">Version: v26.09.19</div>
+            <div class="loader-subtext-version">Version: v26.09.22</div>
             <div class="loader-subtext">Setting up your sandbox...</div>
             <button id="skip-loading-btn" onclick="skipLoading()">Skip Setup</button>
         </div>
@@ -1551,8 +1551,8 @@
         let targetFPS = 60;
         let lastFrameTime = performance.now();
         let isHUDVisible = true;
-        let isFrustumCullingEnabled = false;
-        let isPhysicsSleepingEnabled = true;
+        let isFrustumCullingEnabled = true;
+        let isPhysicsSleepingEnabled = false;
         let performanceSafeguardActive = true;
         let isSafeguardInCooldown = false;
         let lowFpsCounter = 0;
@@ -3875,7 +3875,7 @@
             isFilmFXEnabled = false;
             isBuildMode = false;
             selectedShape = 'box';
-            isFrustumCullingEnabled = false;
+            isFrustumCullingEnabled = true;
 
             sb3d.init();
 

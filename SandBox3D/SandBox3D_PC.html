@@ -742,7 +742,7 @@
         <div class="loader-content">
             <div class="loader-spinner"></div>
             <div class="loader-text">Sand Box 3D for PC</div>
-            <div class="loader-subtext-version">Version: v26.09.19</div>
+            <div class="loader-subtext-version">Version: v26.09.22</div>
             <div class="loader-subtext">Setting up your sandbox...</div>
             <button id="skip-loading-btn" onclick="skipLoading()">Skip Setup</button>
         </div>
@@ -1554,8 +1554,8 @@
         let viewTargetMesh = null;
         let throwForce = 50; 
         let isHUDVisible = true;
-        let isFrustumCullingEnabled = false;
-        let isPhysicsSleepingEnabled = true;
+        let isFrustumCullingEnabled = true;
+        let isPhysicsSleepingEnabled = false;
         let performanceSafeguardActive = true;
         let isSafeguardInCooldown = false;
         let lowFpsCounter = 0;
@@ -2336,7 +2336,7 @@
             const btn = document.getElementById('btn-screenshake');
             if (!btn) return;
             btn.innerHTML = isScreenShakeEnabled
-                ? `<span class="shape-icon" style="background:#e74c3c;border-radius:2px;box-shadow:0 0 5px #e74c3c;"></span> ${t.dynShakeOn}`
+                ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynShakeOn}`
                 : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynShakeOff}`;
         }
 
@@ -2381,7 +2381,7 @@
             if (!btn) return;
             const t = SB3D_LANGS[activeLang];
             if (isSpawnParticlesEnabled) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#a855f7;border-radius:50%;box-shadow:0 0 5px #a855f7;"></span> ${t.dynSpawnFXOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynSpawnFXOn}`;
                 btn.style.borderLeftColor = '#a855f7';
                 btn.classList.add('active');
             } else {
@@ -2448,19 +2448,19 @@
                 'btn-restart-options': `<span class="shape-icon" style="background:transparent;border:2px solid #e74c3c;border-radius:50%;width:10px;height:10px;"></span> ${t.restartBtnSettings}`,
                 'btn-show-more': `<span class="shape-icon" style="background: transparent; border: 2px solid #c0392b; border-radius: 2px; width: 10px; height: 10px;"></span> ${t.btnShowMore}`,
                 'btn-about-versions': `<span class="shape-icon" style="background: transparent; border: 2px solid #4aa3df; border-radius: 2px; width: 10px; height: 10px;"></span> ${t.btnVersions}`,
-                'btn-export-session-log': `<span class="shape-icon" style="background: #00bcd4; border-radius: 50%;"></span> ${t.btnExportSession}`,
+                'btn-export-session-log': `<span class="shape-icon" style="background:#555; border-radius: 50%;"></span> ${t.btnExportSession}`,
                 'btn-mirror_box': `<span class="shape-icon icon-box" style="background: linear-gradient(135deg, #eee, #aaa);"></span> ${t.btnMirrorCube}`,
                 'btn-mirror_sphere': `<span class="shape-icon icon-sphere" style="background: linear-gradient(135deg, #eee, #aaa);"></span> ${t.btnMirrorSphere}`,
                 'btn-mirror_cyl': `<span class="shape-icon icon-cyl" style="background: linear-gradient(135deg, #eee, #aaa);"></span> ${t.btnMirrorCyl}`,
                 'btn-mirror_tri': `<span class="shape-icon icon-tri" style="border-bottom-color: #ccc; filter: drop-shadow(0 -2px 1px #eee);"></span> ${t.btnMirrorTri}`,
                 'btn-gravgun': `<span class="shape-icon icon-hand" style="border-color: #00bcd4;"></span> ${t.btnGravgun}`,
-                'btn-spawn-particles': `<span class="shape-icon" style="background:${isSpawnParticlesEnabled ? '#a855f7' : '#555'};border-radius:50%;${isSpawnParticlesEnabled ? 'box-shadow:0 0 5px #a855f7;' : ''}"></span> ${t[isSpawnParticlesEnabled ? 'dynSpawnFXOn' : 'dynSpawnFXOff']}`,
+                'btn-spawn-particles': `<span class="shape-icon" style="background:${isSpawnParticlesEnabled ? '#a855f7' : '#555'};border-radius:50%;${isSpawnParticlesEnabled ? '' : ''}"></span> ${t[isSpawnParticlesEnabled ? 'dynSpawnFXOn' : 'dynSpawnFXOff']}`,
                 'btn-firebomb': `<span class="shape-icon icon-fire"></span> ${t.btnFireBomb}`,
                 'btn-icebomb': `<span class="shape-icon icon-icebomb"></span> ${t.btnIceBomb}`,
                 'btn-pyramid': `<span class="shape-icon icon-tri"></span> ${t.btnPyramid}`,
                 'btn-torus': `<span class="shape-icon" style="background:transparent; border:2px solid #ccc; border-radius:50%; width:10px; height:10px;"></span> ${t.btnTorus}`,
-                'btn-ice_mat': `<span class="shape-icon" style="background:#00bcd4; border-radius:2px;"></span> ${t.btnIceMat}`,
-                'btn-rubber_mat': `<span class="shape-icon" style="background:#e91e63; border-radius:50%;"></span> ${t.btnRubberMat}`,
+                'btn-ice_mat': `<span class="shape-icon" style="background:#555; border-radius:2px;"></span> ${t.btnIceMat}`,
+                'btn-rubber_mat': `<span class="shape-icon" style="background:#555; border-radius:50%;"></span> ${t.btnRubberMat}`,
             };
             const sliderLbls = {
                 'lbl-ambience-vol': t.labelAmbienceVol,
@@ -2584,85 +2584,85 @@
             if (hudBtn) {
                 const isShowing = isHUDVisible;
                 hudBtn.innerHTML = isShowing
-                    ? `<span class="shape-icon" style="background:#2ecc71;border-radius:2px;"></span> ${t.dynHudShow}`
-                    : `<span class="shape-icon" style="background:#e74c3c;border-radius:2px;"></span> ${t.dynHudHide}`;
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynHudShow}`
+                    : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynHudHide}`;
             }
 
             const ambBtn = document.getElementById('btn-ambient');
             if (ambBtn) {
                 const isOn = workshop?.shaman?.sandbox3d?.TemporalAudio?.enabled;
                 ambBtn.innerHTML = isOn
-                    ? `<span class="shape-icon" style="background:#2ecc71;border-radius:50%;box-shadow:0 0 5px #2ecc71;"></span> ${t.dynAmbientOn}`
-                    : `<span class="shape-icon" style="background:#9b59b6;border-radius:50%;"></span> ${t.dynAmbientOff}`;
+                    ? `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynAmbientOn}`
+                    : `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynAmbientOff}`;
             }
 
             const safeguardBtn = document.getElementById('btn-perf-safeguard');
             if (safeguardBtn) {
                 safeguardBtn.innerHTML = performanceSafeguardActive
-                    ? `<span class="shape-icon" style="background:#f1c40f;border-radius:2px;"></span> ${t.dynSafeguardOn}`
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSafeguardOn}`
                     : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSafeguardOff}`;
             }
 
             const sleepBtn = document.getElementById('btn-physics-sleep');
             if (sleepBtn) {
                 sleepBtn.innerHTML = isPhysicsSleepingEnabled
-                    ? `<span class="shape-icon" style="background:#2ecc71;border-radius:2px;box-shadow:0 0 5px #2ecc71;"></span> ${t.dynSleepOn}`
-                    : `<span class="shape-icon" style="background:#e67e22;border-radius:2px;"></span> ${t.dynSleepOff}`;
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSleepOn}`
+                    : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSleepOff}`;
             }
 
             const frustumBtn = document.getElementById('btn-frustum-cull');
             if (frustumBtn) {
                 frustumBtn.innerHTML = isFrustumCullingEnabled
-                    ? `<span class="shape-icon" style="background:#2ecc71;border-radius:2px;box-shadow:0 0 5px #2ecc71;"></span> ${t.dynFrustumOn}`
-                    : `<span class="shape-icon" style="background:#e67e22;border-radius:2px;"></span> ${t.dynFrustumOff}`;
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFrustumOn}`
+                    : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFrustumOff}`;
             }
 
             const daynightBtn = document.getElementById('btn-daynight');
             if (daynightBtn) {
                 daynightBtn.innerHTML = isDayNightEnabled
-                    ? `<span class="shape-icon" style="background:#f39c12;border-radius:50%;box-shadow:0 0 6px #f39c12;"></span> ${t.dynTimeOn}`
-                    : `<span class="shape-icon" style="background:#f39c12;border-radius:50%;"></span> ${t.dynTimeOff}`;
+                    ? `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynTimeOn}`
+                    : `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynTimeOff}`;
             }
 
             const flashEnableBtn = document.getElementById('btn-flashlight-enable');
             if (flashEnableBtn) {
                 flashEnableBtn.innerHTML = isFlashlightEnabled
-                    ? `<span class="shape-icon" style="background:#f1c40f;border-radius:50%;box-shadow:0 0 6px #f1c40f;"></span> ${t.dynFlashlightOn}`
+                    ? `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynFlashlightOn}`
                     : `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynFlashlightOff}`;
             }
 
             const filmFXBtn = document.getElementById('btn-filmfx');
             if (filmFXBtn) {
                 filmFXBtn.innerHTML = isFilmFXEnabled
-                    ? `<span class="shape-icon" style="background:#e74c3c;border-radius:2px;box-shadow:0 0 6px #e74c3c;"></span> ${t.dynFilmFXOn}`
-                    : `<span class="shape-icon" style="background:#c0392b;border-radius:2px;"></span> ${t.dynFilmFXOff}`;
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFilmFXOn}`
+                    : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFilmFXOff}`;
             }
 
             const syncBtn = document.getElementById('btn-sync-time');
             if (syncBtn) {
                 syncBtn.innerHTML = isSyncingDeviceTime
-                    ? `<span class="shape-icon" style="background:#2ecc71;border-radius:50%;box-shadow:0 0 5px #2ecc71;"></span> ${t.dynSyncOn}`
-                    : `<span class="shape-icon" style="background:#3498db;border-radius:50%;"></span> ${t.dynSyncOff}`;
+                    ? `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynSyncOn}`
+                    : `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynSyncOff}`;
             }
 
             const shakeBtn = document.getElementById('btn-screenshake');
             if (shakeBtn) {
                 shakeBtn.innerHTML = isScreenShakeEnabled
-                    ? `<span class="shape-icon" style="background:#e74c3c;border-radius:2px;box-shadow:0 0 5px #e74c3c;"></span> ${t.dynShakeOn}`
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynShakeOn}`
                     : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynShakeOff}`;
             }
 
             const sunBtn = document.getElementById('btn-sun');
             if (sunBtn) {
                 sunBtn.innerHTML = isSunEnabled
-                    ? `<span class="shape-icon" style="background:#f1c40f;border-radius:50%;box-shadow:0 0 6px #f1c40f;"></span> ${t.dynSunOn}`
+                    ? `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynSunOn}`
                     : `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynSunOff}`;
             }
 
             const flashVidBtn = document.getElementById('btn-flashvid');
             if (flashVidBtn) {
                 flashVidBtn.innerHTML = isFlashbangVideoEnabled
-                    ? `<span class="shape-icon" style="background:#f1c40f;border-radius:2px;"></span> ${t.dynFlashVidOn}`
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFlashVidOn}`
                     : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFlashVidOff}`;
             }
 
@@ -2670,21 +2670,21 @@
             if (recBtn) {
                 const isRecording = !!sessionRecorderStartTime;
                 recBtn.innerHTML = isRecording
-                    ? `<span class="shape-icon" style="background:#00bcd4;border-radius:2px;box-shadow:0 0 6px #00bcd4;"></span> ${t.dynSessionRecorderOn}`
-                    : `<span class="shape-icon" style="background:#00bcd4;border-radius:2px;"></span> ${t.dynSessionRecorderOff}`;
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSessionRecorderOn}`
+                    : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSessionRecorderOff}`;
             }
 
             const bgPillarsBtn = document.getElementById('btn-bg-pillars');
             if (bgPillarsBtn) {
                 bgPillarsBtn.innerHTML = isBgPillarsEnabled
-                    ? `<span class="shape-icon" style="background:#78909c;border-radius:2px;"></span> ${t.dynBgPillarsOn}`
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynBgPillarsOn}`
                     : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynBgPillarsOff}`;
             }
 
             const bgDecorsBtn = document.getElementById('btn-bg-decors');
             if (bgDecorsBtn) {
                 bgDecorsBtn.innerHTML = isBgDecorsEnabled
-                    ? `<span class="shape-icon" style="background:#80cbc4;border-radius:50%;"></span> ${t.dynBgDecorsOn}`
+                    ? `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynBgDecorsOn}`
                     : `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynBgDecorsOff}`;
             }
 
@@ -2694,7 +2694,7 @@
             const mapTexBtn = document.getElementById('btn-map-textures');
             if (mapTexBtn) {
                 mapTexBtn.innerHTML = isMapTexturesEnabled
-                    ? `<span class="shape-icon" style="background:#e91e63;border-radius:2px;box-shadow:0 0 6px #e91e63;"></span> ${t.dynMapTextureOn}`
+                    ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynMapTextureOn}`
                     : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynMapTextureOff}`;
             }
 
@@ -2823,11 +2823,11 @@
 
             if (isHUDVisible) {
                 hud.style.display = 'flex';
-                btn.innerHTML = `<span class="shape-icon" style="background:#2ecc71;border-radius:2px;"></span> ${t.dynHudShow}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynHudShow}`;
                 btn.style.borderColor = '#2ecc71';
             } else {
                 hud.style.display = 'none';
-                btn.innerHTML = `<span class="shape-icon" style="background:#e74c3c;border-radius:2px;"></span> ${t.dynHudHide}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynHudHide}`;
                 btn.style.borderColor = '#e74c3c';
             }
         }
@@ -2839,7 +2839,7 @@
             const t = SB3D_LANGS[activeLang];
 
             if (isFlashlightEnabled) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#f1c40f;border-radius:50%;box-shadow:0 0 6px #f1c40f;"></span> ${t.dynFlashlightOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynFlashlightOn}`;
                 btn.style.borderLeftColor = '#f1c40f';
                 btn.classList.add('active');
                 hud.style.display = 'block';
@@ -2912,7 +2912,7 @@
             const btn = document.getElementById('btn-perf-safeguard');
             const t = SB3D_LANGS[activeLang];
             btn.innerHTML = performanceSafeguardActive
-                ? `<span class="shape-icon" style="background:#f1c40f;border-radius:2px;"></span> ${t.dynSafeguardOn}`
+                ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSafeguardOn}`
                 : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSafeguardOff}`;
         }
 
@@ -2926,7 +2926,7 @@
                 sessionRecorderSnapshots = [];
                 btn.textContent = '';
                 const _t = SB3D_LANGS[activeLang];
-                btn.innerHTML = `<span class="shape-icon" style="background:#00bcd4;border-radius:2px;box-shadow:0 0 6px #00bcd4;"></span> ${_t.dynSessionRecorderOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${_t.dynSessionRecorderOn}`;
                 btn.style.borderLeftColor = '#00bcd4';
                 btn.style.background = '#0a2e33';
                 exportWrap.style.display = 'block';
@@ -2941,7 +2941,7 @@
                 clearInterval(sessionRecorderInterval);
                 sessionRecorderInterval = null;
                 const _t = SB3D_LANGS[activeLang];
-                btn.innerHTML = `<span class="shape-icon" style="background:#00bcd4;border-radius:2px;"></span> ${_t.dynSessionRecorderOff}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${_t.dynSessionRecorderOff}`;
                 btn.style.background = '';
                 exportWrap.style.display = 'none';
                 sessionRecorderStartTime = null;
@@ -3280,12 +3280,12 @@
             const t = SB3D_LANGS[activeLang];
 
             if (isFilmFXEnabled) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#e74c3c;border-radius:2px;box-shadow:0 0 6px #e74c3c;"></span> ${t.dynFilmFXOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFilmFXOn}`;
                 btn.style.borderLeftColor = '#e74c3c';
                 btn.classList.add('active');
                 applyFilmFX();
             } else {
-                btn.innerHTML = `<span class="shape-icon" style="background:#c0392b;border-radius:2px;"></span> ${t.dynFilmFXOff}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFilmFXOff}`;
                 btn.style.borderLeftColor = '#c0392b';
                 btn.classList.remove('active');
                 removeFilmFX();
@@ -3395,13 +3395,13 @@
             const filmSliders = document.getElementById('filmfx-sliders');
 
             if (isOn) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#e74c3c;border-radius:2px;box-shadow:0 0 6px #e74c3c;"></span> ${t.dynPostFXOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynPostFXOn}`;
                 btn.style.borderLeftColor = '#e74c3c';
                 btn.classList.add('active');
                 if (showMoreWrap) showMoreWrap.style.display = 'block';
                 if (filmSliders) filmSliders.style.display = 'block';
             } else {
-                btn.innerHTML = `<span class="shape-icon" style="background:#e74c3c;border-radius:2px;"></span> ${t.dynPostFXOff}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynPostFXOff}`;
                 btn.style.borderLeftColor = '#e74c3c';
                 btn.classList.remove('active');
                 if (showMoreWrap) showMoreWrap.style.display = 'none';
@@ -3424,7 +3424,7 @@
             const t = SB3D_LANGS[activeLang];
 
             if (isDayNightEnabled) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#f39c12;border-radius:50%;box-shadow:0 0 6px #f39c12;"></span> ${t.dynTimeOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynTimeOn}`;
                 btn.style.borderLeftColor = '#f39c12';
                 btn.classList.add('active');
                 panel.style.display = 'block';
@@ -3432,7 +3432,7 @@
                 if (slider) setTimeOfDay(slider.value);
                 resetNightPulseSystem();
             } else {
-                btn.innerHTML = `<span class="shape-icon" style="background:#f39c12;border-radius:50%;"></span> ${t.dynTimeOff}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynTimeOff}`;
                 btn.style.borderLeftColor = '#f39c12';
                 btn.classList.remove('active');
                 panel.style.display = 'none';
@@ -3477,7 +3477,7 @@
 
             if (btn) {
                 if (isSunEnabled) {
-                    btn.innerHTML = `<span class="shape-icon" style="background:#f1c40f;border-radius:50%;box-shadow:0 0 6px #f1c40f;"></span> ${t.dynSunOn}`;
+                    btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynSunOn}`;
                     btn.style.borderLeftColor = '#f1c40f';
                 } else {
                     btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynSunOff}`;
@@ -3699,14 +3699,14 @@
             const t = SB3D_LANGS[activeLang];
 
             if (isSyncingDeviceTime) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#2ecc71;border-radius:50%;box-shadow:0 0 5px #2ecc71;"></span> ${t.dynSyncOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynSyncOn}`;
                 btn.style.borderLeftColor = '#2ecc71';
                 btn.classList.add('active');
                 if (slider) slider.disabled = true;
                 applyDeviceTime();
                 syncDeviceTimeInterval = setInterval(applyDeviceTime, 10000);
             } else {
-                btn.innerHTML = `<span class="shape-icon" style="background:#3498db;border-radius:50%;"></span> ${t.dynSyncOff}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynSyncOff}`;
                 btn.style.borderLeftColor = '#3498db';
                 btn.classList.remove('active');
                 if (slider) slider.disabled = false;
@@ -3728,7 +3728,7 @@
             const t = SB3D_LANGS[activeLang];
 
             if (isPhysicsSleepingEnabled) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#2ecc71;border-radius:2px;box-shadow:0 0 5px #2ecc71;"></span> ${t.dynSleepOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSleepOn}`;
                 btn.classList.add('active');
                 btn.style.borderColor = '#2ecc71';
             } else {
@@ -3738,7 +3738,7 @@
                         if (mesh.metadata) { mesh.metadata.lastMovedTime = performance.now(); mesh.metadata.isSleeping = false; }
                     }
                 });
-                btn.innerHTML = `<span class="shape-icon" style="background:#e67e22;border-radius:2px;"></span> ${t.dynSleepOff}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynSleepOff}`;
                 btn.classList.remove('active');
                 btn.style.borderColor = '#e67e22';
             }
@@ -3876,7 +3876,7 @@
             isInspectorEnabled = false;
             isBuildMode = false;
             selectedShape = 'box';
-            isFrustumCullingEnabled = false;
+            isFrustumCullingEnabled = true;
 
             sb3d.init();
 
@@ -3948,11 +3948,11 @@
             const isWebGPU = localStorage.getItem('sb3d_use_webgpu') === 'true';
 
             if (isWebGPU) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#2ecc71;border-radius:50%;box-shadow:0 0 5px #2ecc71;"></span> ${t.dynWebGPUOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynWebGPUOn}`;
                 btn.classList.add('active');
                 btn.style.borderColor = '#2ecc71';
             } else {
-                btn.innerHTML = `<span class="shape-icon" style="background:#3498db;border-radius:50%;"></span> ${t.dynWebGPUOff}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynWebGPUOff}`;
                 btn.classList.remove('active');
                 btn.style.borderColor = '#3498db';
             }
@@ -3964,11 +3964,11 @@
             const t = SB3D_LANGS[activeLang];
 
             if (isEnabled) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#2ecc71;border-radius:50%;box-shadow:0 0 5px #2ecc71;"></span> ${t.dynAmbientOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynAmbientOn}`;
                 btn.classList.add('active');
                 btn.style.borderColor = '#2ecc71';
             } else {
-                btn.innerHTML = `<span class="shape-icon" style="background:#9b59b6;border-radius:50%;"></span> ${t.dynAmbientOff}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynAmbientOff}`;
                 btn.classList.remove('active');
                 btn.style.borderColor = '#9b59b6';
             }
@@ -3983,7 +3983,7 @@
             const t = SB3D_LANGS[activeLang];
             const btn = document.getElementById('btn-bg-pillars');
             if (btn) btn.innerHTML = isBgPillarsEnabled
-                ? `<span class="shape-icon" style="background:#78909c;border-radius:2px;"></span> ${t.dynBgPillarsOn}`
+                ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynBgPillarsOn}`
                 : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynBgPillarsOff}`;
         }
 
@@ -3996,7 +3996,7 @@
             const t = SB3D_LANGS[activeLang];
             const btn = document.getElementById('btn-bg-decors');
             if (btn) btn.innerHTML = isBgDecorsEnabled
-                ? `<span class="shape-icon" style="background:#80cbc4;border-radius:50%;"></span> ${t.dynBgDecorsOn}`
+                ? `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynBgDecorsOn}`
                 : `<span class="shape-icon" style="background:#555;border-radius:50%;"></span> ${t.dynBgDecorsOff}`;
         }
 
@@ -4024,7 +4024,7 @@
             const btn = document.getElementById('btn-flashvid');
             const t = SB3D_LANGS[activeLang];
             btn.innerHTML = isFlashbangVideoEnabled
-                ? `<span class="shape-icon" style="background:#f1c40f;border-radius:2px;"></span> ${t.dynFlashVidOn}`
+                ? `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFlashVidOn}`
                 : `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFlashVidOff}`;
         }
 
@@ -4047,7 +4047,7 @@
             const t = SB3D_LANGS[activeLang];
 
             if (isFrustumCullingEnabled) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#2ecc71;border-radius:2px;box-shadow:0 0 5px #2ecc71;"></span> ${t.dynFrustumOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFrustumOn}`;
                 btn.classList.add('active');
                 btn.style.borderColor = '#2ecc71';
             } else {
@@ -4063,7 +4063,7 @@
                     mesh.alwaysSelectAsActiveMesh = false;
                     mesh.getChildMeshes().forEach(c => c.alwaysSelectAsActiveMesh = false);
                 });
-                btn.innerHTML = `<span class="shape-icon" style="background:#e67e22;border-radius:2px;"></span> ${t.dynFrustumOff}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynFrustumOff}`;
                 btn.classList.remove('active');
                 btn.style.borderColor = '#e67e22';
             }
@@ -4411,7 +4411,7 @@
             const t = SB3D_LANGS[activeLang];
 
             if (isMapTexturesEnabled) {
-                btn.innerHTML = `<span class="shape-icon" style="background:#e91e63;border-radius:2px;box-shadow:0 0 6px #e91e63;"></span> ${t.dynMapTextureOn}`;
+                btn.innerHTML = `<span class="shape-icon" style="background:#555;border-radius:2px;"></span> ${t.dynMapTextureOn}`;
                 btn.classList.add('active');
                 btn.style.borderLeftColor = '#e91e63';
             } else {
