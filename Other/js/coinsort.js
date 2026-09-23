@@ -1,0 +1,309 @@
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0d0d18);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        updateCameraForScreen();
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.15;
+        document.body.appendChild(renderer.domElement);
+        renderer.domElement.style.touchAction = 'none';
+
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmrem.fromScene(new THREE.Scene().add(new THREE.Mesh(
+            new THREE.SphereGeometry(50, 8, 8),
+            new THREE.MeshBasicMaterial({ color: 0x223344, side: THREE.BackSide })
+        )), 0.04).texture;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+        scene.add(ambientLight);
+
+        const hemiLight = new THREE.HemisphereLight(0x99ccff, 0x332200, 0.7);
+        scene.add(hemiLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.3);
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        scene.add(dirLight);
+
+        const rimLight = new THREE.PointLight(0x00ffcc, 1, 30);
+        rimLight.position.set(-8, 6, 8);
+        scene.add(rimLight);
+
+        const bins = [];
+        const binConfig = [
+            { color: 0xcd7f32, x: -6, val: 1, name: "BRONZE" },
+            { color: 0xc0c0c0, x: 0, val: 5, name: "SILVER" },
+            { color: 0xffd700, x: 6, val: 10, name: "GOLD" }
+        ];
+
+        function createLabel(text, x, y, z) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fillRect(0, 0, 256, 128);
+            ctx.strokeStyle = '#00ffcc';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(3, 3, 250, 122);
+            ctx.fillStyle = '#00ffcc';
+            ctx.font = 'bold 40px Courier New';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 128, 60);
+            ctx.font = 'bold 24px Courier New';
+            ctx.fillStyle = '#fff';
+            ctx.fillText('▲ SIZE', 128, 100);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const mat = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(mat);
+            sprite.scale.set(4, 2, 1);
+            sprite.position.set(x, y, z);
+            scene.add(sprite);
+        }
+
+        binConfig.forEach(cfg => {
+            const geo = new THREE.BoxGeometry(4, 2.5, 4);
+            const mat = new THREE.MeshPhysicalMaterial({
+                color: cfg.color,
+                transmission: 0.5,
+                opacity: 0.8,
+                transparent: true,
+                roughness: 0.1,
+                metalness: 0.9
+            });
+            const bin = new THREE.Mesh(geo, mat);
+            bin.position.set(cfg.x, 1.25, -5);
+            bin.userData = { value: cfg.val };
+            bin.receiveShadow = true;
+            scene.add(bin);
+            bins.push(bin);
+        });
+
+        binConfig.forEach(cfg => {
+            createLabel(cfg.name, cfg.x, 4, -5);
+        });
+
+        const coins = [];
+        const planeGeo = new THREE.PlaneGeometry(100, 100);
+        const planeMat = new THREE.MeshBasicMaterial({ visible: false });
+        const dragPlane = new THREE.Mesh(planeGeo, planeMat);
+        dragPlane.rotation.x = -Math.PI / 2;
+        scene.add(dragPlane);
+
+        const floorGeo = new THREE.PlaneGeometry(100, 100);
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2a, roughness: 0.8 });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        let score = 0;
+        let timeLeft = 60;
+        let draggedCoin = null;
+        let isGameOver = false;
+
+        const scoreEl = document.getElementById('score');
+        const timeEl = document.getElementById('time');
+        const gameOverEl = document.getElementById('game-over');
+        const finalScoreEl = document.getElementById('final-score');
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(freq, type, duration) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            gain.gain.setValueAtTime(1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function spawnCoin() {
+            if (isGameOver) return;
+            const cfg = binConfig[Math.floor(Math.random() * binConfig.length)];
+            const radius = cfg.val === 1 ? 0.9 : cfg.val === 5 ? 1.2 : 1.5;
+            const geo = new THREE.CylinderGeometry(radius, radius, 0.3, 32);
+
+            const isChaos = Math.random() > 0.85;
+            const mat = new THREE.MeshStandardMaterial({
+                color: isChaos ? 0xff00ff : new THREE.Color(cfg.color).multiplyScalar(0.65),
+                metalness: 0.4,
+                roughness: 0.55,
+                emissive: isChaos ? 0xff0055 : cfg.color,
+                emissiveIntensity: isChaos ? 0.5 : 0.15
+            });
+
+            const coin = new THREE.Mesh(geo, mat);
+            coin.position.set((Math.random() - 0.5) * 16, 0.5, 6 + Math.random() * 4);
+            coin.castShadow = true;
+            coin.userData = { value: cfg.val, isChaos: isChaos };
+            scene.add(coin);
+            coins.push(coin);
+        }
+
+        setInterval(spawnCoin, 1200);
+
+        const timerInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                isGameOver = true;
+                clearInterval(timerInterval);
+                gameOverEl.style.display = 'block';
+                finalScoreEl.innerText = score;
+                playSfx(150, 'sawtooth', 1.5);
+            } else {
+                timeLeft--;
+                timeEl.innerText = timeLeft;
+                if (timeLeft <= 10) timeEl.style.color = '#ff0055';
+            }
+        }, 1000);
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('pointerdown', (e) => {
+            if (isGameOver) return;
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects(coins);
+            if (intersects.length > 0) {
+                draggedCoin = intersects[0].object;
+                playSfx(600, 'sine', 0.1);
+            }
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!draggedCoin || isGameOver) return;
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObject(dragPlane);
+            if (intersects.length > 0) {
+                draggedCoin.position.x = intersects[0].point.x;
+                draggedCoin.position.z = intersects[0].point.z;
+                draggedCoin.position.y = 3;
+            }
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (!draggedCoin || isGameOver) return;
+            let sorted = false;
+
+            bins.forEach(bin => {
+                if (draggedCoin.position.distanceTo(bin.position) < 4) {
+                    if (draggedCoin.userData.value === bin.userData.value) {
+                        const multiplier = draggedCoin.userData.isChaos ? 3 : 1;
+                        score += (draggedCoin.userData.value * multiplier);
+                        timeLeft += 2;
+                        playSfx(1200, 'square', 0.2);
+                    } else {
+                        score -= 10;
+                        timeLeft = Math.max(0, timeLeft - 3);
+                        playSfx(200, 'sawtooth', 0.4);
+                    }
+                    timeEl.innerText = timeLeft;
+                    timeEl.style.color = timeLeft <= 10 ? '#ff0055' : '#fff';
+                    scoreEl.innerText = score;
+                    scene.remove(draggedCoin);
+                    coins.splice(coins.indexOf(draggedCoin), 1);
+                    sorted = true;
+                }
+            });
+
+            if (!sorted) draggedCoin.position.y = 0.5;
+            draggedCoin = null;
+        });
+
+        window.addEventListener('resize', () => {
+            updateCameraForScreen();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                updateCameraForScreen();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }, 200);
+        });
+
+        function updateCameraForScreen() {
+            const aspect = window.innerWidth / window.innerHeight;
+            camera.aspect = aspect;
+
+            if (aspect < 1) {
+                camera.fov = 85;
+                camera.position.set(0, 16, 16);
+            } else if (aspect < 1.4) {
+                camera.fov = 78;
+                camera.position.set(0, 14, 14);
+            } else {
+                camera.fov = 75;
+                camera.position.set(0, 12, 12);
+            }
+
+            camera.lookAt(0, 0, 0);
+            camera.updateProjectionMatrix();
+        }
+
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const fsBtn = document.getElementById('fullscreen-btn');
+        const mobileAlert = document.getElementById('mobile-alert');
+
+        if (isMobile) {
+            setTimeout(() => {
+                mobileAlert.classList.add('fade-out');
+                setTimeout(() => mobileAlert.remove(), 600);
+            }, 3000);
+        } else {
+            mobileAlert.remove();
+        }
+
+        fsBtn.addEventListener('click', async () => {
+            try {
+                if (!document.fullscreenElement) {
+                    await document.documentElement.requestFullscreen();
+                    if (isMobile && screen.orientation && screen.orientation.lock) {
+                        try {
+                            await screen.orientation.lock('landscape');
+                        } catch (err) {
+                            console.log('orientation lock not supported here');
+                        }
+                    }
+                } else {
+                    await document.exitFullscreen();
+                }
+            } catch (err) {
+                console.log('fullscreen blocked:', err);
+            }
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            coins.forEach(c => {
+                if (c.userData.isChaos) {
+                    c.rotation.x += 0.2;
+                    c.rotation.y += 0.2;
+                    c.position.x += Math.sin(Date.now() * 0.01) * 0.1;
+                } else {
+                    c.rotation.y += 0.03;
+                }
+            });
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    
