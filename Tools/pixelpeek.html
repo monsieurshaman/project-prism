@@ -82,8 +82,36 @@
         .app-shell {
             max-width: 1320px;
             margin: 0 auto;
-            padding: 20px 20px 100px;
+            padding: 84px 20px 100px;
         }
+
+        .home-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: .02em;
+            text-decoration: none;
+            box-shadow: var(--shadow-1);
+            transition: border-color .2s ease, background .2s ease, color .2s ease, transform .15s ease;
+        }
+        .home-btn:hover {
+            border-color: var(--accent);
+            background: var(--surface-2);
+            color: var(--accent);
+            transform: translateX(-2px);
+        }
+        .home-btn:active { transform: translateX(0); }
 
         .topbar {
             display: flex;
@@ -687,6 +715,8 @@
 </head>
 
 <body>
+    <a href="../index.html" class="home-btn" aria-label="Back to home">← Home</a>
+
     <div class="app-shell">
 
         <div class="topbar">
