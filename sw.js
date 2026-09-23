@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v3.5-26.9.19';
+const CACHE_NAME = 'v3.6-26.9.19';
 
 const CORE_URLS = [
     '/',
@@ -17,6 +17,15 @@ const CORE_URLS = [
     './Other/websend',
     './Tools/lapscan',
     './Tools/pixelpeek',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/ismycompteureron.js',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/devcheck.js',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/notmoving.js',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/gifview.js',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/mathlol.js',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/coinsort.js',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/websend.js',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Tools/js/lapscan.js',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Tools/js/pixelpeek.js',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo2.png',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo192.png',
