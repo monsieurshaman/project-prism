@@ -85,7 +85,7 @@
             padding: 84px 20px 100px;
         }
 
-        .home-btn {
+        .back-btn {
             position: fixed;
             top: 20px;
             left: 20px;
@@ -105,13 +105,13 @@
             box-shadow: var(--shadow-1);
             transition: border-color .2s ease, background .2s ease, color .2s ease, transform .15s ease;
         }
-        .home-btn:hover {
+        .back-btn:hover {
             border-color: var(--accent);
             background: var(--surface-2);
             color: var(--accent);
             transform: translateX(-2px);
         }
-        .home-btn:active { transform: translateX(0); }
+        .back-btn:active { transform: translateX(0); }
 
         .topbar {
             display: flex;
@@ -715,7 +715,7 @@
 </head>
 
 <body>
-    <a href="../index.html" class="home-btn" aria-label="Back to home">← Home</a>
+    <a href="../index.html" class="back-btn" id="backBtn" aria-label="Go back">← Back</a>
 
     <div class="app-shell">
 
