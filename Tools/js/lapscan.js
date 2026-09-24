@@ -265,7 +265,6 @@ async function handleFiles(files) {
   fileInput.value = '';
 }
 
-// Back button: return to wherever this tool was opened from, if possible
 const backBtn = document.getElementById('backBtn');
 if (backBtn) {
   backBtn.addEventListener('click', (e) => {
@@ -273,6 +272,5 @@ if (backBtn) {
       e.preventDefault();
       window.history.back();
     }
-    // otherwise let the link fall through to its href
   });
 }
