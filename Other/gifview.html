@@ -16,6 +16,32 @@
             background: #111;
             font-family: sans-serif;
             overflow: hidden;
+            transition: opacity .22s ease;
+        }
+
+        body.page-leaving {
+            opacity: 0;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: #222;
+            color: #fff;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background .2s ease;
+        }
+
+        .back-btn:hover {
+            background: #333;
         }
 
         .viewer {
@@ -102,6 +128,8 @@
 </head>
 
 <body>
+
+    <a href="../index.html" class="back-btn" id="backBtn" aria-label="Go back">← Back</a>
 
     <div class="viewer">
         <input type="text" id="gifUrl" placeholder="past gif link hir 🤤">

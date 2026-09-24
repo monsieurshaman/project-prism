@@ -25,6 +25,39 @@
             margin: 0;
             text-align: center;
             overflow: hidden;
+            transition: opacity .22s ease;
+        }
+
+        body.page-leaving {
+            opacity: 0;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--button-bg);
+            border: 2px solid var(--text-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 13px;
+            text-decoration: none;
+            transition: all .2s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .back-btn:active {
+            transform: scale(0.95);
         }
 
         .container {
@@ -118,6 +151,8 @@
     </style>
 </head>
 <body>
+
+    <a href="../index.html" class="back-btn" id="backBtn" aria-label="Go back">← Back</a>
 
     <div class="container">
         <h1>Is My Computer Really On?</h1>

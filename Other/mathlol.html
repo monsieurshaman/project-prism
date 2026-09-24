@@ -44,9 +44,39 @@
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
-      transition: background 0.12s ease;
+      transition: background 0.12s ease, opacity .22s ease;
       position: relative;
       padding: 0 0 env(safe-area-inset-bottom) 0;
+    }
+
+    body.page-leaving {
+      opacity: 0;
+    }
+
+    .site-back-btn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 1000;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: border-color .12s, color .12s;
+    }
+
+    .site-back-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     body.correct {
@@ -87,7 +117,7 @@
       justify-content: center;
       min-height: 100vh;
       gap: 0;
-      padding: 24px 16px;
+      padding: 64px 16px 24px;
       position: relative;
       z-index: 10;
       width: 100%;
@@ -291,7 +321,7 @@
       justify-content: center;
       width: 100%;
       min-height: 100vh;
-      padding: 16px 16px 24px;
+      padding: 64px 16px 24px;
       position: relative;
       z-index: 10;
       gap: 0;
@@ -798,6 +828,8 @@
 </head>
 
 <body>
+
+  <a href="../index.html" class="site-back-btn" id="backBtn" aria-label="Go back">← BACK</a>
 
   <div id="flash-overlay"></div>
   <canvas id="canvas"></canvas>

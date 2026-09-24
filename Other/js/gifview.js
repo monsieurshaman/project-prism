@@ -31,4 +31,24 @@
             gif.classList.remove("fullscreen");
             exitBtn.classList.remove("show");
         }
+
+        // Back button: return to wherever this tool was opened from, if possible
+        const backBtn = document.getElementById('backBtn');
+        if (backBtn) {
+            backBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('page-leaving');
+                setTimeout(() => {
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        window.location.href = backBtn.getAttribute('href');
+                    }
+                }, 220);
+            });
+        }
+        // Guard against a stuck fade if the browser restores this page from cache
+        window.addEventListener('pageshow', () => {
+            document.body.classList.remove('page-leaving');
+        });
     

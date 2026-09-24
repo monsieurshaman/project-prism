@@ -15,6 +15,40 @@
             overflow: hidden;
             height: 100vh;
             width: 100vw;
+            transition: opacity .22s ease;
+        }
+
+        body.page-leaving {
+            opacity: 0;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(8,8,20,0.75);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(12px);
+            color: #f0f0f8;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            text-decoration: none;
+            transition: border-color .2s ease, transform .15s ease;
+        }
+
+        .back-btn:hover {
+            border-color: rgba(255,255,255,0.3);
+            transform: translateX(-2px);
+        }
+
+        .back-btn:active {
+            transform: translateX(0);
         }
 
         #canvas-container {
@@ -192,6 +226,8 @@
     </style>
 </head>
 <body>
+
+<a href="../index.html" class="back-btn" id="backBtn" aria-label="Go back">← Back</a>
 
 <div id="canvas-container"></div>
 <div id="flash"></div>

@@ -10,6 +10,34 @@
       max-width: 480px;
       margin: 60px auto;
       padding: 0 16px;
+      transition: opacity .22s ease;
+    }
+
+    body.page-leaving {
+      opacity: 0;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 1000;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: #f2f2f2;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      color: #333;
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+      text-decoration: none;
+      transition: background-color .2s ease;
+    }
+
+    .back-btn:hover {
+      background: #e6e6e6;
     }
 
     input,
@@ -40,6 +68,8 @@
 </head>
 
 <body>
+
+  <a href="../index.html" class="back-btn" id="backBtn" aria-label="Go back">← Back</a>
 
   <h2>Webhook Transit for Discord</h2>
 
