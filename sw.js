@@ -65,7 +65,6 @@ const GAME_URLS = [
     'https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js',
     'https://cdn.babylonjs.com/ammo.js',
     'https://cdn.jsdelivr.net/npm/babylonjs-loaders@9.11.0/babylonjs.loaders.min.js',
-    'https://cdn.jsdelivr.net/npm/babylonjs-inspector@9.11.0/babylon.inspector.bundle.js',
     'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
     'https://assets.babylonjs.com/textures/flare.png',
 ];
