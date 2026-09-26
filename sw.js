@@ -1,6 +1,7 @@
-const CACHE_NAME = 'v4.1-26.9.26';
+const CACHE_NAME = 'v4.1-26.9.27';
 
 const CORE_URLS = [
+    '/',
     '/index.html',
     './SandBox3D/sb3d_page',
     './RiftRunners2D/rr2d_page',
