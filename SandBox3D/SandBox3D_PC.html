@@ -10,7 +10,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
     <script src="https://cdn.babylonjs.com/ammo.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/babylonjs-loaders@9.11.0/babylonjs.loaders.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/babylonjs-inspector@9.11.0/babylon.inspector-v2.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3duianim_pc.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dmatyou.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dammo.js"></script>
@@ -3900,12 +3899,6 @@
                 sceneRef.debugLayer.hide();
                 isInspectorEnabled = false;
                 syncPanelPositions();
-                return;
-            }
-
-            if (typeof BABYLON.Inspector === 'undefined') {
-                console.error('[Inspector] BABYLON.Inspector is undefined. CDN bundle missing or failed to load.');
-                alert('Babylon Inspector failed to load.\n\nCheck the CDN link or version mismatch in console.');
                 return;
             }
 
