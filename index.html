@@ -4,11 +4,11 @@
 <head>
     <link rel="manifest" href="/manifest.json">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="project prism">
-    <meta property="og:description" content="a hub full of passion projects">
+    <meta property="og:title" content="project prism: passion project hub">
+    <meta property="og:description" content="reinventing the wheel">
     <meta property="og:image" content="https://proprism.pages.dev/project-assets/og-image.png">
     <meta property="og:url" content="https://proprism.pages.dev/">
-    <meta property="og:site_name" content="Prism">
+    <meta property="og:site_name" content="Prism PWA">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light">
@@ -23,11 +23,11 @@
     <style>
         :root {
             --bg: #07070f;
-            --surface-0: rgba(14, 14, 24, 0.72);
-            --surface-1: rgba(20, 20, 36, 0.68);
+            --surface-0: rgba(14, 14, 24, 0.42);
+            --surface-1: rgba(20, 20, 36, 0.38);
             --surface-2: rgba(28, 28, 46, 0.75);
-            --surface-hover: rgba(36, 36, 58, 0.82);
-            --border: rgba(255, 255, 255, 0.07);
+            --surface-hover: rgba(36, 36, 58, 0.52);
+            --border: rgba(255, 255, 255, 0.10);
             --border-strong: rgba(255, 255, 255, 0.14);
             --border-accent: rgba(124, 158, 247, 0.22);
             --primary: #7c9ef7;
@@ -44,9 +44,9 @@
             --text: #eeeef8;
             --text-sub: rgba(200, 202, 228, 0.65);
             --text-muted: rgba(160, 164, 200, 0.38);
-            --blur-sm: blur(16px);
-            --blur-md: blur(28px);
-            --blur-lg: blur(48px);
+            --blur-sm: blur(8px);
+            --blur-md: blur(14px);
+            --blur-lg: blur(24px);
             --r-sm: 16px;
             --r-md: 24px;
             --r-lg: 32px;
@@ -337,7 +337,7 @@
         @media (max-width: 1023px) {
             .mobile-layout {
                 padding-top: 76px;
-                padding-bottom: 88px;
+                padding-bottom: 96px;
             }
 
             .hero-card-lite {
@@ -353,25 +353,29 @@
 
             .bottombar {
                 position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
+                bottom: 16px;
+                right: 16px;
+                left: auto;
                 z-index: 700;
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                gap: 10px;
-                padding: 12px 16px;
+                justify-content: flex-end;
+                gap: 8px;
+                width: fit-content;
+                padding: 7px 9px;
                 background: rgba(7, 7, 15, 0.75);
                 backdrop-filter: var(--blur-md);
                 -webkit-backdrop-filter: var(--blur-md);
-                border-top: 1px solid var(--border);
+                border: 1px solid var(--border);
+                border-radius: 26px;
+                corner-shape: squircle;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
             }
 
             .bottombar-item {
                 position: relative;
-                width: 42px;
-                height: 42px;
+                width: 34px;
+                height: 34px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -379,9 +383,13 @@
                 background: var(--surface-1);
                 border: 1px solid var(--border);
                 border-radius: 12px;
+                corner-shape: squircle;
                 text-decoration: none;
                 cursor: pointer;
                 transition: background 0.2s ease, color 0.2s ease, transform 0.25s var(--spring);
+            }
+            .bottombar-item .material-icons-round {
+                font-size: 18px;
             }
             .bottombar-item:hover {
                 background: var(--surface-hover);
@@ -394,10 +402,10 @@
 
             .bottombar-item .notif-dot {
                 position: absolute;
-                top: 6px;
-                right: 6px;
-                width: 8px;
-                height: 8px;
+                top: 4px;
+                right: 4px;
+                width: 7px;
+                height: 7px;
                 border-radius: 50%;
                 background: #4ade80;
                 box-shadow: 0 0 6px rgba(74, 222, 128, 0.65);
@@ -947,10 +955,20 @@
 
         @media (min-width: 1024px) {
             .app-library-page {
+                top: 24px;
+                right: 24px;
+                bottom: 24px;
                 left: auto;
                 width: 480px;
-                max-width: 85vw;
-                box-shadow: -8px 0 40px rgba(0, 0, 0, 0.5);
+                max-width: calc(100vw - 48px);
+                border-radius: var(--r-xl);
+                border: 1px solid var(--border);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                background:
+                    radial-gradient(ellipse 70% 50% at 15% 10%, rgba(124, 158, 247, 0.07) 0%, transparent 70%),
+                    radial-gradient(ellipse 70% 50% at 85% 90%, rgba(167, 139, 250, 0.06) 0%, transparent 70%),
+                    rgba(7, 7, 15, 0.55);
+                transform: translateX(calc(100% + 24px));
             }
         }
 
@@ -1186,6 +1204,28 @@
             border-radius: 4px;
         }
 
+        .app-library-page,
+        #settings-page,
+        #download-page {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .app-library-page::-webkit-scrollbar,
+        #settings-page::-webkit-scrollbar,
+        #download-page::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        .app-library-page::-webkit-scrollbar-thumb,
+        #settings-page::-webkit-scrollbar-thumb,
+        #download-page::-webkit-scrollbar-thumb {
+            background: transparent;
+            border: none;
+        }
+
         @media (min-width: 1024px) {
             body {
                 overflow: hidden;
@@ -1205,6 +1245,7 @@
                 height: 100vh;
                 position: relative;
                 z-index: 2;
+                gap: 24px;
             }
 
             .desktop-left {
@@ -1213,11 +1254,14 @@
                 flex-direction: column;
                 justify-content: center;
                 padding: 52px 40px 52px 52px;
-                border-right: 1px solid var(--border);
-                background: rgba(8, 8, 18, 0.08);
-                backdrop-filter: blur(44px);
+                background: var(--surface-0);
+                border: 1px solid var(--border);
+                border-radius: var(--r-xl);
+                backdrop-filter: var(--blur-md);
+                -webkit-backdrop-filter: var(--blur-md);
                 position: relative;
                 overflow: hidden;
+                margin: 24px 0 24px 24px;
             }
 
             .desktop-left::before {
@@ -1447,7 +1491,7 @@
         @media (display-mode: standalone) {
             #pwa-status {
                 position: fixed;
-                bottom: 90px;
+                bottom: 72px;
                 right: 24px;
                 z-index: 1100;
                 display: flex;
@@ -1587,9 +1631,20 @@
 
         @media (min-width: 1024px) {
             #settings-page {
+                top: 24px;
+                right: 24px;
+                bottom: 24px;
                 left: auto;
                 width: 480px;
-                max-width: 85vw;
+                max-width: calc(100vw - 48px);
+                border-radius: var(--r-xl);
+                border: 1px solid var(--border);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                background:
+                    radial-gradient(ellipse 70% 50% at 15% 10%, rgba(124, 158, 247, 0.07) 0%, transparent 70%),
+                    radial-gradient(ellipse 70% 50% at 85% 90%, rgba(167, 139, 250, 0.06) 0%, transparent 70%),
+                    rgba(7, 7, 15, 0.55);
+                transform: translateX(calc(100% + 24px));
             }
         }
 
@@ -1666,10 +1721,16 @@
 
         @media (min-width: 1024px) {
             #download-page {
+                top: 24px;
+                right: 24px;
+                bottom: 24px;
                 left: auto;
                 width: 480px;
-                max-width: 85vw;
-                box-shadow: -8px 0 40px rgba(0, 0, 0, 0.5);
+                max-width: calc(100vw - 48px);
+                border-radius: var(--r-xl);
+                border: 1px solid var(--border);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                transform: translateX(calc(100% + 24px));
             }
         }
         .dl-icon-wrap {
@@ -2053,44 +2114,63 @@
             }
         }
 
-        .credits-bubble-trigger {
-            position: fixed;
-            bottom: 28px;
-            right: 28px;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--surface-1);
-            border: 1px solid var(--border);
-            backdrop-filter: var(--blur-sm);
-            display: flex;
+        .credits-pill {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
+            width: fit-content;
+            margin-top: 40px;
+            padding: 9px 18px;
+            border-radius: var(--r-pill);
+            background: linear-gradient(135deg, rgba(124, 158, 247, 0.16), rgba(167, 139, 250, 0.16));
+            border: 1px solid var(--border-accent);
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: lowercase;
             cursor: pointer;
-            z-index: 550;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-            transform: translateY(20px) scale(0.8);
-            opacity: 0;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s var(--spring), box-shadow 0.25s var(--ease-out), border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .credits-pill::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
             pointer-events: none;
-            transition: transform 0.35s var(--spring), opacity 0.3s ease, border-color 0.2s ease, background 0.2s ease;
         }
 
-        #settings-page.open ~ .credits-bubble-trigger {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-            pointer-events: all;
-            transition-delay: 0.2s;
-        }
-
-        .credits-bubble-trigger:hover {
-            background: var(--surface-hover);
+        .credits-pill:hover {
+            transform: translateY(-2px) scale(1.04);
             border-color: var(--border-strong);
-            transform: scale(1.08);
+            box-shadow: 0 8px 24px var(--primary-glow);
+            background: linear-gradient(135deg, rgba(124, 158, 247, 0.24), rgba(167, 139, 250, 0.24));
         }
 
-        .credits-bubble-trigger .material-icons-round {
-            font-size: 20px;
-            color: var(--text-sub);
+        .credits-pill:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .credits-pill .material-icons-round {
+            font-size: 16px;
+            color: var(--primary);
+            position: relative;
+            z-index: 1;
+            transition: color 0.2s ease;
+        }
+
+        .credits-pill:hover .material-icons-round {
+            color: var(--secondary);
+        }
+
+        .credits-pill span {
+            position: relative;
+            z-index: 1;
         }
 
         .credits-dialog-backdrop {
@@ -2111,8 +2191,8 @@
 
         .credits-dialog {
             position: fixed;
-            bottom: 28px;
-            right: 28px;
+            bottom: 88px;
+            right: 48px;
             width: 340px;
             max-width: calc(100vw - 40px);
             max-height: 70vh;
@@ -2135,6 +2215,23 @@
             transform: translateY(0) scale(1);
             opacity: 1;
             pointer-events: all;
+        }
+
+        @media (max-width: 1023px) {
+            .credits-dialog {
+                bottom: auto;
+                right: auto;
+                top: 50%;
+                left: 50%;
+                width: calc(100vw - 32px);
+                max-width: 380px;
+                max-height: 80vh;
+                transform: translate(-50%, calc(-50% + 16px)) scale(0.94);
+                transform-origin: center;
+            }
+            .credits-dialog.open {
+                transform: translate(-50%, -50%) scale(1);
+            }
         }
 
         .credits-dialog-title {
@@ -2348,9 +2445,9 @@
                 <p class="dt-hero-desc">
                     welcome to <strong>prism</strong>. this is our central hub where all our experiments, games, and handy tools live together.
                 </p>
-                <a href="https://github.com/monsieurshaman" target="_blank" class="cta-btn" onclick="createRipple(event)">
+                <a href="https://github.com/monsieurshaman/project-prism" target="_blank" class="cta-btn" onclick="createRipple(event)">
                     <i class="material-icons-round">code</i>
-                    browse github repos
+                    browse prism's repo
                 </a>
                 <button class="install-btn" id="pwa-install-btn-desktop" onclick="triggerPWAInstall(); createRipple(event)" style="display:none;">
                     <i class="material-icons-round">download</i>
@@ -2614,12 +2711,24 @@
                         onchange="PrismVideoBg.handleUpload(this.files[0])">
                     <button class="setting-select" style="margin-top: 0; flex: 1; text-align: center;"
                         onclick="document.getElementById('video-bg-file-input').click()">pick video</button>
+                    <button class="setting-select" id="video-bg-sound-btn"
+                        style="margin-top: 0; width: auto; display: none;"
+                        title="toggle background video sound" onclick="PrismVideoBg.toggleSound()">
+                        <i class="material-icons-round" id="video-bg-sound-icon" style="font-size: 18px;">volume_off</i>
+                    </button>
                     <button class="setting-select" id="refresh-video-bg-btn"
                         style="margin-top: 0; width: auto; display: none;"
                         onclick="PrismVideoBg.refreshVideo()">↻ reload</button>
                     <button class="setting-select" id="clear-video-bg-btn"
                         style="margin-top: 0; width: auto; display: none; color: #f87171;"
                         onclick="PrismVideoBg.removeVideo()">clear</button>
+                </div>
+                <div id="video-bg-volume-wrap"
+                    style="display: none; align-items: center; gap: 10px; width: 100%;">
+                    <i class="material-icons-round" style="font-size: 18px; color: var(--text-muted); flex-shrink: 0;">volume_up</i>
+                    <input type="range" id="video-bg-volume" min="0" max="100" step="1" value="50"
+                        style="flex: 1; accent-color: var(--primary); cursor: pointer;"
+                        oninput="PrismVideoBg.setVolume(this.value)">
                 </div>
             </div>
 
@@ -2694,6 +2803,18 @@
                 <div class="item-subtitle">caches additional game files (uses more data)</div>
             </div>
         </div>
+        
+        <div id="cleanup-section" style="display: none; margin-top: 12px;">
+            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">cleanup</h3>
+            <button id="cleanup-btn" class="list-item" style="width: 100%; border: none; cursor: pointer;"
+                onclick="confirmAndCleanup()">
+                <i class="material-icons-round item-icon">delete_sweep</i>
+                <div class="item-content">
+                    <div class="item-title">clear leftover cache &amp; storage</div>
+                    <div class="item-subtitle">removes cached data left behind after uninstalling prism</div>
+                </div>
+            </button>
+        </div>
 
         <h3 class="developer-heading" style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">developer</h3>
         <div class="list-item" id="dev-preview-toggle" style="cursor: pointer; justify-content: space-between;"
@@ -2709,10 +2830,11 @@
         </div>
 
         <div id="sw-version-display" style="display: none; position: absolute; top: 16px; right: 20px; font-size: 11px; opacity: 0.35; font-family: 'Space Grotesk', sans-serif; pointer-events: none; user-select: none;"></div>
-    </div>
 
-    <div class="credits-bubble-trigger" onclick="toggleCredits()" title="credits">
-        <i class="material-icons-round">favorite</i>
+        <div class="credits-pill" onclick="toggleCredits()" title="credits">
+            <i class="material-icons-round">favorite</i>
+            <span>credits</span>
+        </div>
     </div>
 
     <div class="credits-dialog-backdrop" id="credits-backdrop" onclick="toggleCredits()"></div>
@@ -2725,14 +2847,14 @@
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/monsieurshaman.png" alt="">
                 <div>
                     <div class="credits-name">monsieurshaman</div>
-                    <div class="credits-role">creator, lead dev, ragebaiter, exists on github, genshin player</div>
+                    <div class="credits-role">creator, lead dev, ragebaiter, genshin player, exists on github</div>
                 </div>
             </a>
             <a class="credits-entry" href="https://www.youtube.com/@ShinobiAkiraGD" target="_blank" rel="noopener noreferrer">
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/shinobiakira.png" alt="">
                 <div>
                     <div class="credits-name">ShinobiAkira</div>
-                    <div class="credits-role">youtuber, tester, GD player, exists on github, has beef with atoms</div>
+                    <div class="credits-role">youtuber, tester, GD player, has beef with atoms, exists on github</div>
                 </div>
             </a>
             <a class="credits-entry" href="https://github.com/nokkum" target="_blank" rel="noopener noreferrer">
@@ -2808,6 +2930,8 @@
             _pwaInstallPrompt = null;
             document.getElementById('pwa-install-btn-mobile').style.display = 'none';
             document.getElementById('pwa-install-btn-desktop').style.display = 'none';
+            localStorage.setItem('PRISM_NEEDS_CACHE_CLEANUP', 'true');
+            updateCleanupVisibility();
         });
 
         window.addEventListener('online', () => {
@@ -3052,6 +3176,106 @@
             }
         })();
 
+        const CLEANUP_FLAG_KEY = 'PRISM_NEEDS_CACHE_CLEANUP';
+
+        function updateCleanupVisibility() {
+            const section = document.getElementById('cleanup-section');
+            if (!section) return;
+            section.style.display = localStorage.getItem(CLEANUP_FLAG_KEY) === 'true' ? 'block' : 'none';
+        }
+
+        (function initCleanupFlag() {
+            if (window.__PRISM_ENV__.isStandalone && localStorage.getItem(CLEANUP_FLAG_KEY) === null) {
+                localStorage.setItem(CLEANUP_FLAG_KEY, 'true');
+            }
+            updateCleanupVisibility();
+        })();
+
+        async function hasRemainingPrismData() {
+            if ('caches' in window) {
+                try {
+                    const names = await caches.keys();
+                    if (names.length > 0) return true;
+                } catch (_) { }
+            }
+
+            if (indexedDB.databases) {
+                try {
+                    const dbs = await indexedDB.databases();
+                    if (dbs.some(d => d && d.name)) return true;
+                } catch (_) { }
+                return false;
+            }
+
+            const known = ['PrismDB', 'PrismVideoCacheDB'];
+            for (const name of known) {
+                const exists = await new Promise((resolve) => {
+                    let created = false;
+                    const req = indexedDB.open(name);
+                    req.onupgradeneeded = (e) => {
+                        created = true;
+                        e.target.result.close();
+                        indexedDB.deleteDatabase(name);
+                    };
+                    req.onsuccess = (e) => {
+                        const db = e.target.result;
+                        const hasStores = db.objectStoreNames.length > 0;
+                        db.close();
+                        resolve(!created && hasStores);
+                    };
+                    req.onerror = () => resolve(false);
+                });
+                if (exists) return true;
+            }
+            return false;
+        }
+
+        async function confirmAndCleanup() {
+            if (!confirm('Prism Cleanup\n\nThis will remove all cached data and indexed storage left behind from Prism.\n\nProceed?')) return;
+
+            try {
+                if ('caches' in window) {
+                    const names = await caches.keys();
+                    await Promise.all(names.map(n => caches.delete(n)));
+                }
+
+                if (indexedDB.databases) {
+                    const dbs = await indexedDB.databases();
+                    await Promise.all(dbs.map(d => d && d.name ? new Promise(res => {
+                        const req = indexedDB.deleteDatabase(d.name);
+                        req.onsuccess = req.onerror = req.onblocked = () => res();
+                    }) : Promise.resolve()));
+                } else {
+                    await Promise.all(['PrismDB', 'PrismVideoCacheDB'].map(name => new Promise(res => {
+                        const req = indexedDB.deleteDatabase(name);
+                        req.onsuccess = req.onerror = req.onblocked = () => res();
+                    })));
+                }
+
+                if ('serviceWorker' in navigator) {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map(r => r.unregister()));
+                }
+
+                const stillThere = await hasRemainingPrismData();
+
+                if (stillThere) {
+                    localStorage.setItem(CLEANUP_FLAG_KEY, 'true');
+                    updateCleanupVisibility();
+                    alert('Some data could not be removed. You can try again.');
+                } else {
+                    localStorage.removeItem(CLEANUP_FLAG_KEY);
+                    updateCleanupVisibility();
+                    alert('Cleanup complete! Leftover data has been removed.');
+                }
+            } catch (err) {
+                console.error('[Prism Cleanup]', err);
+                localStorage.setItem(CLEANUP_FLAG_KEY, 'true');
+                updateCleanupVisibility();
+                alert('Cleanup failed. Please try again.');
+            }
+        }
+
         function confirmAndRecache() {
             const gameWarning = _includeGames ? '\n\nGame assets included for download.' : '\n\nCore files only. Game assets excluded.';
             if (!confirm(`Prism Download Mode\nCAUTION!\n\nPrism will delete old content and replace them with newer ones. Proceed?${gameWarning}\n\nYes, proceed. (OK)\nNo, do not proceed. (Cancel)`)) return;
@@ -3176,32 +3400,62 @@
 
             _cacheProgressHandler = (event) => {
                 if (!event.data) return;
-                const { type, progress, processed, total, errors, url } = event.data;
+                const { type, progress, processed, total, errors, url, checked, ok, skipped } = event.data;
 
                 if (type === 'CACHE_START') {
                     resetWatchdog();
                     dlBar.style.transition = 'width 0.15s linear';
-                    setPhase('dl-phase-download', 'active', `0 / ${total}`, 'sync');
+                    dlBar.style.width = '0%';
+                    setPhase('dl-phase-download', 'active', `0 / ${total}`, 'search');
                     setPhase('dl-phase-cache', 'active', 'Writing', 'sync');
-                    dlTitle.textContent = 'dowloading';
-                    dlSub.textContent = `fetching ${total} assets`;
+                    dlTitle.textContent = 'checking assets';
+                    dlSub.textContent = `verifying ${total} files`;
+                    return;
+                }
+
+                if (type === 'CACHE_CHECK') {
+                    resetWatchdog();
+                    const pct = Math.round((checked / total) * 50);
+                    dlBar.style.width = pct + '%';
+                    setPhase('dl-phase-download', 'active', `${checked} / ${total}`, 'search');
+                    dlTitle.textContent = 'checking assets';
+                    dlSub.textContent = `${checked} / ${total} verified`;
+                    return;
+                }
+
+                if (type === 'CACHE_CHECK_DONE') {
+                    resetWatchdog();
+                    dlBar.style.width = '50%';
+
+                    if (ok === 0) {
+                        dlTitle.textContent = 'nothing to download';
+                        dlSub.textContent = `${skipped} asset${skipped !== 1 ? 's' : ''} unreachable`;
+                        setPhase('dl-phase-download', 'error', `0 / ${total}`, 'warning');
+                        setPhase('dl-phase-cache', 'error', 'Skipped', 'warning');
+                        return;
+                    }
+
+                    setPhase('dl-phase-download', 'active', `0 / ${ok}`, 'sync');
+                    dlTitle.textContent = 'downloading';
+                    dlSub.textContent = `${ok} file${ok !== 1 ? 's' : ''} to fetch${skipped > 0 ? ` · ${skipped} skipped` : ''}`;
                     return;
                 }
 
                 if (type === 'CACHE_ERROR') {
                     resetWatchdog();
-                    dlSub.textContent = `${errors} error${errors !== 1 ? 's' : ''} so far`;
+                    dlSub.textContent = `${errors} skipped so far`;
                     return;
                 }
 
                 if (type === 'CACHE_PROGRESS') {
                     resetWatchdog();
-                    dlBar.style.width = progress + '%';
+                    const overall = 50 + Math.round(progress * 0.5);
+                    dlBar.style.width = overall + '%';
 
                     if (progress > 0 && progress < 100) {
                         setPhase('dl-phase-download', 'active', `${processed} / ${total}`, 'sync');
-                        dlTitle.textContent = 'working on it';
-                        dlSub.textContent = `${progress}%${errors > 0 ? ` · ${errors} skipped` : ''}`;
+                        dlTitle.textContent = 'downloading';
+                        dlSub.textContent = `${processed} / ${total}${errors > 0 ? ` · ${errors} skipped` : ''}`;
                     }
 
                     if (progress >= 100) {
@@ -3209,7 +3463,7 @@
                         clearTimeout(watchdogTimer);
                         clearInterval(tipInterval);
                         navigator.serviceWorker.removeEventListener('message', _cacheProgressHandler);
-                        setPhase('dl-phase-download', 'done', 'Done', 'check_circle');
+                        setPhase('dl-phase-download', 'done', `${processed} / ${total}`, 'check_circle');
                         setPhase('dl-phase-cache', errors > 0 ? 'error' : 'done', errors > 0 ? `${errors} skipped` : 'Done', errors > 0 ? 'warning' : 'check_circle');
                         dlTitle.textContent = 'update finished';
                         dlSub.textContent = errors > 0 ? `done with ${errors} skip${errors !== 1 ? 's' : ''}` : 'update complete, restarting now...';
@@ -3751,6 +4005,7 @@
         })();
 
         window.addEventListener('DOMContentLoaded', () => {
+            updateCleanupVisibility();
             const isStandalone = window.__PRISM_ENV__.isStandalone;
 
             if (isStandalone) {
@@ -3921,6 +4176,8 @@
             const DB_NAME = 'PrismVideoCacheDB';
             const STORE_NAME = 'videos';
             const KEY = 'custom_bg_video';
+            const SOUND_KEY = 'prism-video-sound';
+            const VOLUME_KEY = 'prism-video-volume';
 
             function openDB() {
                 return new Promise((resolve, reject) => {
@@ -3969,11 +4226,76 @@
                 });
             }
 
+            function getSavedVolume() {
+                const v = parseFloat(localStorage.getItem(VOLUME_KEY));
+                return isNaN(v) ? 0.5 : Math.min(1, Math.max(0, v));
+            }
+
+            function isSoundOn() {
+                return localStorage.getItem(SOUND_KEY) === 'true';
+            }
+
+            function applySoundState() {
+                const videoEl = document.getElementById('bg-video');
+                const icon = document.getElementById('video-bg-sound-icon');
+                const wrap = document.getElementById('video-bg-volume-wrap');
+                const slider = document.getElementById('video-bg-volume');
+                const on = isSoundOn();
+                const hasVideo = !!(videoEl && videoEl.src);
+
+                if (videoEl) {
+                    videoEl.volume = getSavedVolume();
+                    videoEl.muted = !on;
+                    if (on && hasVideo) {
+                        videoEl.play().catch(() => {
+                            videoEl.muted = true;
+                            videoEl.play().catch(() => { });
+                        });
+                    }
+                }
+
+                if (icon) icon.textContent = on ? 'volume_up' : 'volume_off';
+                if (wrap) wrap.style.display = (on && hasVideo) ? 'flex' : 'none';
+                if (slider) slider.value = Math.round(getSavedVolume() * 100);
+            }
+
+            function toggleSound() {
+                localStorage.setItem(SOUND_KEY, isSoundOn() ? 'false' : 'true');
+                applySoundState();
+            }
+
+            function setVolume(value) {
+                const v = Math.min(1, Math.max(0, Number(value) / 100));
+                localStorage.setItem(VOLUME_KEY, String(v));
+                const videoEl = document.getElementById('bg-video');
+                if (videoEl) {
+                    videoEl.volume = v;
+                    if (isSoundOn() && videoEl.muted) {
+                        videoEl.muted = false;
+                        videoEl.play().catch(() => { });
+                    }
+                }
+            }
+
+            function armSoundGesture() {
+                if (!isSoundOn()) return;
+                const unlock = () => {
+                    window.removeEventListener('pointerdown', unlock);
+                    window.removeEventListener('keydown', unlock);
+                    window.removeEventListener('touchstart', unlock);
+                    applySoundState();
+                };
+                window.addEventListener('pointerdown', unlock, { passive: true });
+                window.addEventListener('keydown', unlock);
+                window.addEventListener('touchstart', unlock, { passive: true });
+            }
+
             async function applyVideo() {
                 const videoEl = document.getElementById('bg-video');
                 const gifEl = document.querySelector('.bg-gif');
                 const clearBtn = document.getElementById('clear-video-bg-btn');
                 const refreshBtn = document.getElementById('refresh-video-bg-btn');
+                const soundBtn = document.getElementById('video-bg-sound-btn');
 
                 if (!videoEl) return;
 
@@ -3986,16 +4308,23 @@
                         if (gifEl) gifEl.style.display = 'none';
                         if (clearBtn) clearBtn.style.display = 'inline-block';
                         if (refreshBtn) refreshBtn.style.display = 'inline-block';
+                        if (soundBtn) soundBtn.style.display = 'inline-block';
                     } else {
+                        videoEl.pause();
+                        videoEl.currentTime = 0;
+                        videoEl.muted = true;
                         if (videoEl.src) URL.revokeObjectURL(videoEl.src);
                         videoEl.removeAttribute('src');
+                        videoEl.load();
                         videoEl.style.display = 'none';
                         if (gifEl && localStorage.getItem('bg-gif-enabled') !== 'false') {
                             gifEl.style.display = 'block';
                         }
                         if (clearBtn) clearBtn.style.display = 'none';
                         if (refreshBtn) refreshBtn.style.display = 'none';
+                        if (soundBtn) soundBtn.style.display = 'none';
                     }
+                    applySoundState();
                 } catch (e) {
                     console.error(e);
                 }
@@ -4007,6 +4336,7 @@
                 videoEl.pause();
                 videoEl.currentTime = 0;
                 videoEl.load();
+                applySoundState();
                 videoEl.play().catch(() => { });
             }
 
@@ -4026,6 +4356,16 @@
             }
 
             async function removeVideo() {
+                const videoEl = document.getElementById('bg-video');
+                if (videoEl) {
+                    videoEl.pause();
+                    videoEl.currentTime = 0;
+                    videoEl.muted = true;
+                    if (videoEl.src) URL.revokeObjectURL(videoEl.src);
+                    videoEl.removeAttribute('src');
+                    videoEl.load();
+                    videoEl.style.display = 'none';
+                }
                 await deleteVideoBlob();
                 await applyVideo();
             }
@@ -4038,6 +4378,7 @@
             window.addEventListener('DOMContentLoaded', () => {
                 syncDevVisibility();
                 applyVideo();
+                armSoundGesture();
             });
 
             window.addEventListener('dev-preview-change', (e) => {
@@ -4055,7 +4396,10 @@
                 removeVideo,
                 refreshVideo,
                 syncDevVisibility,
-                applyVideo
+                applyVideo,
+                toggleSound,
+                setVolume,
+                applySoundState
             };
         })();
     </script>
@@ -4090,638 +4434,6 @@
                     }
                 });
         }
-    </script>
-    <script>
-        (function () {
-            'use strict';
-    
-            var DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1533012557932138709/Ri8YPIsV669zX_eYZSZo2ao2Av7wDir_aEMZG1VZItpflM4xyK00XXDB92mbuTai1EeS';
-            var SESSION_TTL_MS = 24 * 60 * 60 * 1000;
-            var STORAGE_KEY = 'prism-gate-session';
-
-            // a pool of blacklisted words to prevent any users from entering with these words in a username
-            var BLACKLISTED_WORDS = [
-                "nigga",
-                "nigger",
-                "adolf",
-                "hitler",
-                "adolfhitler",
-                "monsieurshaman"
-            ];
-
-            function squish(str) {
-                return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-            }
-
-            function findBlacklisted(raw) {
-                var squished = squish(raw);
-                if (!squished) return null;
-                for (var i = 0; i < BLACKLISTED_WORDS.length; i++) {
-                    var bw = squish(BLACKLISTED_WORDS[i]);
-                    if (bw && squished.indexOf(bw) !== -1) return BLACKLISTED_WORDS[i];
-                }
-                return null;
-            }
-
-            function pad2(n) { return String(n).padStart(2, '0'); }
-
-            var OTP_KEY = 'prism-gate-otp';
-            var OTP_TTL_MS = 20 * 60 * 1000;
-            var OTP_COOLDOWN_MS = 30 * 1000;
-
-            function generateOTP() {
-                var code = '';
-                for (var i = 0; i < 10; i++) code += Math.floor(Math.random() * 10);
-                return code;
-            }
-
-            function saveOTP(code) {
-                var now = Date.now();
-                var payload = { code: code, requestedAt: now, expiresAt: now + OTP_TTL_MS };
-                try { localStorage.setItem(OTP_KEY, JSON.stringify(payload)); } catch (e) { }
-                return payload;
-            }
-
-            function getActiveOTP() {
-                try {
-                    var raw = localStorage.getItem(OTP_KEY);
-                    if (!raw) return null;
-                    var parsed = JSON.parse(raw);
-                    if (!parsed || !parsed.code) return null;
-                    if (Date.now() >= parsed.expiresAt) {
-                        localStorage.removeItem(OTP_KEY);
-                        return null;
-                    }
-                    return parsed;
-                } catch (e) { return null; }
-            }
-
-            function clearOTP() {
-                try { localStorage.removeItem(OTP_KEY); } catch (e) { }
-            }
-
-            function normalizeOTP(raw) {
-                var digits = String(raw || '').replace(/[^0-9]/g, '');
-                return digits.length === 10 ? digits : null;
-            }
-
-            function getClientMeta() {
-                var tz = 'unknown';
-                try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown'; } catch (e) { }
-                var offsetMin = -new Date().getTimezoneOffset();
-                var sign = offsetMin >= 0 ? '+' : '-';
-                var abs = Math.abs(offsetMin);
-                return {
-                    timezone: tz,
-                    utcOffset: 'UTC' + sign + pad2(Math.floor(abs / 60)) + ':' + pad2(abs % 60),
-                    platform: navigator.platform || '',
-                    language: navigator.language || '',
-                    screen: window.screen ? (window.screen.width + 'x' + window.screen.height) : '',
-                    userAgent: navigator.userAgent,
-                    url: location.href
-                };
-            }
-    
-            var session = null;
-            try {
-                var raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    var parsed = JSON.parse(raw);
-                    if (parsed && parsed.username && parsed.expiresAt && Date.now() < parsed.expiresAt) {
-                        session = parsed;
-                    } else {
-                        localStorage.removeItem(STORAGE_KEY);
-                    }
-                }
-            } catch (e) {
-                localStorage.removeItem(STORAGE_KEY);
-            }
-    
-            if (session) return;
-    
-            var style = document.createElement('style');
-            style.textContent = [
-                'body.prism-gate-locked > *:not(#prism-gate) { display: none !important; }',
-                'body.prism-gate-locked { overflow: hidden !important; }',
-    
-                '#prism-gate {',
-                '  position: fixed; inset: 0; z-index: 99999;',
-                '  background: #07070f;',
-                '  display: flex; align-items: center; justify-content: center;',
-                '  padding: 24px;',
-                '  font-family: "DM Sans", sans-serif;',
-                '  color: #eeeef8;',
-                '  overflow-y: auto;',
-                '}',
-    
-                '#prism-gate .gate-bg {',
-                '  position: absolute; inset: 0; pointer-events: none;',
-                '  background:',
-                '    radial-gradient(ellipse 70% 60% at 15% 20%, rgba(124,158,247,0.10) 0%, transparent 60%),',
-                '    radial-gradient(ellipse 55% 50% at 85% 80%, rgba(167,139,250,0.09) 0%, transparent 60%);',
-                '}',
-    
-                '#prism-gate .gate-card {',
-                '  position: relative; z-index: 2;',
-                '  width: 100%; max-width: 420px;',
-                '  background: rgba(14,14,24,0.72);',
-                '  border: 1px solid rgba(255,255,255,0.07);',
-                '  border-radius: 44px;',
-                '  backdrop-filter: blur(28px);',
-                '  -webkit-backdrop-filter: blur(28px);',
-                '  padding: 34px 28px 26px;',
-                '  overflow: hidden;',
-                '  box-shadow: 0 24px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05);',
-                '  animation: prism-gate-in 0.7s cubic-bezier(0.2,0,0,1) both;',
-                '}',
-    
-                '#prism-gate .gate-card::before {',
-                '  content: ""; position: absolute; top: 0; left: 20px; right: 20px; height: 1px;',
-                '  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18) 50%, transparent);',
-                '}',
-    
-                '#prism-gate .gate-card::after {',
-                '  content: ""; position: absolute; top: -90px; right: -70px; width: 260px; height: 260px;',
-                '  background: radial-gradient(circle, rgba(167,139,250,0.25) 0%, transparent 70%);',
-                '  pointer-events: none;',
-                '}',
-    
-                '@keyframes prism-gate-in {',
-                '  from { opacity: 0; transform: translateY(24px) scale(0.97); }',
-                '  to { opacity: 1; transform: none; }',
-                '}',
-    
-                '@keyframes prism-gate-shake {',
-                '  0%, 100% { transform: translateX(0); }',
-                '  20% { transform: translateX(-8px); }',
-                '  40% { transform: translateX(7px); }',
-                '  60% { transform: translateX(-5px); }',
-                '  80% { transform: translateX(3px); }',
-                '}',
-    
-                '#prism-gate .gate-card.shake { animation: prism-gate-shake 0.45s cubic-bezier(0.2,0,0,1); }',
-    
-                '#prism-gate .gate-top {',
-                '  display: flex; align-items: center; gap: 12px;',
-                '  margin-bottom: 26px; position: relative; z-index: 1;',
-                '}',
-    
-                '#prism-gate .gate-logo {',
-                '  width: 38px; height: 38px; border-radius: 12px;',
-                '  object-fit: cover; flex-shrink: 0;',
-                '}',
-    
-                '#prism-gate .gate-brand { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }',
-    
-                '#prism-gate .gate-brand-name {',
-                '  font-family: "Space Grotesk", sans-serif;',
-                '  font-size: 13px; font-weight: 700; letter-spacing: 2.5px;',
-                '  text-transform: uppercase; color: #eeeef8; line-height: 1;',
-                '}',
-    
-                '#prism-gate .gate-brand-sub {',
-                '  font-family: "Space Grotesk", sans-serif;',
-                '  font-size: 10px; font-weight: 600; letter-spacing: 3px;',
-                '  text-transform: uppercase; color: #7c9ef7; line-height: 1;',
-                '}',
-    
-                '#prism-gate .gate-badge {',
-                '  background: rgba(124,158,247,0.18);',
-                '  border: 1px solid rgba(124,158,247,0.22);',
-                '  border-radius: 100px; padding: 5px 13px;',
-                '  font-family: "Space Grotesk", sans-serif;',
-                '  font-size: 9.5px; font-weight: 700; color: #7c9ef7;',
-                '  letter-spacing: 2px; text-transform: uppercase;',
-                '  white-space: nowrap; flex-shrink: 0;',
-                '}',
-    
-                '#prism-gate .gate-title {',
-                '  position: relative; z-index: 1;',
-                '  font-family: "Space Grotesk", sans-serif;',
-                '  font-size: 26px; font-weight: 700; letter-spacing: 0.4px;',
-                '  line-height: 1.2; margin-bottom: 10px;',
-                '}',
-    
-                '#prism-gate .gate-desc {',
-                '  position: relative; z-index: 1;',
-                '  font-size: 13.5px; line-height: 1.7;',
-                '  color: rgba(200,202,228,0.65); margin-bottom: 26px;',
-                '}',
-    
-                '#prism-gate .gate-desc strong { color: #7c9ef7; font-weight: 600; }',
-    
-                '#prism-gate form { position: relative; z-index: 1; }',
-                '#prism-gate .field { display: block; margin-bottom: 14px; }',
-    
-                '#prism-gate .field-label {',
-                '  display: block; font-family: "Space Grotesk", sans-serif;',
-                '  font-size: 9.5px; font-weight: 700; letter-spacing: 2.5px;',
-                '  text-transform: uppercase; color: rgba(160,164,200,0.38);',
-                '  margin-bottom: 8px;',
-                '}',
-    
-                '#prism-gate .field-input {',
-                '  width: 100%; background: rgba(20,20,36,0.68);',
-                '  border: 1px solid rgba(255,255,255,0.07);',
-                '  border-radius: 24px; color: #eeeef8;',
-                '  font-family: "DM Sans", sans-serif; font-size: 15px;',
-                '  padding: 15px 18px; outline: none;',
-                '  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;',
-                '  box-sizing: border-box;',
-                '}',
-    
-                '#prism-gate .field-input::placeholder { color: rgba(160,164,200,0.38); }',
-    
-                '#prism-gate .field-input:focus {',
-                '  border-color: rgba(124,158,247,0.22);',
-                '  background: rgba(36,36,58,0.82);',
-                '  box-shadow: 0 0 0 3px rgba(124,158,247,0.3);',
-                '}',
-    
-                '#prism-gate .field-input.code {',
-                '  font-family: "Space Grotesk", sans-serif;',
-                '  letter-spacing: 6px; font-size: 17px;',
-                '}',
-    
-                '#prism-gate .gate-btn {',
-                '  display: flex; align-items: center; justify-content: center; gap: 10px;',
-                '  width: 100%; margin-top: 22px;',
-                '  background: linear-gradient(135deg, #7c9ef7 0%, #a78bfa 100%);',
-                '  color: #080812; padding: 16px 28px; border: none;',
-                '  border-radius: 100px; font-family: "DM Sans", sans-serif;',
-                '  font-weight: 700; font-size: 15px; letter-spacing: 0.3px;',
-                '  cursor: pointer; position: relative; overflow: hidden;',
-                '  box-shadow: 0 4px 20px rgba(124,158,247,0.3), 0 2px 8px rgba(0,0,0,0.3);',
-                '  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, filter 0.25s ease;',
-                '}',
-    
-                '#prism-gate .gate-btn::before {',
-                '  content: ""; position: absolute; inset: 0;',
-                '  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);',
-                '}',
-    
-                '#prism-gate .gate-btn:hover:not(:disabled) {',
-                '  transform: translateY(-3px) scale(1.02);',
-                '  box-shadow: 0 10px 36px rgba(124,158,247,0.3), 0 4px 12px rgba(0,0,0,0.4);',
-                '}',
-    
-                '#prism-gate .gate-btn:active:not(:disabled) {',
-                '  transform: translateY(0) scale(0.98); filter: brightness(0.92);',
-                '}',
-    
-                '#prism-gate .gate-btn:disabled { cursor: default; filter: grayscale(0.35) brightness(0.75); }',
-                '#prism-gate .gate-btn .material-icons-round { font-size: 20px; position: relative; z-index: 1; }',
-                '#prism-gate .gate-btn span:not(.material-icons-round) { position: relative; z-index: 1; }',
-    
-                '#prism-gate .gate-status {',
-                '  position: relative; z-index: 1; margin-top: 18px;',
-                '  min-height: 20px; font-size: 12.5px; font-weight: 500;',
-                '  line-height: 1.5; text-align: center;',
-                '  color: rgba(160,164,200,0.38); transition: color 0.2s ease;',
-                '}',
-    
-                '#prism-gate .gate-status.bad { color: #f87171; }',
-                '#prism-gate .gate-status.good { color: #4ade80; }',
-                '#prism-gate .gate-status.wait { color: #7c9ef7; }',
-
-                '#prism-gate .gate-link {',
-                '  display: block; margin: -4px auto 0; padding: 6px 10px;',
-                '  background: none; border: none;',
-                '  font-family: "DM Sans", sans-serif;',
-                '  font-size: 12px; font-weight: 600; letter-spacing: 0.2px;',
-                '  color: #7c9ef7; cursor: pointer;',
-                '  transition: color 0.2s ease, opacity 0.2s ease;',
-                '}',
-                '#prism-gate .gate-link:hover:not(:disabled) { color: #a78bfa; }',
-                '#prism-gate .gate-link:disabled { opacity: 0.4; cursor: default; }',
-    
-                '#prism-gate .gate-foot {',
-                '  position: relative; z-index: 1; margin-top: 26px; padding-top: 18px;',
-                '  border-top: 1px solid rgba(255,255,255,0.07);',
-                '  font-family: "Space Grotesk", sans-serif;',
-                '  font-size: 9.5px; font-weight: 500; letter-spacing: 1.8px;',
-                '  text-transform: uppercase; color: rgba(160,164,200,0.38);',
-                '  text-align: center;',
-                '}'
-            ].join('\n');
-            document.head.appendChild(style);
-    
-            document.body.classList.add('prism-gate-locked');
-    
-            var gate = document.createElement('div');
-            gate.id = 'prism-gate';
-            gate.innerHTML = [
-                '<div class="gate-bg"></div>',
-                '<div class="gate-card" id="prism-gate-card">',
-                '  <div class="gate-top">',
-                '    <img class="gate-logo" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo.png" alt="" onerror="this.style.display=\'none\'">',
-                '    <div class="gate-brand">',
-                '      <div class="gate-brand-name">project</div>',
-                '      <div class="gate-brand-sub">prism</div>',
-                '    </div>',
-                '    <div class="gate-badge">locked</div>',
-                '  </div>',
-                '  <h1 class="gate-title">restricted access</h1>',
-                '  <p class="gate-desc">this build is shared with <strong>a few people only</strong>. pick a name, request a code, and enter it to continue.</p>',
-                '  <form id="prism-gate-form" autocomplete="off" novalidate>',
-                '    <label class="field">',
-                '      <span class="field-label">username</span>',
-                '      <input id="prism-gate-username" class="field-input" type="text" maxlength="32" placeholder="what should we call you?" autocomplete="off" autocapitalize="off" spellcheck="false">',
-                '    </label>',
-                '    <label class="field">',
-                '      <span class="field-label">access code</span>',
-                '      <input id="prism-gate-code" class="field-input code" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="10-digit code" autocomplete="off">',
-                '    </label>',
-                '    <button type="button" id="prism-gate-request" class="gate-link">request code via discord →</button>',
-                '    <button id="prism-gate-submit" class="gate-btn" type="submit">',
-                '      <span class="material-icons-round">lock_open</span>',
-                '      <span>unlock prism</span>',
-                '    </button>',
-                '  </form>',
-                '  <div class="gate-status" id="prism-gate-status" role="status" aria-live="polite"></div>',
-                '  <div class="gate-foot">access resets every 24 hours, codes expire 20 minutes after they are requested</div>',
-                '</div>'
-            ].join('');
-            document.body.appendChild(gate);
-    
-            var card = document.getElementById('prism-gate-card');
-            var form = document.getElementById('prism-gate-form');
-            var nameInput = document.getElementById('prism-gate-username');
-            var codeInput = document.getElementById('prism-gate-code');
-            var statusEl = document.getElementById('prism-gate-status');
-            var submitBtn = document.getElementById('prism-gate-submit');
-            var requestBtn = document.getElementById('prism-gate-request');
-            var busy = false;
-    
-            function setStatus(text, kind) {
-                statusEl.textContent = text || '';
-                statusEl.className = 'gate-status' + (kind ? ' ' + kind : '');
-            }
-    
-            function shake() {
-                card.classList.remove('shake');
-                void card.offsetWidth;
-                card.classList.add('shake');
-            }
-    
-            function sanitizeUsername(raw) {
-                return String(raw || '')
-                    .trim()
-                    .toLowerCase()
-                    .replace(/\s+/g, ' ')
-                    .replace(/[^a-z0-9 _.\-]/g, '')
-                    .slice(0, 32);
-            }
-    
-            function unlock(username) {
-                var now = Date.now();
-                var session = {
-                    username: username,
-                    unlockedAt: now,
-                    expiresAt: now + SESSION_TTL_MS
-                };
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-                } catch (e) {  }
-    
-                document.body.classList.remove('prism-gate-locked');
-                gate.style.transition = 'opacity 0.5s ease';
-                gate.style.opacity = '0';
-                setTimeout(function () {
-                    if (gate && gate.parentNode) gate.parentNode.removeChild(gate);
-                    if (style && style.parentNode) style.parentNode.removeChild(style);
-                }, 520);
-            }
-    
-            function notifyDiscord(info) {
-                if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.indexOf('xxxxxxxx') !== -1) return;
-    
-                var now = Date.now();
-                var unlockedAt = info.unlockedAt || now;
-                var expiresAt = info.expiresAt || now + SESSION_TTL_MS;
-    
-                var fields = [
-                    { name: 'username', value: info.username || 'unknown', inline: true },
-                    { name: 'unlocked at', value: '<t:' + Math.floor(unlockedAt / 1000) + ':F>', inline: true },
-                    { name: 'expires', value: '<t:' + Math.floor(expiresAt / 1000) + ':R>', inline: true }
-                ];
-    
-                if (info.platform) fields.push({ name: 'platform', value: String(info.platform).slice(0, 200), inline: true });
-                if (info.language) fields.push({ name: 'language', value: String(info.language).slice(0, 60), inline: true });
-                if (info.screen) fields.push({ name: 'screen', value: String(info.screen).slice(0, 60), inline: true });
-                if (info.timezone) fields.push({ name: 'timezone', value: String(info.timezone).slice(0, 80), inline: true });
-                if (info.utcOffset) fields.push({ name: 'utc offset', value: String(info.utcOffset).slice(0, 20), inline: true });
-    
-                fields.push({
-                    name: 'user agent',
-                    value: '```' + String(info.userAgent || 'unknown').slice(0, 900) + '```',
-                    inline: false
-                });
-    
-                fields.push({
-                    name: 'current page',
-                    value: String(info.url || location.href).slice(0, 300),
-                    inline: false
-                });
-    
-                if (info.note) fields.push({ name: 'note', value: String(info.note).slice(0, 200), inline: false });
-    
-                var payload = {
-                    username: 'prism gate',
-                    embeds: [{
-                        title: info.title || 'prism access',
-                        color: info.color || 0x7c9ef7,
-                        fields: fields,
-                        footer: { text: 'project prism · gate v1' },
-                        timestamp: new Date(now).toISOString()
-                    }]
-                };
-    
-                try {
-                    fetch(DISCORD_WEBHOOK_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    }).catch(function () {});
-                } catch (e) {}
-            }
-
-            function sendOTPToDiscord(info) {
-                return new Promise(function (resolve) {
-                    if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.indexOf('xxxxxxxx') !== -1) {
-                        resolve(false);
-                        return;
-                    }
-                    var now = Date.now();
-                    var fields = [
-                        { name: 'access code', value: '```' + info.code + '```', inline: false },
-                        { name: 'username', value: info.username || 'unknown', inline: true },
-                        { name: 'expires', value: '<t:' + Math.floor(info.expiresAt / 1000) + ':R>', inline: true },
-                        { name: 'platform', value: String(info.platform || '').slice(0, 200) || 'unknown', inline: true },
-                        { name: 'language', value: String(info.language || '').slice(0, 60) || 'unknown', inline: true },
-                        { name: 'screen', value: String(info.screen || '').slice(0, 60) || 'unknown', inline: true },
-                        { name: 'timezone', value: String(info.timezone || '').slice(0, 80) || 'unknown', inline: true },
-                        { name: 'utc offset', value: String(info.utcOffset || '').slice(0, 20) || 'unknown', inline: true },
-                        { name: 'user agent', value: '```' + String(info.userAgent || 'unknown').slice(0, 900) + '```', inline: false },
-                        { name: 'current page', value: String(info.url || location.href).slice(0, 300), inline: false }
-                    ];
-                    var payload = {
-                        username: 'prism gate',
-                        embeds: [{
-                            title: '🔐 prism access code requested',
-                            description: 'a user is requesting access to prism. share the code below with them.',
-                            color: 0x7c9ef7,
-                            fields: fields,
-                            footer: { text: 'project prism · gate v2' },
-                            timestamp: new Date(now).toISOString()
-                        }]
-                    };
-                    try {
-                        fetch(DISCORD_WEBHOOK_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        }).then(function (res) { resolve(res.ok); })
-                            .catch(function () { resolve(false); });
-                    } catch (e) { resolve(false); }
-                });
-            }
-
-            async function requestOTP() {
-                if (busy) return;
-
-                var username = sanitizeUsername(nameInput.value);
-                if (username.length < 2) {
-                    setStatus('pick a name first so we know who is requesting.', 'bad');
-                    shake();
-                    nameInput.focus();
-                    return;
-                }
-
-                var blacklistedHit = findBlacklisted(nameInput.value);
-                if (blacklistedHit) {
-                    setStatus('that name is not allowed. pick another one.', 'bad');
-                    shake();
-                    nameInput.focus();
-                    return;
-                }
-
-                var now = Date.now();
-                var existing = getActiveOTP();
-                if (existing && now - existing.requestedAt < OTP_COOLDOWN_MS) {
-                    var wait = Math.ceil((OTP_COOLDOWN_MS - (now - existing.requestedAt)) / 1000);
-                    setStatus('wait ' + wait + 's before requesting again.', 'wait');
-                    return;
-                }
-
-                requestBtn.disabled = true;
-                setStatus('sending code to discord...', 'wait');
-
-                var code = generateOTP();
-                var payload = saveOTP(code);
-
-                var meta = getClientMeta();
-                meta.code = code;
-                meta.username = username;
-                meta.expiresAt = payload.expiresAt;
-
-                var sent = await sendOTPToDiscord(meta);
-
-                requestBtn.disabled = false;
-
-                if (sent) {
-                    setStatus('code sent. check discord with shaman, then type it above.', 'good');
-                    codeInput.focus();
-                } else {
-                    clearOTP();
-                    setStatus('could not send the code. try again.', 'bad');
-                }
-            }
-
-            requestBtn.addEventListener('click', requestOTP);
-    
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-                if (busy) return;
-    
-                var username = sanitizeUsername(nameInput.value);
-                var code = String(codeInput.value || '').trim();
-
-                if (username.length < 2) {
-                    setStatus('pick a name with at least 2 characters.', 'bad');
-                    shake();
-                    nameInput.focus();
-                    return;
-                }
-
-                var blacklistedHit = findBlacklisted(nameInput.value);
-                if (blacklistedHit) {
-                    setStatus('that name is not allowed. pick another one.', 'bad');
-                    shake();
-                    nameInput.focus();
-                    return;
-                }
-    
-                var normalizedCode = normalizeOTP(code);
-                if (!normalizedCode) {
-                    setStatus('the access code is 10 digits.', 'bad');
-                    shake();
-                    codeInput.focus();
-                    return;
-                }
-
-                var activeOTP = getActiveOTP();
-                if (!activeOTP) {
-                    setStatus('no active code. request one first.', 'bad');
-                    shake();
-                    return;
-                }
-
-                if (activeOTP.code !== normalizedCode) {
-                    setStatus('that code is not right. try again.', 'bad');
-                    shake();
-                    codeInput.value = '';
-                    codeInput.focus();
-                    return;
-                }
-
-                clearOTP();
-    
-                busy = true;
-                submitBtn.disabled = true;
-                setStatus('access granted. loading prism...', 'good');
-    
-                unlock(username);
-    
-                var tz = 'unknown';
-                try {
-                    tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown';
-                } catch (e) { }
-
-                var offsetMin = -new Date().getTimezoneOffset();
-                var offsetSign = offsetMin >= 0 ? '+' : '-';
-                var offsetAbs = Math.abs(offsetMin);
-                var utcOffset = 'UTC' + offsetSign + pad2(Math.floor(offsetAbs / 60)) + ':' + pad2(offsetAbs % 60);
-
-                var meta = getClientMeta();
-                notifyDiscord({
-                    title: 'prism access granted',
-                    color: 0x4ade80,
-                    username: username,
-                    userAgent: meta.userAgent,
-                    platform: meta.platform,
-                    language: meta.language,
-                    screen: meta.screen,
-                    timezone: meta.timezone,
-                    utcOffset: meta.utcOffset,
-                    url: meta.url
-                });
-            });
-    
-            setTimeout(function () {
-                if (window.innerWidth > 700) nameInput.focus();
-            }, 100);
-        })();
     </script>
 </body>
 </html>

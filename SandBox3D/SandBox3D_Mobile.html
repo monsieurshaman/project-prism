@@ -730,7 +730,7 @@
         <div class="loader-content">
             <div class="loader-spinner"></div>
             <div class="loader-text">Sand Box 3D for Mobile</div>
-            <div class="loader-subtext-version">Version: v26.09.22</div>
+            <div class="loader-subtext-version">Version: v26.09.26</div>
             <div class="loader-subtext">Setting up your sandbox...</div>
             <button id="skip-loading-btn" onclick="skipLoading()">Skip Setup</button>
         </div>
@@ -3855,6 +3855,7 @@
                 sb3d._resizeHandler = null;
             }
 
+            sb3d._occluderList = null;
             spawnedMeshes = [];
             if (sb3d.scene) { sb3d.scene.dispose(); sb3d.scene = null; }
             if (sb3d.engine) { sb3d.engine.dispose(); sb3d.engine = null; }
@@ -4964,8 +4965,29 @@
                     handleFrustumCulling: function () {
                         if (!this.cameraFree || !isFrustumCullingEnabled) return;
 
+                        const scene = this.scene;
+                        const camPos = this.cameraFree.position;
                         const transform = this.cameraFree.getViewMatrix().multiply(this.cameraFree.getProjectionMatrix());
                         const frustumPlanes = BABYLON.Frustum.GetPlanes(transform);
+
+                        if (!this._occluderList || this._occluderList.length === 0 ||
+                            !this._occluderList[0] || this._occluderList[0].isDisposed() ||
+                            this._occluderList[0].getScene() !== scene) {
+                            this._occluderList = scene.meshes.filter(m =>
+                                m && !m.isDisposed() && m.isEnabled() && m.isVisible &&
+                                (
+                                    m.name === 'ground' ||
+                                    m.name === 'ramp' ||
+                                    m.name === 'poolFloor' ||
+                                    m.name === 'pillar' ||
+                                    m.name.startsWith('stair_step_') ||
+                                    m.name.startsWith('wall') ||
+                                    m.name.startsWith('bgPillar_')
+                                )
+                            );
+                        }
+
+                        const occluders = this._occluderList;
 
                         for (let i = 0; i < spawnedMeshes.length; i++) {
                             const mesh = spawnedMeshes[i];
@@ -4975,14 +4997,30 @@
                             const boundingInfo = mesh.getBoundingInfo();
                             const inFrustum = boundingInfo.isInFrustum(frustumPlanes);
 
-                            const isCustom = mesh.name.includes("customInstance") || mesh.name.includes("customHitbox");
-                            const resolvedVisible = isCustom ? false : inFrustum;
+                            let resolvedVisible = inFrustum;
 
-                            mesh.isVisible = resolvedVisible;
+                            if (inFrustum && occluders.length > 0) {
+                                const center = boundingInfo.boundingSphere.centerWorld;
+                                const delta = center.subtract(camPos);
+                                const dist = delta.length();
+
+                                if (dist > 15) {
+                                    const ray = new BABYLON.Ray(camPos, delta.normalizeToNew(), dist - 0.5);
+                                    const hit = scene.pickWithRay(ray, m => occluders.indexOf(m) !== -1);
+                                    if (hit && hit.hit && hit.pickedMesh) {
+                                        resolvedVisible = false;
+                                    }
+                                }
+                            }
+
+                            const isCustom = mesh.name.includes("customInstance") || mesh.name.includes("customHitbox");
+                            const finalVisible = isCustom ? false : resolvedVisible;
+
+                            mesh.isVisible = finalVisible;
 
                             const children = mesh.getChildMeshes();
                             for (let j = 0; j < children.length; j++) {
-                                children[j].isVisible = resolvedVisible;
+                                children[j].isVisible = finalVisible;
                             }
                         }
                     },
@@ -5430,8 +5468,19 @@
                         }
 
                         const scale = currentSize;
-                        const pivotOffset = scale * 0.5 + (isBuildMode ? 0 : 0.01);
-                        const spawnPos = pickInfo.pickedPoint.add(normal.scale(pivotOffset));
+                        let spawnPos;
+                        if (isBuildMode) {
+                            const gridSize = scale;
+                            const nudged = pickInfo.pickedPoint.add(normal.scale(0.01));
+                            spawnPos = new BABYLON.Vector3(
+                                Math.floor(nudged.x / gridSize) * gridSize + gridSize / 2,
+                                Math.floor(nudged.y / gridSize) * gridSize + gridSize / 2,
+                                Math.floor(nudged.z / gridSize) * gridSize + gridSize / 2
+                            );
+                        } else {
+                            const pivotOffset = scale * 0.5 + 0.01;
+                            spawnPos = pickInfo.pickedPoint.add(normal.scale(pivotOffset));
+                        }
 
                         const customIdx = type.startsWith('custom_') ? parseInt(type.split('_')[1]) : -1;
                         const customSlot = customIdx >= 0 ? customModelTemplates[customIdx] : null;
@@ -5442,8 +5491,12 @@
                             mesh.getChildMeshes().forEach(c => c.alwaysSelectAsActiveMesh = false);
                             mesh.setEnabled(true);
                             mesh.scaling = new BABYLON.Vector3(scale, scale, scale);
-                            const customOffset = (customSlot.dimensions.height * scale) / 2;
-                            mesh.position = pickInfo.pickedPoint.add(normal.scale(customOffset));
+                            if (isBuildMode) {
+                                mesh.position = spawnPos.clone();
+                            } else {
+                                const customOffset = (customSlot.dimensions.height * scale) / 2;
+                                mesh.position = pickInfo.pickedPoint.add(normal.scale(customOffset));
+                            }
                         }
                         else if (baseType === 'box') {
                             mesh = BABYLON.MeshBuilder.CreateBox(isGlass ? "glass_box" : (isMirror ? "mirror_box" : "box"), { size: scale }, scene);
@@ -5456,6 +5509,26 @@
                         else if (baseType === 'cylinder') {
                             mesh = BABYLON.MeshBuilder.CreateCylinder(isGlass ? "glass_cyl" : "cyl", { height: scale, diameter: scale / 2 }, scene);
                             mesh.position.copyFrom(spawnPos);
+
+                            if (isBuildMode) {
+                                const ax = Math.abs(normal.x);
+                                const ay = Math.abs(normal.y);
+                                const az = Math.abs(normal.z);
+
+                                if (ay >= ax && ay >= az) {
+                                    mesh.rotation.x = 0;
+                                    mesh.rotation.y = 0;
+                                    mesh.rotation.z = 0;
+                                } else if (ax >= az) {
+                                    mesh.rotation.x = 0;
+                                    mesh.rotation.y = 0;
+                                    mesh.rotation.z = Math.PI / 2;
+                                } else {
+                                    mesh.rotation.x = Math.PI / 2;
+                                    mesh.rotation.y = 0;
+                                    mesh.rotation.z = 0;
+                                }
+                            }
                         }
                         else if (baseType === 'triangle') {
                             mesh = BABYLON.MeshBuilder.CreateCylinder(isGlass ? "glass_tri" : "tri", { height: scale, diameter: scale, tessellation: 3 }, scene);
@@ -5521,10 +5594,10 @@
                         if (mesh) {
                             if (baseType !== 'custom') mesh.material = mat;
 
-                            let massVal = currentMass;
+                            let massVal = isBuildMode ? 0 : currentMass;
 
                             if (baseType === 'custom' && customSlot) {
-                                mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 5 * scale, restitution: 0.1, friction: 0.5 }, scene);
+                                mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: isBuildMode ? 0 : 5 * scale, restitution: 0.1, friction: 0.5 }, scene);
                             }
                             else if (baseType === 'box') {
                                 mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, BABYLON.PhysicsImpostor.BoxImpostor, { mass: massVal, restitution: 0.1, friction: 0.8 }, scene);
@@ -5570,11 +5643,6 @@
                                 this.armBomb(mesh, scene, baseType === 'frag_bomb');
                             }
 
-                            if (isBuildMode && pickInfo.pickedMesh && pickInfo.pickedMesh.physicsImpostor && !baseType.includes('bomb')) {
-                                const joint = new BABYLON.PhysicsJoint(BABYLON.PhysicsJoint.LockJoint, {});
-                                pickInfo.pickedMesh.physicsImpostor.addJoint(mesh.physicsImpostor, joint);
-                                if (mesh.material && mesh.material.emissiveColor) mesh.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
-                            }
                             spawnParticleBurst(mesh.position, scene);
                             spawnedMeshes.push(mesh);
                             if (!isMirror && !isGlass) {

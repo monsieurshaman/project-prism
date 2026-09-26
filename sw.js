@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v3.6-26.9.23';
+const CACHE_NAME = 'v4.0-26.9.26';
 
 const CORE_URLS = [
     '/',
@@ -86,96 +86,171 @@ self.addEventListener('install', e => {
 
     const urlsToCache = includeGames ? [...CORE_URLS, ...GAME_URLS] : CORE_URLS;
 
-    e.waitUntil(
-        caches.open(CACHE_NAME).then(async (cache) => {
-            let processedAssets = 0;
-            let errorCount = 0;
-            const totalAssets = urlsToCache.length;
+    e.waitUntil((async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const totalAssets = urlsToCache.length;
+        const CHECK_TIMEOUT_MS = 8000;
+        const DOWNLOAD_TIMEOUT_MS = 45000;
 
-            async function broadcast(msg) {
-                const clientsList = await self.clients.matchAll({ includeUncontrolled: true, type: 'window' });
-                for (const client of clientsList) client.postMessage(msg);
+        let checkedAssets = 0;
+        let processedAssets = 0;
+        let errorCount = 0;
+
+        async function broadcast(msg) {
+            const clientsList = await self.clients.matchAll({ includeUncontrolled: true, type: 'window' });
+            for (const client of clientsList) client.postMessage(msg);
+        }
+
+        function fetchWithTimeout(url, opts, ms) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), ms);
+            return fetch(url, Object.assign({}, opts, { signal: controller.signal }))
+                .finally(() => clearTimeout(timer));
+        }
+
+        async function checkAsset(absoluteUrl) {
+            try {
+                const cached = await caches.match(absoluteUrl);
+                if (cached) return { ok: true, cached: true };
+            } catch (_) { }
+
+            try {
+                const res = await fetchWithTimeout(absoluteUrl, { method: 'HEAD', cache: 'no-store' }, CHECK_TIMEOUT_MS);
+                if (res.status === 200 || res.status === 304) return { ok: true, cached: false };
+                if (res.status !== 405 && res.status !== 501) return { ok: false, cached: false };
+            } catch (_) { }
+
+            try {
+                const res = await fetchWithTimeout(absoluteUrl, { cache: 'no-store' }, CHECK_TIMEOUT_MS);
+                return { ok: res.status === 200 || res.status === 304, cached: false };
+            } catch (_) {
+                return { ok: false, cached: false };
             }
+        }
 
-            async function broadcastProgress() {
+        await broadcast({ type: 'CACHE_START', total: totalAssets });
+
+        const entries = await Promise.all(urlsToCache.map(async (url) => {
+            const absoluteUrl = new URL(url, self.location.origin).href;
+            const result = await checkAsset(absoluteUrl);
+            checkedAssets++;
+            await broadcast({
+                type: 'CACHE_CHECK',
+                checked: checkedAssets,
+                total: totalAssets,
+                url: absoluteUrl,
+                ok: result.ok
+            });
+            return { url, absoluteUrl, ok: result.ok, cached: result.cached };
+        }));
+
+        const downloadable = entries.filter(x => x.ok);
+        const skipped = entries.filter(x => !x.ok);
+
+        for (const s of skipped) {
+            errorCount++;
+            await broadcast({ type: 'CACHE_ERROR', url: s.absoluteUrl, errors: errorCount });
+        }
+
+        await broadcast({
+            type: 'CACHE_CHECK_DONE',
+            total: totalAssets,
+            ok: downloadable.length,
+            skipped: skipped.length
+        });
+
+        if (downloadable.length === 0) {
+            await broadcast({ type: 'CACHE_PROGRESS', progress: 100, processed: 0, total: 0, errors: errorCount });
+            return;
+        }
+
+        async function downloadAsset(entry) {
+            const { absoluteUrl, cached } = entry;
+
+            if (cached) {
                 processedAssets++;
-                const progress = Math.round((processedAssets / totalAssets) * 100);
-                await broadcast({ type: 'CACHE_PROGRESS', progress, processed: processedAssets, total: totalAssets, errors: errorCount });
+                await broadcast({
+                    type: 'CACHE_PROGRESS',
+                    progress: Math.round((processedAssets / downloadable.length) * 100),
+                    processed: processedAssets,
+                    total: downloadable.length,
+                    errors: errorCount
+                });
+                return;
             }
 
-            await broadcast({ type: 'CACHE_START', total: totalAssets });
+            try {
+                const response = await fetchWithTimeout(absoluteUrl, { cache: 'reload' }, DOWNLOAD_TIMEOUT_MS);
 
-            const downloadTasks = urlsToCache.map(async (url) => {
-                const absoluteUrl = new URL(url, self.location.origin).href;
-                try {
-                    const cached = await caches.match(absoluteUrl);
-                    if (cached) {
-                        await broadcastProgress();
-                        return;
-                    }
-
-                    const response = await fetch(absoluteUrl, { cache: 'reload' });
-                    if (response.status !== 200) {
-                        console.warn("Skipping non-200 asset:", absoluteUrl, response.status);
-                        await broadcastProgress();
-                        return;
-                    }
-
-                    if (absoluteUrl.includes('fonts.googleapis.com')) {
-                        const cssText = await response.clone().text();
-                        const fontUrls = [...cssText.matchAll(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/g)].map(m => m[1]);
-
-                        for (const fontUrl of fontUrls) {
-                            const fontRes = await fetch(fontUrl);
-                            if (fontRes.status === 200) {
-                                const fontBlob = await fontRes.blob();
-                                const fontCacheRes = new Response(fontBlob.slice(0), {
-                                    status: 200,
-                                    headers: { 'Content-Type': fontRes.headers.get('content-type') || 'application/octet-stream' }
-                                });
-                                await cache.put(fontUrl, fontCacheRes);
-
-                                if (isStandalone) {
-                                    try {
-                                        await setIDBData(fontUrl, { blob: fontBlob.slice(0), type: fontCacheRes.headers.get('content-type') });
-                                    } catch (idbErr) {
-                                        await deleteIDBData(fontUrl).catch(() => { });
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    const blob = await response.blob();
-                    const contentType = response.headers.get('content-type');
-
-                    const cacheResponse = new Response(blob.slice(0), {
-                        status: 200,
-                        headers: { 'Content-Type': contentType || 'application/octet-stream' }
-                    });
-                    await cache.put(absoluteUrl, cacheResponse);
-
-                    if (isStandalone) {
-                        try {
-                            await setIDBData(absoluteUrl, { blob: blob.slice(0), type: contentType });
-                        } catch (idbErr) {
-                            console.error("IDB write failed, cleaning up:", absoluteUrl, idbErr);
-                            await deleteIDBData(absoluteUrl).catch(() => { });
-                        }
-                    }
-                } catch (err) {
-                    console.error("Precaching error for:", absoluteUrl, err);
+                if (response.status !== 200) {
+                    console.warn('Skipping non-200 asset:', absoluteUrl, response.status);
                     errorCount++;
                     await broadcast({ type: 'CACHE_ERROR', url: absoluteUrl, errors: errorCount });
-                    await deleteIDBData(absoluteUrl).catch(() => { });
-                } finally {
-                    await broadcastProgress();
+                    return;
                 }
-            });
 
-            await Promise.all(downloadTasks);
-        })
-    );
+                if (absoluteUrl.includes('fonts.googleapis.com')) {
+                    const cssText = await response.clone().text();
+                    const fontUrls = [...cssText.matchAll(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/g)].map(m => m[1]);
+
+                    for (const fontUrl of fontUrls) {
+                        try {
+                            const fontRes = await fetchWithTimeout(fontUrl, {}, DOWNLOAD_TIMEOUT_MS);
+                            if (fontRes.status !== 200) continue;
+
+                            const fontBlob = await fontRes.blob();
+                            const fontCacheRes = new Response(fontBlob.slice(0), {
+                                status: 200,
+                                headers: { 'Content-Type': fontRes.headers.get('content-type') || 'application/octet-stream' }
+                            });
+                            await cache.put(fontUrl, fontCacheRes);
+
+                            if (isStandalone) {
+                                try {
+                                    await setIDBData(fontUrl, { blob: fontBlob.slice(0), type: fontCacheRes.headers.get('content-type') });
+                                } catch (_) {
+                                    await deleteIDBData(fontUrl).catch(() => { });
+                                }
+                            }
+                        } catch (_) { }
+                    }
+                }
+
+                const blob = await response.blob();
+                const contentType = response.headers.get('content-type');
+
+                const cacheResponse = new Response(blob.slice(0), {
+                    status: 200,
+                    headers: { 'Content-Type': contentType || 'application/octet-stream' }
+                });
+                await cache.put(absoluteUrl, cacheResponse);
+
+                if (isStandalone) {
+                    try {
+                        await setIDBData(absoluteUrl, { blob: blob.slice(0), type: contentType });
+                    } catch (_) {
+                        await deleteIDBData(absoluteUrl).catch(() => { });
+                    }
+                }
+            } catch (err) {
+                console.error('Precaching error for:', absoluteUrl, err);
+                errorCount++;
+                await broadcast({ type: 'CACHE_ERROR', url: absoluteUrl, errors: errorCount });
+                await deleteIDBData(absoluteUrl).catch(() => { });
+            } finally {
+                processedAssets++;
+                await broadcast({
+                    type: 'CACHE_PROGRESS',
+                    progress: Math.round((processedAssets / downloadable.length) * 100),
+                    processed: processedAssets,
+                    total: downloadable.length,
+                    errors: errorCount
+                });
+            }
+        }
+
+        await Promise.all(downloadable.map(downloadAsset));
+    })());
 });
 
 self.addEventListener('activate', e => {

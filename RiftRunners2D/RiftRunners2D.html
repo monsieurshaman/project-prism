@@ -109,6 +109,26 @@
       text-shadow: 0 0 10px rgba(255, 0, 50, 0.8);
     }
 
+    .phase-moon {
+      background: rgba(180, 200, 255, 0.15);
+      border-color: rgba(200, 220, 255, 0.55);
+      color: #d8e4ff;
+      text-shadow: 0 0 8px rgba(200, 220, 255, 0.5);
+    }
+
+    .phase-bloodmoon {
+      background: rgba(200, 20, 20, 0.3);
+      border-color: rgba(255, 40, 40, 0.85);
+      color: #ff2040;
+      text-shadow: 0 0 14px rgba(255, 20, 20, 0.9);
+      animation: bloodmoon-pulse 1.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes bloodmoon-pulse {
+      from { box-shadow: 0 0 6px rgba(255, 40, 40, 0.3); }
+      to   { box-shadow: 0 0 20px rgba(255, 40, 40, 0.8); }
+    }
+
     .hp-bar-wrap {
       width: 100%;
       height: 8px;
@@ -616,7 +636,7 @@
     <button id="close-shop-btn" class="menu-btn" style="margin-top:10px;">Back</button>
   </div>
 
-  <div id="rr-version-tag">RIFT VERSION: v2.6.0</div>
+  <div id="rr-version-tag">RIFT VERSION: v2.7.1</div>
   
   <script>
     window.rrConfig = JSON.parse(localStorage.getItem('rr_custom_config')) || {
@@ -666,7 +686,7 @@
           key: 'moreHp',
           label: 'More HP',
           desc: '+50 Max Integrity per purchase',
-          cost: 150,
+          cost: 149,
           max: 5,
           current: upg.moreHp
         },
@@ -674,7 +694,7 @@
           key: 'moreEchoes',
           label: 'More Echoes',
           desc: '+1 Echo Charge per purchase',
-          cost: 200,
+          cost: 199,
           max: 3,
           current: upg.moreEchoes
         },
@@ -682,7 +702,7 @@
           key: 'betterShield',
           label: 'Better Shield',
           desc: '+50 Max Shield HP per purchase',
-          cost: 250,
+          cost: 249,
           max: 5,
           current: upg.betterShield
         },
@@ -690,7 +710,7 @@
           key: 'zapperDmg',
           label: 'Zapper DMG',
           desc: '+25% Zapper DMG per purchase',
-          cost: 160,
+          cost: 159,
           max: 4,
           current: upg.zapperDmg
         },
@@ -698,7 +718,7 @@
           key: 'shotgunDmg',
           label: 'Shotgun DMG',
           desc: '+20% Shotgun DMG per purchase',
-          cost: 170,
+          cost: 169,
           max: 4,
           current: upg.shotgunDmg
         },
@@ -706,7 +726,7 @@
           key: 'bazookaDmg',
           label: 'Bazooka DMG',
           desc: '+50% Bazooka DMG per purchase',
-          cost: 200,
+          cost: 199,
           max: 3,
           current: upg.bazookaDmg
         },
@@ -714,7 +734,7 @@
           key: 'grenadeDmg',
           label: 'Grenade DMG',
           desc: '+40% Grenade DMG per purchase',
-          cost: 180,
+          cost: 179,
           max: 3,
           current: upg.grenadeDmg
         },
@@ -722,7 +742,7 @@
           key: 'bazookaAoEDmg',
           label: 'Bazooka AoE',
           desc: '+50% AoE DMG (Bazooka)',
-          cost: 260,
+          cost: 259,
           max: 2,
           current: upg.bazookaAoEDmg
         },
@@ -730,7 +750,7 @@
           key: 'grenadeAoEDmg',
           label: 'Grenade AoE',
           desc: '+40% AoE DMG (Grenade)',
-          cost: 240,
+          cost: 239,
           max: 2,
           current: upg.grenadeAoEDmg
         },
@@ -738,42 +758,42 @@
           key: 'instant_hp',
           label: 'Instant Heal',
           desc: 'Instantly restores +25 Integrity',
-          cost: 80,
+          cost: 79,
           isInstant: true
         },
         {
           key: 'instant_shield',
           label: 'Instant Shield',
           desc: 'Instantly deploys Kinetic Shield',
-          cost: 130,
+          cost: 129,
           isInstant: true
         },
         {
           key: 'instant_freeze',
           label: 'Rift Freeze',
           desc: 'Instantly freezes all hostiles for 4s',
-          cost: 150,
+          cost: 149,
           isInstant: true
         },
         {
           key: 'instant_ammo',
           label: 'Infinite Ammo',
           desc: 'Instantly triggers 10s of infinite ammo',
-          cost: 120,
+          cost: 119,
           isInstant: true
         },
         {
           key: 'instant_speed',
           label: 'Speed Surge',
           desc: 'Instantly triggers 10s of hyper speed',
-          cost: 100,
+          cost: 99,
           isInstant: true
         },
         {
           key: 'instant_nuke',
           label: 'Tactical Nuke',
           desc: 'Instantly arms a single tactical nuke',
-          cost: 1000,
+          cost: 999,
           isInstant: true
         }
       ];
@@ -1101,14 +1121,15 @@
           this.gState = {
             level: 1,
             phase: 0,
-            phaseNames: ['STABILIZE', 'COLLAPSE', 'EXPANSION', 'ANOMALY'],
-            phaseClasses: ['phase-stabilize', 'phase-collapse', 'phase-expansion', 'phase-anomaly'],
+            phaseNames: ['STABILIZE', 'COLLAPSE', 'EXPANSION', 'ANOMALY', 'MOON', 'BLOODMOON'],
+            phaseClasses: ['phase-stabilize', 'phase-collapse', 'phase-expansion', 'phase-anomaly', 'phase-moon', 'phase-bloodmoon'],
             phaseTimer: 60,
             enemySpawnRate: 5000,
             enemySpawnTimer: 0,
             spawnLimit: 15,
             spawnedThisPhase: 0,
             isBossPhase: false,
+            specialPhase: false,
             bossSpawned: false,
             history: [],
             isPlaying: true,
@@ -1269,32 +1290,12 @@
           };
 
           document.getElementById('exit-btn').onclick = () => {
-            document.getElementById('pause-menu').style.display = 'none';
-            document.getElementById('rr-hud').style.display = 'none';
-            document.getElementById('rr-bottom').style.display = 'none';
-            document.getElementById('ammo-counter').style.display = 'none';
-            document.getElementById('weapon-panel').style.display = 'none';
-            document.getElementById('boss-hud-hp').style.display = 'none';
-            document.getElementById('enemy-hud-count').style.display = 'none';
-            this.physics.pause();
-            this.gState.isPlaying = false;
-
             if (typeof window._rrResetRunUpgrades === 'function') {
               window._rrResetRunUpgrades();
             }
-            const ov = document.getElementById('rr-overlay');
-            ov.innerHTML = `
-              <h1>RIFT RUNNERS 2D</h1>
-              <div class="sub">ECHO PROTOCOL</div>
-              <div style="font-size:12px;color:#5040aa;margin-top:8px;">HIGH VELOCITY EXTRACTION // SHIFTING GEOMETRY // SURVIVE</div>
-              <div class="btn-group">
-                <button id="start-btn" class="menu-btn">Initialize</button>
-                <button class="menu-btn" onclick="RiftRun.showShop('pause')">Shop</button>
-                <button id="open-settings-btn" class="menu-btn" onclick="RiftRun.showSettings('main')">Settings</button>
-              </div>
-            `;
-            ov.style.display = 'flex';
-            document.getElementById('start-btn').addEventListener('click', () => RiftRun.reboot(this));
+            this.gState.isPlaying = false;
+            this.physics.pause();
+            window.location.reload();
           };
           this.keysWpn = this.input.keyboard.addKeys('ONE,TWO,THREE,FOUR');
 
@@ -1365,8 +1366,14 @@
         generateMap() {
           this.walls.clear(true, true);
           this.wallGrid = new Set();
-          const wallType = `wall_${this.gState.phase}`;
-          const density = this.gState.phase === 0 ? 0.08 : this.gState.phase === 1 ? 0.18 : this.gState.phase === 3 ? 0.02 : 0.05;
+          const wallIdx = this.gState.phase === 4 ? 0 : this.gState.phase === 5 ? 3 : this.gState.phase;
+          const wallType = `wall_${wallIdx}`;
+          const density = this.gState.phase === 0 ? 0.08
+            : this.gState.phase === 1 ? 0.18
+            : this.gState.phase === 3 ? 0.02
+            : this.gState.phase === 4 ? 0.03
+            : this.gState.phase === 5 ? 0.14
+            : 0.05;
           for (let x = 64; x < this.worldSize - 64; x += 64) {
             for (let y = 64; y < this.worldSize - 64; y += 64) {
               if (Phaser.Math.Distance.Between(x, y, this.player.x, this.player.y) < 200) continue;
@@ -1394,19 +1401,27 @@
           let pool = [0, 0, 0, 1, 2, 2];
           if (this.gState.phase === 1) pool = [0, 1, 1, 1, 2];
           if (this.gState.phase === 2) pool = [0, 2, 2, 2, 2];
+          if (this.gState.phase === 4) pool = [0, 0, 0, 0, 1];
+          if (this.gState.phase === 5) pool = [0, 1, 2, 2, 2, 2];
           const type = types[Phaser.Math.RND.pick(pool)];
           const mult = 1 + (this.pState.score / 5000);
           const enemy = this.enemies.create(x, y, type.key);
           enemy.eType = type;
           enemy.hp = type.hp * mult * (1 + (this.gState.level * 0.1));
           enemy.maxHp = enemy.hp;
-          enemy.baseSpeed = type.speed * (1 + (this.pState.score / 120000)) * (1 + (this.gState.level * 0.04));
+          let speedMult = 1;
+          if (this.gState.phase === 4) speedMult = 0.75;
+          if (this.gState.phase === 5) speedMult = 1.35;
+          enemy.baseSpeed = type.speed * (1 + (this.pState.score / 120000)) * (1 + (this.gState.level * 0.04)) * speedMult;
           enemy.setCollideWorldBounds(true);
           enemy.setBounce(0.5);
           const hb = ENEMY_HITBOXES[type.key];
           if (hb) enemy.setCircle(hb.r, hb.ox, hb.oy);
 
-          enemy.hasWeapon = Math.random() < (0.2 + (this.gState.level * 0.05));
+          let wpnChance = 0.2 + (this.gState.level * 0.05);
+          if (this.gState.phase === 4) wpnChance *= 0.4;
+          if (this.gState.phase === 5) wpnChance = Math.min(0.95, wpnChance * 1.8 + 0.15);
+          enemy.hasWeapon = Math.random() < wpnChance;
           if (enemy.hasWeapon) {
             const aimRoll = Math.random() + (this.gState.level * 0.1);
             if (aimRoll < 0.33) {
@@ -1802,7 +1817,10 @@
           if (this.pState.invincible > 0 || this.pState.isDashing) return;
           this.playSfx(120, 'sawtooth', 0.2);
 
-          const dmg = (enemy.isBoss ? 30 : 15) * (1 + (this.gState.level * 0.2));
+          let dmgMult = 1;
+          if (this.gState.phase === 4) dmgMult = 0.6;
+          if (this.gState.phase === 5) dmgMult = 1.5;
+          const dmg = (enemy.isBoss ? 30 : 15) * (1 + (this.gState.level * 0.2)) * dmgMult;
           this.cameras.main.shake(200, 0.01);
 
           if (this.pState.shieldActive) {
@@ -1837,7 +1855,10 @@
           bullet.destroy();
           if (this.pState.invincible > 0 || this.pState.isDashing) return;
 
-          const dmg = 20 * (1 + (this.gState.level * 0.2));
+          let dmgMult = 1;
+          if (this.gState.phase === 4) dmgMult = 0.6;
+          if (this.gState.phase === 5) dmgMult = 1.5;
+          const dmg = 20 * (1 + (this.gState.level * 0.2)) * dmgMult;
           this.cameras.main.shake(200, 0.01);
 
           if (this.pState.shieldActive) {
@@ -1929,14 +1950,30 @@
           this.pEmitters[tint].explode(count, x, y);
         }
         shiftPhase() {
-          this.gState.phase = (this.gState.phase + 1) % 4;
-          if (this.gState.phase === 0) this.gState.level++;
-          this.gState.phaseTimer = 60;
+          if (this.gState.phase === 3) {
+            if (Math.random() < 0.2) {
+              this.gState.specialPhase = true;
+              this.gState.phase = Math.random() < 0.5 ? 4 : 5;
+            } else {
+              this.gState.specialPhase = false;
+              this.gState.phase = 0;
+              this.gState.level++;
+            }
+          } else if (this.gState.specialPhase) {
+            this.gState.specialPhase = false;
+            this.gState.phase = 0;
+            this.gState.level++;
+          } else {
+            this.gState.phase = (this.gState.phase + 1) % 4;
+            if (this.gState.phase === 0) this.gState.level++;
+          }
+          this.gState.phaseTimer = this.gState.phase === 4 ? 45 : this.gState.phase === 5 ? 40 : 60;
           this.gState.spawnedThisPhase = 0;
+          this.gState.spawnLimit = this.gState.phase === 4 ? 10 : this.gState.phase === 5 ? 28 : 15;
           this.gState.isBossPhase = (this.gState.phase === 3);
           this.gState.bossSpawned = false;
           this.cameras.main.shake(400, 0.015);
-          const colors = [0x80b0ff, 0xff8060, 0x60ff90, 0xff3050];
+          const colors = [0x80b0ff, 0xff8060, 0x60ff90, 0xff3050, 0xd8e4ff, 0xff2040];
           this.flashRect.fillColor = colors[this.gState.phase];
           this.flashRect.setAlpha(0.4);
           this.tweens.add({ targets: this.flashRect, alpha: 0, duration: 800 });
@@ -1945,6 +1982,13 @@
           if (this.gState.phase === 1) {
             this.pState.hp = Math.min(this.pState.maxHp, this.pState.hp + 15);
             this.logFeed('Stabilize Bonus: +15 HP');
+          }
+          if (this.gState.phase === 4) {
+            this.pState.hp = Math.min(this.pState.maxHp, this.pState.hp + 30);
+            this.logFeed('MOON PHASE: Serenity Restores +30 HP');
+          }
+          if (this.gState.phase === 5) {
+            this.logFeed('BLOODMOON RISING // HOSTILITY SURGE');
           }
           this.pState.echoCharges = this.pState.maxEchoCharges;
           this.updateDOM();
@@ -2254,7 +2298,11 @@
           if (this.gState.enemySpawnTimer <= 0) {
             this.spawnEnemy();
             this.gState.enemySpawnRate = Math.max(500, 2000 - (this.pState.score / 5));
-            const mult = this.gState.phase === 2 ? 3 : this.gState.phase === 1 ? 2 : 1;
+            const mult = this.gState.phase === 2 ? 3
+              : this.gState.phase === 1 ? 2
+                : this.gState.phase === 4 ? 0.5
+                  : this.gState.phase === 5 ? 4
+                    : 1;
             this.gState.enemySpawnTimer = this.gState.enemySpawnRate / mult;
           }
           this.enemies.getChildren().forEach(enemy => {
