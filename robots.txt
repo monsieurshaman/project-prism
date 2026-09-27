@@ -1,0 +1,33 @@
+# Project Prism robots.txt
+# the council has spoken 🫪
+
+# ─────────────────────────────
+# Google Search
+# ─────────────────────────────
+
+User-agent: Googlebot
+Allow: /
+
+
+# ─────────────────────────────
+# ChatGPT Search
+# ─────────────────────────────
+
+User-agent: OAI-SearchBot
+Allow: /
+
+
+# ─────────────────────────────
+# Claude Search
+# ─────────────────────────────
+
+User-agent: ClaudeBot
+Allow: /
+
+
+# ─────────────────────────────
+# EVERYONE ELSE
+# ─────────────────────────────
+
+User-agent: *
+Disallow: /
