@@ -5479,7 +5479,17 @@
                                     }
 
                                     if (selectedShape === 'eraser') {
-                                        if (mesh.name === "ground" || mesh.name === "ramp") return;
+                                        const isStaticMap =
+                                            mesh.name === "ground" ||
+                                            mesh.name === "ramp" ||
+                                            mesh.name === "pillar" ||
+                                            mesh.name === "poolFloor" ||
+                                            mesh.name === "wallN" ||
+                                            mesh.name === "wallS" ||
+                                            mesh.name === "wallE" ||
+                                            mesh.name === "wallW" ||
+                                            mesh.name.startsWith("stair_step_");
+                                        if (isStaticMap) return;
                                         mesh.dispose();
                                         const index = spawnedMeshes.indexOf(mesh);
                                         if (index > -1) spawnedMeshes.splice(index, 1);
