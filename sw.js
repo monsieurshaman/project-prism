@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v4.1-26.9.27';
+const CACHE_NAME = 'v4.5-26.9.27';
 
 const CORE_URLS = [
     '/',

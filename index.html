@@ -2942,7 +2942,7 @@
             _pwaInstallPrompt = null;
             document.getElementById('pwa-install-btn-mobile').style.display = 'none';
             document.getElementById('pwa-install-btn-desktop').style.display = 'none';
-            localStorage.setItem('PRISM_NEEDS_CACHE_CLEANUP', 'true');
+            localStorage.setItem(CLEANUP_FLAG_KEY, 'true');
             updateCleanupVisibility();
         });
 
@@ -3189,6 +3189,7 @@
         })();
 
         const CLEANUP_FLAG_KEY = 'PRISM_NEEDS_CACHE_CLEANUP';
+        const STORAGE_CLEARED_KEY = 'PRISM_STORAGE_CLEARED';
 
         function updateCleanupVisibility() {
             const section = document.getElementById('cleanup-section');
@@ -3197,50 +3198,28 @@
         }
 
         (function initCleanupFlag() {
-            if (window.__PRISM_ENV__.isStandalone && localStorage.getItem(CLEANUP_FLAG_KEY) === null) {
+            if (window.__PRISM_ENV__.isStandalone) {
                 localStorage.setItem(CLEANUP_FLAG_KEY, 'true');
             }
             updateCleanupVisibility();
         })();
 
-        async function hasRemainingPrismData() {
-            if ('caches' in window) {
-                try {
-                    const names = await caches.keys();
-                    if (names.length > 0) return true;
-                } catch (_) { }
-            }
+        (function checkStorageClearedPartition() {
+            if (!window.__PRISM_ENV__.isStandalone) return;
+            if (localStorage.getItem(STORAGE_CLEARED_KEY) !== 'true') return;
 
-            if (indexedDB.databases) {
-                try {
-                    const dbs = await indexedDB.databases();
-                    if (dbs.some(d => d && d.name)) return true;
-                } catch (_) { }
-                return false;
-            }
-
-            const known = ['PrismDB', 'PrismVideoCacheDB'];
-            for (const name of known) {
-                const exists = await new Promise((resolve) => {
-                    let created = false;
-                    const req = indexedDB.open(name);
-                    req.onupgradeneeded = (e) => {
-                        created = true;
-                        e.target.result.close();
-                        indexedDB.deleteDatabase(name);
-                    };
-                    req.onsuccess = (e) => {
-                        const db = e.target.result;
-                        const hasStores = db.objectStoreNames.length > 0;
-                        db.close();
-                        resolve(!created && hasStores);
-                    };
-                    req.onerror = () => resolve(false);
-                });
-                if (exists) return true;
-            }
-            return false;
-        }
+            setTimeout(() => {
+                const proceed = confirm(
+                    'Prism Storage Missing\n\n' +
+                    'Prism\'s cached data partition (IDB / Cache) is missing.\n' +
+                    'This usually happens after using "clear leftover cache & storage".\n\n' +
+                    'Download the latest Prism files now?\n\n' +
+                    'OK to download — Cancel to skip.'
+                );
+                localStorage.removeItem(STORAGE_CLEARED_KEY);
+                if (proceed) confirmAndRecache();
+            }, 3400);
+        })();
 
         async function confirmAndCleanup() {
             if (!confirm('Prism Cleanup\n\nThis will remove all cached data and indexed storage left behind from Prism.\n\nProceed?')) return;
@@ -3269,17 +3248,10 @@
                     await Promise.all(regs.map(r => r.unregister()));
                 }
 
-                const stillThere = await hasRemainingPrismData();
-
-                if (stillThere) {
-                    localStorage.setItem(CLEANUP_FLAG_KEY, 'true');
-                    updateCleanupVisibility();
-                    alert('Some data could not be removed. You can try again.');
-                } else {
-                    localStorage.removeItem(CLEANUP_FLAG_KEY);
-                    updateCleanupVisibility();
-                    alert('Cleanup complete! Leftover data has been removed.');
-                }
+                localStorage.setItem(CLEANUP_FLAG_KEY, 'false');
+                localStorage.setItem(STORAGE_CLEARED_KEY, 'true');
+                updateCleanupVisibility();
+                alert('Cleanup complete! Leftover data has been removed.');
             } catch (err) {
                 console.error('[Prism Cleanup]', err);
                 localStorage.setItem(CLEANUP_FLAG_KEY, 'true');
