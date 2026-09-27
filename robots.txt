@@ -8,6 +8,6 @@ User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: *
-Disallow: /
+Allow: /
 
 (dev note: 🫵🤡🤡🤡💩)
