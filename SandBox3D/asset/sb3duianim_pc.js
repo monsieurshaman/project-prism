@@ -161,39 +161,47 @@
 
             #game-settings-modal,
             #restart-modal,
-            #postfx-modal {
+            #postfx-modal,
+            #world-settings-modal {
                 animation: sb3dModalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
                 will-change: transform, opacity;
                 cursor: grab;
             }
             #game-settings-modal:active,
             #restart-modal:active,
-            #postfx-modal:active {
+            #postfx-modal:active,
+            #world-settings-modal:active {
                 cursor: grabbing;
             }
             #game-settings-modal button,
             #restart-modal button,
             #postfx-modal button,
+            #world-settings-modal button,
             #game-settings-modal .settings-close-btn,
             #postfx-modal .settings-close-btn,
+            #world-settings-modal .settings-close-btn,
             #game-settings-modal select,
             #restart-modal select,
             #postfx-modal select,
             #game-settings-modal input,
             #restart-modal input,
-            #postfx-modal input {
+            #postfx-modal input,
+            #world-settings-modal input {
                 cursor: grab;
             }
             #game-settings-modal input[type=range]:active,
             #restart-modal input[type=range]:active,
-            #postfx-modal input[type=range]:active {
+            #postfx-modal input[type=range]:active,
+            #world-settings-modal input[type=range]:active {
                 cursor: grabbing !important;
             }
             #game-settings-modal button:active,
             #restart-modal button:active,
             #postfx-modal button:active,
+            #world-settings-modal button:active,
             #game-settings-modal .settings-close-btn:active,
             #postfx-modal .settings-close-btn:active,
+            #world-settings-modal .settings-close-btn:active,
             #game-settings-modal select:active,
             #restart-modal select:active,
             #postfx-modal select:active {
@@ -246,7 +254,7 @@
         document.head.appendChild(style);
 
         onReady(() => {
-            const modals = ['settings-modal-overlay', 'postfx-modal-overlay', 'restart-modal-overlay'];
+            const modals = ['settings-modal-overlay', 'postfx-modal-overlay', 'restart-modal-overlay', 'world-settings-modal-overlay'];
             modals.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) document.body.appendChild(el);
@@ -303,7 +311,7 @@
                 if (typeof originalFn !== 'function') return;
 
                 window[closeTriggerFn] = function () {
-                    const modal = overlay.querySelector('.ui-panel-base, #game-settings-modal, #restart-modal, #postfx-modal');
+                    const modal = overlay.querySelector('.ui-panel-base, #game-settings-modal, #restart-modal, #postfx-modal, #world-settings-modal');
                     if (modal && overlay.style.display === 'flex') {
                         modal.classList.add('sb3d-modal-closing');
                         modal.addEventListener('animationend', () => {
@@ -354,6 +362,7 @@
             patchModalClose('settings-modal-overlay', 'toggleGraphicsUI');
             patchModalClose('postfx-modal-overlay', 'togglePostFXModal');
             patchModalClose('restart-modal-overlay', 'toggleRestartModal');
+            patchModalClose('world-settings-modal-overlay', 'toggleWorldSettingsUI');
 
             onReady(() => {
                 function onFullscreenChange() {

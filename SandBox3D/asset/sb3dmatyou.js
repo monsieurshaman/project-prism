@@ -178,7 +178,8 @@ button#btn-upload {
 
 #game-settings-modal,
 #restart-modal,
-#postfx-modal {
+#postfx-modal,
+#world-settings-modal {
     background: var(--prism-md3-surface-container-high) !important;
     border: 1px solid var(--prism-md3-outline-variant) !important;
     border-radius: var(--prism-md3-shape-corner-extra-large) !important;
@@ -204,8 +205,34 @@ button#btn-upload {
 
 #settings-modal-overlay,
 #restart-modal-overlay,
-#postfx-modal-overlay {
+#postfx-modal-overlay,
+#world-settings-modal-overlay {
     background: rgba(0, 0, 0, 0.75) !important;
+}
+
+#world-settings-modal .settings-header,
+#world-settings-modal .settings-header h2 {
+    border-bottom-color: var(--prism-md3-outline-variant) !important;
+    color: var(--prism-md3-primary) !important;
+}
+#world-settings-modal .settings-close-btn {
+    background: var(--prism-md3-error) !important;
+    border-color: var(--prism-md3-error) !important;
+    color: var(--prism-md3-on-error) !important;
+}
+#world-settings-modal code {
+    background: var(--prism-md3-surface-container-highest) !important;
+    color: var(--prism-md3-primary) !important;
+    border-radius: var(--prism-md3-shape-corner-extra-small) !important;
+}
+#world-settings-modal pre {
+    background: var(--prism-md3-surface-container-lowest) !important;
+    color: var(--prism-md3-on-surface-variant) !important;
+    border: 1px solid var(--prism-md3-outline-variant) !important;
+    border-radius: var(--prism-md3-shape-corner-small) !important;
+}
+#world-save-status {
+    color: var(--prism-md3-primary) !important;
 }
 
 .restart-option {
@@ -353,6 +380,10 @@ button#btn-session-recorder { border-left-color: #00bcd4 !important; }
 button#btn-export-session-log { border-left-color: #00bcd4 !important; }
 button#btn-show-more { border-left-color: #c0392b !important; }
 button#btn-spawn-particles { border-left-color: #a855f7 !important; }
+button#btn-world-settings-toggle { border-left-color: var(--prism-md3-primary) !important; }
+button#btn-world-upload { border-left-color: var(--prism-md3-primary) !important; }
+button#btn-world-save { border-left-color: var(--prism-md3-tertiary) !important; }
+button#btn-world-clear { border-left-color: var(--prism-md3-error) !important; }
 `;
 
         const styleEl = document.createElement('style');
