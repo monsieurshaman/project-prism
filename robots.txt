@@ -1,13 +1,5 @@
-# Project Prism robots.txt
-# the council has spoken 🫪
-
-User-agent: Googlebot
-Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
+# Everyone can come in
+# by monsieurshaman
 
 User-agent: *
 Allow: /
-
-(dev note: 🫵🤡🤡🤡💩)
