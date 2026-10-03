@@ -4050,7 +4050,7 @@
 
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register(
-                    `/sw.js?standalone=${isStandalone}&includeGames={isStandalone}`
+                    `/sw.js?standalone=${isStandalone}&includeGames=${isStandalone}`
                 );
             }
 
