@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v5.0.0-Prismatic';
+const CACHE_NAME = 'v5.0.1-Prismatic';
 
 const CORE_URLS = [
     '/',
@@ -67,6 +67,7 @@ const GAME_URLS = [
     'https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js',
     'https://cdn.jsdelivr.net/npm/babylonjs@9.11.0/babylon.js',
     'https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
     'https://cdn.babylonjs.com/ammo.js',
     'https://cdn.jsdelivr.net/npm/babylonjs-loaders@9.11.0/babylonjs.loaders.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
