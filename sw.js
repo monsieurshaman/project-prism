@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v4.5-26.9.27';
+const CACHE_NAME = 'v5.0.0-Prismatic';
 
 const CORE_URLS = [
     '/',
@@ -56,11 +56,14 @@ const GAME_URLS = [
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid2.mp3',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid3.mp3',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid4.mp3',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ground.png',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ramp.png',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/stairs.png',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pool.png',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pillars.png',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/obj_glass.png',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/ground_texturepbr.zip',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/rampstairs_texturepbr.zip',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/pillars_texturepbr.zip',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/pool_texturepbr.zip',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/rubber_texturepbr.zip',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/ice_texturepbr.zip',
+    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/allobj_texturepbr.zip',
     'https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js',
     'https://cdn.jsdelivr.net/npm/babylonjs@9.11.0/babylon.js',
     'https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js',
@@ -93,6 +96,7 @@ self.addEventListener('install', e => {
 
         let checkedAssets = 0;
         let processedAssets = 0;
+        let storedAssets = 0;
         let errorCount = 0;
 
         async function broadcast(msg) {
@@ -147,8 +151,7 @@ self.addEventListener('install', e => {
         const skipped = entries.filter(x => !x.ok);
 
         for (const s of skipped) {
-            errorCount++;
-            await broadcast({ type: 'CACHE_ERROR', url: s.absoluteUrl, errors: errorCount });
+            console.warn('[Prism SW] Unreachable asset, skipping:', s.absoluteUrl);
         }
 
         await broadcast({
@@ -160,13 +163,18 @@ self.addEventListener('install', e => {
 
         if (downloadable.length === 0) {
             await broadcast({ type: 'CACHE_PROGRESS', progress: 100, processed: 0, total: 0, errors: errorCount });
+            await broadcast({ type: 'CACHE_STORE', progress: 100, stored: 0, total: 0, errors: errorCount });
             return;
         }
 
         async function downloadAsset(entry) {
             const { absoluteUrl, cached } = entry;
+            let downloadCounted = false;
+            let storeCounted = false;
 
-            if (cached) {
+            const bumpDownload = async () => {
+                if (downloadCounted) return;
+                downloadCounted = true;
                 processedAssets++;
                 await broadcast({
                     type: 'CACHE_PROGRESS',
@@ -175,6 +183,24 @@ self.addEventListener('install', e => {
                     total: downloadable.length,
                     errors: errorCount
                 });
+            };
+
+            const bumpStore = async () => {
+                if (storeCounted) return;
+                storeCounted = true;
+                storedAssets++;
+                await broadcast({
+                    type: 'CACHE_STORE',
+                    progress: Math.round((storedAssets / downloadable.length) * 100),
+                    stored: storedAssets,
+                    total: downloadable.length,
+                    errors: errorCount
+                });
+            };
+
+            if (cached) {
+                await bumpDownload();
+                await bumpStore();
                 return;
             }
 
@@ -218,6 +244,8 @@ self.addEventListener('install', e => {
                 const blob = await response.blob();
                 const contentType = response.headers.get('content-type');
 
+                await bumpDownload();
+
                 const cacheResponse = new Response(blob.slice(0), {
                     status: 200,
                     headers: { 'Content-Type': contentType || 'application/octet-stream' }
@@ -237,14 +265,8 @@ self.addEventListener('install', e => {
                 await broadcast({ type: 'CACHE_ERROR', url: absoluteUrl, errors: errorCount });
                 await deleteIDBData(absoluteUrl).catch(() => { });
             } finally {
-                processedAssets++;
-                await broadcast({
-                    type: 'CACHE_PROGRESS',
-                    progress: Math.round((processedAssets / downloadable.length) * 100),
-                    processed: processedAssets,
-                    total: downloadable.length,
-                    errors: errorCount
-                });
+                await bumpDownload();
+                await bumpStore();
             }
         }
 

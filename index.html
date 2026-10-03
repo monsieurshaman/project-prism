@@ -1784,6 +1784,7 @@
         .dl-pipeline-row {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 10px;
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.06);
@@ -1842,6 +1843,59 @@
         .dl-pipeline-row.active .dl-phase-status { color: var(--primary); }
         .dl-pipeline-row.done .dl-phase-status   { color: #4ade80; }
         .dl-pipeline-row.error .dl-phase-status  { color: #f87171; }
+
+        .dl-phase-bar {
+            flex-basis: 100%;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 2px;
+        }
+
+        .dl-phase-bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.25s linear;
+        }
+
+        .dl-pipeline-row.done .dl-phase-bar-fill  { background: #4ade80; }
+        .dl-pipeline-row.error .dl-phase-bar-fill { background: #f87171; }
+
+        .dl-skip-btn {
+            display: none;
+            margin-top: 26px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text-sub);
+            padding: 11px 24px;
+            border-radius: var(--r-pill);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.25s var(--spring);
+        }
+
+        .dl-skip-btn.show {
+            display: inline-block;
+            animation: fade-up 0.4s var(--ease-out);
+        }
+
+        .dl-skip-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+            border-color: var(--border-strong);
+            transform: translateY(-2px);
+        }
+
+        .dl-skip-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
 
         #gif-custom-url-wrap {
             display: none;
@@ -2702,7 +2756,7 @@
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <i class="material-icons-round item-icon">wallpaper</i>
                     <div class="item-content">
-                        <div class="item-title">background gif</div>
+                        <div class="item-title">gif background</div>
                         <div class="item-subtitle" id="bg-status">enabled</div>
                     </div>
                 </div>
@@ -2714,7 +2768,7 @@
                 <div style="display: flex; align-items: center; gap: 14px; width: 100%;">
                     <i class="material-icons-round item-icon">video_settings</i>
                     <div class="item-content">
-                        <div class="item-title">custom video background</div>
+                        <div class="item-title">video background</div>
                         <div class="item-subtitle">cache a video file for your background</div>
                     </div>
                 </div>
@@ -2730,7 +2784,7 @@
                     </button>
                     <button class="setting-select" id="refresh-video-bg-btn"
                         style="margin-top: 0; width: auto; display: none;"
-                        onclick="PrismVideoBg.refreshVideo()">↻ reload</button>
+                        onclick="PrismVideoBg.refreshVideo()">reload</button>
                     <button class="setting-select" id="clear-video-bg-btn"
                         style="margin-top: 0; width: auto; display: none; color: #f87171;"
                         onclick="PrismVideoBg.removeVideo()">clear</button>
@@ -2752,7 +2806,7 @@
                 <option value="gif4">gif 3</option>
                 <option value="gif5">gif 4</option>
                 <option value="gif6">gif 5</option>
-                <option value="custom">custom gif link (giphy recommended)</option>
+                <option value="custom">add your own (giphy recommended)</option>
             </select>
             <div id="gif-custom-url-wrap">
                 <input id="gif-custom-url-input" type="url" placeholder="https://media.giphy.com/..." />
@@ -2862,18 +2916,18 @@
                     <div class="credits-role">creator, lead dev, ragebaiter, genshin player, exists on github</div>
                 </div>
             </a>
-            <a class="credits-entry" href="https://github.com/nokkum" target="_blank" rel="noopener noreferrer">
-                <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/haku.png" alt="">
-                <div>
-                    <div class="credits-name">Hakuシ</div>
-                    <div class="credits-role">co-dev, tester, minecraft java modder, exists on github</div>
-                </div>
-            </a>
             <a class="credits-entry" href="https://www.youtube.com/@ShinobiAkiraGD" target="_blank" rel="noopener noreferrer">
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/shinobiakira.png" alt="">
                 <div>
                     <div class="credits-name">ShinobiAkira</div>
                     <div class="credits-role">youtuber, tester, GD player, has beef with atoms, exists on github</div>
+                </div>
+            </a>
+            <a class="credits-entry" href="https://github.com/nokkum" target="_blank" rel="noopener noreferrer">
+                <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/haku.png" alt="">
+                <div>
+                    <div class="credits-name">Hakuシ</div>
+                    <div class="credits-role">co-dev, tester, minecraft java modder, exists on github</div>
                 </div>
             </a>
             <a class="credits-entry">
@@ -2912,19 +2966,29 @@
                 <span class="dl-phase-icon material-icons-round">pending</span>
                 <span class="dl-phase-label">clear cache & storage</span>
                 <span class="dl-phase-status">waiting...</span>
+                <div class="dl-phase-bar"><div class="dl-phase-bar-fill" id="dl-bar-clear"></div></div>
+            </div>
+            <div class="dl-pipeline-row" id="dl-phase-check">
+                <span class="dl-phase-icon material-icons-round">pending</span>
+                <span class="dl-phase-label">check assets</span>
+                <span class="dl-phase-status">waiting...</span>
+                <div class="dl-phase-bar"><div class="dl-phase-bar-fill" id="dl-bar-check"></div></div>
             </div>
             <div class="dl-pipeline-row" id="dl-phase-download">
                 <span class="dl-phase-icon material-icons-round">pending</span>
                 <span class="dl-phase-label">download files</span>
                 <span class="dl-phase-status">waiting...</span>
+                <div class="dl-phase-bar"><div class="dl-phase-bar-fill" id="dl-bar-download"></div></div>
             </div>
             <div class="dl-pipeline-row" id="dl-phase-cache">
                 <span class="dl-phase-icon material-icons-round">pending</span>
                 <span class="dl-phase-label">save to storage</span>
                 <span class="dl-phase-status">waiting...</span>
+                <div class="dl-phase-bar"><div class="dl-phase-bar-fill" id="dl-bar-cache"></div></div>
             </div>
         </div>
         <div class="dl-tip-box" id="download-tip">loading tips...</div>
+        <button class="dl-skip-btn" id="dl-skip-btn">skip update &amp; restart</button>
     </div>
 
     <script>
@@ -3161,12 +3225,12 @@
             const icon = document.getElementById('icon-dev-preview');
 
             if (!isCurrentlyOn) {
-                if (!confirm('Prism Developer Preview Mode\n\nThis enables experimental/unfinished features intended for testing purposes only. Things may break.\n\nProceed?')) return;
+                if (!confirm('Prism Developer Preview Mode\n\nThis enables features that are hidden across Prism and other apps. Do you wish to proceed?')) return;
                 setDevPreviewMode('true');
                 icon.textContent = 'toggle_on';
                 icon.style.color = 'var(--primary)';
             } else {
-                if (!confirm('Prism Developer Preview Mode?\n\nThis will turn off experimental/testing features across Prism. Proceed?')) return;
+                if (!confirm('Prism Developer Preview Mode\n\nThis disables Developer Preview Mode. Do you wish to proceed?')) return;
                 setDevPreviewMode('false');
                 icon.textContent = 'toggle_off';
                 icon.style.color = 'var(--text-muted)';
@@ -3210,10 +3274,10 @@
 
             setTimeout(() => {
                 const proceed = confirm(
-                    'Prism Storage Missing\n\n' +
-                    'Prism\'s cached data partition (IDB / Cache) is missing.\n' +
-                    'This usually happens after using "clear leftover cache & storage".\n\n' +
-                    'Download the latest Prism files now?\n\n' +
+                    'Prism Storage Manager\n\n' +
+                    'Prism\'s files are currently missing...\n' +
+                    'You may have used "clear leftover cache & storage" accidentally while Prism is still installed.\n\n' +
+                    'Do you want to fetch new files now?\n\n' +
                     'OK to download — Cancel to skip.'
                 );
                 localStorage.removeItem(STORAGE_CLEARED_KEY);
@@ -3222,7 +3286,7 @@
         })();
 
         async function confirmAndCleanup() {
-            if (!confirm('Prism Cleanup\n\nThis will remove all cached data and indexed storage left behind from Prism.\n\nProceed?')) return;
+            if (!confirm('Prism Storage Manager\n\nThis will clear files for you after you\'ve uninstalled Prism. Do you wish to proceed?\n\nIf you\'re still in Prism or have it installed and met this prompt, you can click CANCEL to do nothing.')) return;
 
             try {
                 if ('caches' in window) {
@@ -3262,7 +3326,7 @@
 
         function confirmAndRecache() {
             const gameWarning = _includeGames ? '\n\nGame assets included for download.' : '\n\nCore files only. Game assets excluded.';
-            if (!confirm(`Prism Download Mode\nCAUTION!\n\nPrism will delete old content and replace them with newer ones. Proceed?${gameWarning}\n\nYes, proceed. (OK)\nNo, do not proceed. (Cancel)`)) return;
+            if (!confirm(`Prism Update\nCAUTION!\n\nYou are about to update Prism to the latest version. Do you wish to proceed?${gameWarning}\n\nClick OK to update Prism.\nClick CANCEL to decline.`)) return;
             clearAndRecache('full');
         }
 
@@ -3277,10 +3341,19 @@
             const dlTip = document.getElementById('download-tip');
             const dlTitle = document.getElementById('dl-phase-title');
             const dlSub = document.getElementById('dl-phase-sub');
+            const dlSkip = document.getElementById('dl-skip-btn');
+
+            const phaseBars = {
+                clear: document.getElementById('dl-bar-clear'),
+                check: document.getElementById('dl-bar-check'),
+                download: document.getElementById('dl-bar-download'),
+                cache: document.getElementById('dl-bar-cache')
+            };
 
             dlPage.classList.add('open');
             dlBar.style.transition = 'none';
             dlBar.style.width = '0%';
+            dlSkip.classList.remove('show');
 
             function setPhase(rowId, state, statusText, icon) {
                 const row = document.getElementById(rowId);
@@ -3288,6 +3361,16 @@
                 row.className = 'dl-pipeline-row ' + state;
                 row.querySelector('.dl-phase-status').textContent = statusText;
                 row.querySelector('.dl-phase-icon').textContent = icon;
+            }
+
+            function setPhaseBar(phase, pct) {
+                const bar = phaseBars[phase];
+                if (!bar) return;
+                bar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+            }
+
+            function setOverall(pct) {
+                dlBar.style.width = Math.min(100, Math.max(0, pct)) + '%';
             }
 
             const tips = [
@@ -3362,21 +3445,58 @@
             const tipInterval = setInterval(cycleTip, 3000);
 
             let freshVersion = null;
-            let watchdogTimer = null;
             let finished = false;
+            let skippedByUser = false;
+            let downloadComplete = false;
+            let storeComplete = false;
 
-            function resetWatchdog() {
-                clearTimeout(watchdogTimer);
-                watchdogTimer = setTimeout(() => {
-                    if (finished) return;
-                    console.warn('[Prism Download Mode]: no progress after 30 seconds, restarting anyway...');
-                    finished = true;
-                    clearInterval(tipInterval);
-                    dlTitle.textContent = 'stalled';
-                    dlSub.textContent = 'update error, cancelling anyway...';
-                    setTimeout(() => { window.location.reload(); }, 1500);
-                }, 30000);
+            let settleTimer = null;
+
+            function scheduleFinishCheck() {
+                clearTimeout(settleTimer);
+                settleTimer = setTimeout(maybeFinish, 700);
             }
+
+            function maybeFinish() {
+                if (finished || skippedByUser) return;
+                if (!downloadComplete || !storeComplete) return;
+                finished = true;
+                clearTimeout(skipTimer);
+                clearTimeout(settleTimer);
+                clearInterval(tipInterval);
+                if (_cacheProgressHandler && navigator.serviceWorker) {
+                    navigator.serviceWorker.removeEventListener('message', _cacheProgressHandler);
+                }
+                setOverall(100);
+                dlTitle.textContent = 'update finished';
+                dlSub.textContent = 'update complete';
+                if (freshVersion) localStorage.setItem('PRISM_SW_VERSION', freshVersion);
+                setTimeout(() => {
+                    alert('Prism Update\n\nPrism has been fully updated. Click OK to restart.');
+                    window.location.reload();
+                }, 700);
+            }
+
+            const skipTimer = setTimeout(() => {
+                if (finished || skippedByUser) return;
+                dlSkip.classList.add('show');
+                dlSkip.onclick = () => {
+                    if (finished || skippedByUser) return;
+                    skippedByUser = true;
+                    dlSkip.onclick = null;
+                    dlSkip.style.pointerEvents = 'none';
+                    clearTimeout(skipTimer);
+                    clearInterval(tipInterval);
+                    if (_cacheProgressHandler && navigator.serviceWorker) {
+                        navigator.serviceWorker.removeEventListener('message', _cacheProgressHandler);
+                    }
+                    dlTitle.textContent = 'skipping';
+                    dlSub.textContent = 'update skipped, restarting...';
+                    setPhase('dl-phase-download', 'error', 'Skipped', 'skip_next');
+                    setPhase('dl-phase-cache', 'error', 'Skipped', 'skip_next');
+                    setTimeout(() => { window.location.reload(); }, 800);
+                };
+            }, 15000);
 
             if (_cacheProgressHandler && navigator.serviceWorker) {
                 navigator.serviceWorker.removeEventListener('message', _cacheProgressHandler);
@@ -3384,57 +3504,58 @@
 
             _cacheProgressHandler = (event) => {
                 if (!event.data) return;
-                const { type, progress, processed, total, errors, url, checked, ok, skipped } = event.data;
+                const { type, progress, processed, stored, total, errors, url, checked, ok, skipped } = event.data;
 
                 if (type === 'CACHE_START') {
-                    resetWatchdog();
-                    dlBar.style.transition = 'width 0.15s linear';
-                    dlBar.style.width = '0%';
-                    setPhase('dl-phase-download', 'active', `0 / ${total}`, 'search');
-                    setPhase('dl-phase-cache', 'active', 'Writing', 'sync');
+                    dlBar.style.transition = 'width 0.2s linear';
+                    setOverall(0);
+                    setPhase('dl-phase-check', 'active', `0 / ${total}`, 'search');
+                    setPhaseBar('check', 0);
                     dlTitle.textContent = 'checking assets';
                     dlSub.textContent = `verifying ${total} files`;
                     return;
                 }
 
                 if (type === 'CACHE_CHECK') {
-                    resetWatchdog();
-                    const pct = Math.round((checked / total) * 50);
-                    dlBar.style.width = pct + '%';
-                    setPhase('dl-phase-download', 'active', `${checked} / ${total}`, 'search');
+                    const pct = Math.round((checked / total) * 100);
+                    setPhaseBar('check', pct);
+                    setOverall(5 + pct * 0.2);
+                    setPhase('dl-phase-check', 'active', `${checked} / ${total}`, 'search');
                     dlTitle.textContent = 'checking assets';
                     dlSub.textContent = `${checked} / ${total} verified`;
                     return;
                 }
 
                 if (type === 'CACHE_CHECK_DONE') {
-                    resetWatchdog();
-                    dlBar.style.width = '50%';
+                    setPhaseBar('check', 100);
+                    setOverall(25);
+                    setPhase('dl-phase-check', 'done', `${total} / ${total}`, 'check_circle');
 
                     if (ok === 0) {
                         dlTitle.textContent = 'nothing to download';
                         dlSub.textContent = `${skipped} asset${skipped !== 1 ? 's' : ''} unreachable`;
                         setPhase('dl-phase-download', 'error', `0 / ${total}`, 'warning');
                         setPhase('dl-phase-cache', 'error', 'Skipped', 'warning');
+                        setPhaseBar('download', 100);
+                        setPhaseBar('cache', 100);
                         return;
                     }
 
                     setPhase('dl-phase-download', 'active', `0 / ${ok}`, 'sync');
+                    setPhaseBar('download', 0);
                     dlTitle.textContent = 'downloading';
                     dlSub.textContent = `${ok} file${ok !== 1 ? 's' : ''} to fetch${skipped > 0 ? ` · ${skipped} skipped` : ''}`;
                     return;
                 }
 
                 if (type === 'CACHE_ERROR') {
-                    resetWatchdog();
                     dlSub.textContent = `${errors} skipped so far`;
                     return;
                 }
 
                 if (type === 'CACHE_PROGRESS') {
-                    resetWatchdog();
-                    const overall = 50 + Math.round(progress * 0.5);
-                    dlBar.style.width = overall + '%';
+                    setPhaseBar('download', progress);
+                    setOverall(25 + progress * 0.45);
 
                     if (progress > 0 && progress < 100) {
                         setPhase('dl-phase-download', 'active', `${processed} / ${total}`, 'sync');
@@ -3443,27 +3564,43 @@
                     }
 
                     if (progress >= 100) {
-                        finished = true;
-                        clearTimeout(watchdogTimer);
-                        clearInterval(tipInterval);
-                        navigator.serviceWorker.removeEventListener('message', _cacheProgressHandler);
+                        downloadComplete = true;
                         setPhase('dl-phase-download', 'done', `${processed} / ${total}`, 'check_circle');
-                        setPhase('dl-phase-cache', errors > 0 ? 'error' : 'done', errors > 0 ? `${errors} skipped` : 'Done', errors > 0 ? 'warning' : 'check_circle');
-                        dlTitle.textContent = 'update finished';
-                        dlSub.textContent = errors > 0 ? `done with ${errors} skip${errors !== 1 ? 's' : ''}` : 'update complete, restarting now...';
-                        if (freshVersion) localStorage.setItem('PRISM_SW_VERSION', freshVersion);
-                        setTimeout(() => { window.location.reload(); }, 2500);
+                        setPhaseBar('download', 100);
+                        if (!storeComplete) {
+                            dlTitle.textContent = 'saving to storage';
+                            dlSub.textContent = 'writing files locally...';
+                        }
+                        scheduleFinishCheck();
                     }
+                    return;
+                }
+
+                if (type === 'CACHE_STORE') {
+                    setPhaseBar('cache', progress);
+                    setOverall(70 + progress * 0.3);
+
+                    if (progress > 0 && progress < 100) {
+                        setPhase('dl-phase-cache', 'active', `${stored} / ${total}`, 'sync');
+                    }
+
+                    if (progress >= 100) {
+                        storeComplete = true;
+                        setPhase('dl-phase-cache', errors > 0 ? 'error' : 'done', errors > 0 ? `${errors} skipped` : `${stored} / ${total}`, errors > 0 ? 'warning' : 'check_circle');
+                        setPhaseBar('cache', 100);
+                        scheduleFinishCheck();
+                    }
+                    return;
                 }
             };
 
             navigator.serviceWorker.addEventListener('message', _cacheProgressHandler);
-            resetWatchdog();
 
             try {
                 dlTitle.textContent = 'purging';
                 dlSub.textContent = 'deleting previous IDB/Cache....';
                 setPhase('dl-phase-clear', 'active', 'Running', 'sync');
+                setPhaseBar('clear', 40);
 
                 const CORE_URLS = [
                     '/',
@@ -3526,6 +3663,14 @@
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/stairs.png',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pool.png',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pillars.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/obj_glass.png',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/ground_texturepbr.zip',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/rampstairs_texturepbr.zip',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/pillars_texturepbr.zip',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/pool_texturepbr.zip',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/rubber_texturepbr.zip',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/ice_texturepbr.zip',
+                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/allobj_texturepbr.zip',
                     'https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js',
                     'https://cdn.jsdelivr.net/npm/babylonjs@9.11.0/babylon.js',
                     'https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js',
@@ -3589,9 +3734,12 @@
                 });
 
                 setPhase('dl-phase-clear', 'done', 'Done', 'check_circle');
-                dlTitle.textContent = 'downloading';
-                dlSub.textContent = 'cranking stuff';
-                setPhase('dl-phase-download', 'active', 'Starting', 'sync');
+                setPhaseBar('clear', 100);
+                setOverall(5);
+                dlTitle.textContent = 'checking assets';
+                dlSub.textContent = 'contacting update server...';
+                setPhase('dl-phase-check', 'active', 'Starting', 'search');
+                setPhaseBar('check', 0);
 
                 try {
                     const swRes = await fetch('/sw.js', { cache: 'no-store' });
@@ -3606,7 +3754,7 @@
             } catch (err) {
                 console.error('[Prism Download Mode]: Prism reinstall error: ', err);
                 finished = true;
-                clearTimeout(watchdogTimer);
+                clearTimeout(skipTimer);
                 clearInterval(tipInterval);
                 setPhase('dl-phase-clear', 'error', 'Failed', 'error');
                 setTimeout(() => { window.location.reload(); }, 1500);
@@ -4402,7 +4550,7 @@
 
                     if (savedVersion !== liveVersion) {
                         if (isStandalone) {
-                            const ok = confirm(`Prism Download Mode\n\nPrism found a new version: ${liveVersion}\n\nDo you want to update now?`);
+                            const ok = confirm(`Prism Update\n\nWe have found a new version for you: ${liveVersion}\n\nDo you want to update now? You can click OK to proceed.\nClick CANCEL to decline.`);
                             if (ok) {
                                 killStartupLoader();
                                 localStorage.setItem(SW_VERSION_KEY, liveVersion);

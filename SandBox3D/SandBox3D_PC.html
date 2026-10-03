@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
     <script src="https://cdn.babylonjs.com/ammo.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/babylonjs-loaders@9.11.0/babylonjs.loaders.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3duianim_pc.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dmatyou.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dammo.js"></script>
@@ -529,6 +530,95 @@
         #fps-render { color: #00ff00; }
         #fps-phys { color: #f39c12; }
 
+#world-settings-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #world-settings-modal {
+            position: relative;
+            width: calc(100vw - 120px);
+            height: calc(100vh - 120px);
+            max-width: 680px;
+            background: rgba(20, 30, 22, 0.96);
+            border-radius: 12px;
+            border: 1px solid #2ecc71;
+            box-shadow: 0 10px 40px rgba(46, 204, 113, 0.28);
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            color: #eee;
+            pointer-events: auto;
+        }
+
+        #world-settings-modal .settings-header {
+            border-bottom: 2px solid #2ecc71;
+        }
+
+        #world-settings-modal .settings-header h2 {
+            color: #2ecc71;
+        }
+
+        #world-settings-modal .settings-close-btn {
+            background: #27ae60;
+            border: 1px solid #1e8449;
+        }
+
+        #world-settings-modal .settings-close-btn:hover {
+            background: #1e8449;
+        }
+
+        #world-settings-modal .settings-content-grid {
+            display: block;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        #world-settings-modal .settings-content-grid::-webkit-scrollbar { width: 8px; }
+        #world-settings-modal .settings-content-grid::-webkit-scrollbar-track { background: #1a2a1e; border-radius: 4px; }
+        #world-settings-modal .settings-content-grid::-webkit-scrollbar-thumb { background: #2ecc71; border-radius: 4px; }
+
+        #world-settings-modal .settings-category {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #24382a;
+        }
+
+        #world-settings-modal code {
+            background: #0f1a12;
+            color: #7fe0a0;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        #world-settings-modal pre {
+            background: #0f1a12;
+            color: #9be3b4;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #1e3a26;
+            font-size: 11px;
+            line-height: 1.45;
+            overflow-x: auto;
+            margin: 8px 0 0;
+        }
+
+        button#btn-world-settings-toggle { border-left: 4px solid #2ecc71; }
+        button#btn-world-settings-toggle.active { background: #1e5a30; border-color: #2ecc71; }
+        button#btn-world-upload { border-left: 4px solid #2ecc71; }
+        button#btn-world-upload:hover { background: #1e3a26; border-color: #2ecc71; }
+        button#btn-world-save { border-left: 4px solid #16a085; background: #0f1f18; }
+        button#btn-world-save:hover { background: #15342a; border-color: #16a085; }
+        button#btn-world-save.active { background: #1e5a30; border-color: #16a085; }
+
         #restart-modal-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -539,6 +629,7 @@
             justify-content: center;
             align-items: center;
         }
+
 
         #restart-modal {
             position: relative;
@@ -664,6 +755,11 @@
             100% { background-position: 100px 0; }
         }
 
+        @keyframes pbr-pulse {
+            0%, 100% { opacity: 1;   transform: scale(1); }
+            50%      { opacity: 0.4; transform: scale(0.7); }
+        }
+
         button, .ui-panel-base {
             cursor: grab;
         }
@@ -741,13 +837,14 @@
         <div class="loader-content">
             <div class="loader-spinner"></div>
             <div class="loader-text">Sand Box 3D for PC</div>
-            <div class="loader-subtext-version">Version: v26.09.26</div>
+            <div class="loader-subtext-version">Version: v26.10.03</div>
             <div class="loader-subtext">Setting up your sandbox...</div>
             <button id="skip-loading-btn" onclick="skipLoading()">Skip Setup</button>
         </div>
     </div>
 
     <input type="file" id="file-input" accept=".glb,.gltf,.obj" style="display: none;" onchange="handleFileUpload(this)">
+    <input type="file" id="world-save-input" accept=".json,application/json" style="display: none;" onchange="handleWorldSaveUpload(this)">
     
     <div id="flash-layer">
         <video id="flash-meme-vid" playsinline preload="auto"
@@ -1057,6 +1154,13 @@
                 <span class="shape-icon"
                     style="background: transparent; border: 2px solid #4aa3df; border-radius: 2px; width: 10px; height: 10px;"></span>
                 SB3D Settings
+            </button>
+            
+            <button id="btn-world-settings-toggle" onclick="toggleWorldSettingsUI()"
+                style="border-left: 4px solid #2ecc71; margin-bottom: 10px;">
+                <span class="shape-icon"
+                    style="background: transparent; border: 2px solid #2ecc71; border-radius: 2px; width: 10px; height: 10px;"></span>
+                World Settings
             </button>
 
             <button id="btn-toggle-inspector" onclick="showBabylonInspector()"
@@ -1464,6 +1568,82 @@
                 </div>
             </div>
 
+            <div id="world-settings-modal-overlay">
+                <div id="world-settings-modal">
+                    <div class="settings-header">
+                        <h2 id="world-settings-title">World Settings</h2>
+                        <button id="world-settings-close" class="settings-close-btn" onclick="toggleWorldSettingsUI()">Close</button>
+                    </div>
+                    
+                    <div class="settings-content-grid">
+                        <div class="settings-category">
+                            <div id="world-save-builds-label" class="section-label" style="color:#7fe0a0;">World Save — Builds</div>
+                            <p id="world-save-desc" style="font-size:12px;color:#9a9a9a;margin:0 0 14px;line-height:1.5;">
+                                Upload a <code>.json</code> world save to restore a previously saved build.
+                                <br><br>
+                                <b style="color:#2ecc71;">Allowed:</b> cube, sphere, cylinder, triangle, pyramid, torus,
+                                glass_*, mirror_*, ice_mat, rubber_mat.<br>
+                                <b style="color:#e74c3c;">Not allowed:</b> bombs / explosives, custom 3D models.
+                            </p>
+            
+                            <div class="control-group">
+                                <button id="btn-world-upload" onclick="triggerWorldSaveUpload()" style="padding: 12px;">
+                                    <span class="shape-icon" style="background:#2ecc71; border-radius:2px;"></span>
+                                    Upload World Save (.json)
+                                </button>
+                            </div>
+
+                            <div class="control-group" style="margin-top: 8px;">
+                                <button id="btn-world-save" onclick="saveCurrentWorld()" style="padding: 12px;">
+                                    <span class="shape-icon" style="background:#16a085; border-radius:2px;"></span>
+                                    Save Current World (.json)
+                                </button>
+                            </div>
+            
+                            <div class="control-group" style="margin-top: 12px;">
+                                <button id="btn-world-clear" onclick="clearObjects()"
+                                    style="border-left: 4px solid #e74c3c; padding: 12px;">
+                                    <span class="shape-icon" style="background:#e74c3c; border-radius:2px;"></span>
+                                    Clear Scene
+                                </button>
+                            </div>
+            
+                            <div id="world-save-status"
+                                style="font-size:11px;color:#7fe0a0;margin-top:12px;font-family:'Courier New',monospace;"></div>
+            
+                            <div id="world-save-format-label" class="section-label" style="color:#7fe0a0;margin-top:18px;">Save Format</div>
+                            <pre>{
+                                "version": "1.0",
+                                "objects": [
+                                  {
+                                    "object": "cube",
+                                    "location": "0, 5, 0",
+                                    "rotation": "0, 45, 0",
+                                    "color": "blue",
+                                    "size": 1.0,
+                                    "mass": 1.5
+                                  },
+                                  {
+                                    "object": "glass_sphere",
+                                    "location": [3, 8, -2],
+                                    "rotation": [15, 90, 0],
+                                    "color": "#00bcd4",
+                                    "size": 2.0,
+                                    "mass": 4.0
+                                  }
+                                ]
+                              }
+                            </pre>
+                            <p id="world-save-format-hint" style="font-size:11px;color:#666;margin:8px 0 0;line-height:1.5;">
+                                <code>location</code> accepts: <code>"X, Y, Z"</code>, <code>[X, Y, Z]</code>, or
+                                <code>{"x":..,"y":..,"z":..}</code>.<br>
+                                <code>color</code> accepts a hex string or a color name (red, blue, green, etc.).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <button id="btn-upload" onclick="triggerUpload()">
                 <span class="shape-icon icon-upload"></span> Upload 3D Model
             </button>
@@ -1504,6 +1684,50 @@
             
             <button id="btn-clear" onclick="clearObjects()">CLEAR SCENE</button>
         </div>
+    </div>
+
+    <div id="pbr-loading-indicator" style="
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 150;
+        background: rgba(30, 30, 30, 0.92);
+        border: 1px solid #e91e63;
+        border-radius: 6px;
+        padding: 7px 10px 7px 12px;
+        color: #eee;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        align-items: center;
+        gap: 8px;
+        pointer-events: auto;
+        max-width: 220px;
+        user-select: none;
+    ">
+        <span style="
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #e91e63;
+            display: inline-block;
+            flex-shrink: 0;
+            animation: pbr-pulse 1s ease-in-out infinite;
+        "></span>
+        <span style="flex: 1;">Loading textures, please wait...</span>
+        <button onclick="sb3dDismissPbrIndicator()" style="
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer !important;
+            font-size: 15px;
+            line-height: 1;
+            padding: 0 2px;
+            width: auto;
+            font-weight: bold;
+            flex-shrink: 0;
+        " title="Dismiss">×</button>
     </div>
 
     <div id="flashlight-hud" style="
@@ -1611,6 +1835,39 @@
             contrast: 1.15,
             exposure: 1.05,
         };
+
+        let sb3dPbrPendingCount = 0;
+        let sb3dPbrIndicatorDismissed = false;
+
+        function sb3dShowPbrIndicator() {
+            if (sb3dPbrIndicatorDismissed) return;
+            const el = document.getElementById('pbr-loading-indicator');
+            if (el) el.style.display = 'flex';
+        }
+
+        function sb3dHidePbrIndicator() {
+            const el = document.getElementById('pbr-loading-indicator');
+            if (el) el.style.display = 'none';
+        }
+
+        function sb3dPbrStart() {
+            sb3dPbrPendingCount++;
+            sb3dShowPbrIndicator();
+        }
+
+        function sb3dPbrDone() {
+            sb3dPbrPendingCount = Math.max(0, sb3dPbrPendingCount - 1);
+            if (sb3dPbrPendingCount === 0) sb3dHidePbrIndicator();
+        }
+
+        function sb3dDismissPbrIndicator() {
+            sb3dPbrIndicatorDismissed = true;
+            sb3dHidePbrIndicator();
+        }
+
+        function sb3dResetPbrIndicator() {
+            sb3dPbrIndicatorDismissed = false;
+        }
         
 
         const moveState = { up: false, down: false, left: false, right: false };
@@ -1783,6 +2040,7 @@
                 labelSpecialMaterials: "Special Materials",
                 dynMapTextureOn: "Map Textures are ON",
                 dynMapTextureOff: "Map Textures are OFF",
+                toastMapTexturesOff: "Turn off Map Textures?\n\nThis will reload the sandbox to fully release all PBR texture resources from memory.\nYour spawned objects will be cleared.\n\nClick OK to reload — CANCEL to keep textures on.",
                 btnRandomizeTextures: "Randomize All Textures",
                 labelTextureGround: "Ground",
                 labelTextureRamp: "Ramp",
@@ -1790,6 +2048,38 @@
                 labelTexturePool: "Pool",
                 labelTexturePillars: "Pillars",
                 labelMouseSensitivity: "Mouse Sensitivity",
+                btnWorldSettings: "World Settings",
+                worldSettingsTitle: "World Settings",
+                worldSettingsClose: "Close",
+                labelWorldSaveBuilds: "World Save — Builds",
+                worldSaveDescHtml: 'Upload a <code>.json</code> world save to restore a previously saved build.<br><br><b style="color:#2ecc71;">Allowed:</b> cube, sphere, cylinder, triangle, pyramid, torus, glass_*, mirror_*, ice_mat, rubber_mat.<br><b style="color:#e74c3c;">Not allowed:</b> bombs / explosives, custom 3D models.',
+                btnWorldUpload: "Upload World Save (.json)",
+                btnWorldSave: "Save Current World (.json)",
+                btnWorldClear: "Clear Scene",
+                labelSaveFormat: "Save Format",
+                worldSaveFormatHintHtml: '<code>location</code> accepts: <code>"X, Y, Z"</code>, <code>[X, Y, Z]</code>, or <code>{"x":..,"y":..,"z":..}</code>.<br><code>color</code> accepts a hex string or a color name (red, blue, green, etc.).',
+                worldSaveReading: 'Reading "{file}"...',
+                worldSaveParseError: "Failed to parse world save JSON:",
+                worldSaveParseErrorStatus: "Parse error.",
+                worldSaveInvalidFormatTitle: "Invalid world save format.",
+                worldSaveInvalidFormatBody: 'Expected a top-level "objects" array (or a raw array of objects).',
+                worldSaveInvalidFormatStatus: "Invalid format.",
+                worldSaveConfirmHeader: "World Save Detected",
+                worldSaveConfirmFile: "File",
+                worldSaveConfirmObjects: "Objects",
+                worldSaveConfirmProceed: "Proceed to load this world into the current scene?",
+                worldSaveCancelled: "Cancelled.",
+                worldSaveNothingTitle: "Nothing to save.",
+                worldSaveNothingBody: "Only build-mode blocks and physics objects can be saved.\nExplosives, custom 3D models, and fragments are excluded.",
+                worldSaveNothingStatus: "Nothing to save.",
+                worldSaveSavedReport: "Saved {count} object(s).",
+                worldSaveSkippedReport: " Skipped {skipped} ({banned} banned).",
+                worldSaveBadgeSaved: "Saved {count} object(s)!",
+                worldSaveLoadedReport: "Loaded {count} object(s).",
+                worldSaveSkippedLoadedReport: " Skipped {skipped} ({banned} banned/unsupported).",
+                worldSaveReadError: "Read error.",
+                worldSaveReadFailTitle: "Failed to read the file.",
+                worldSaveSceneNotReady: "Scene is not ready yet. Please wait a moment and try again.",
             },
             genz: {
                 pageTitle: "sandbox 3d pc 💀",
@@ -1958,6 +2248,7 @@
                 labelSpecialMaterials: "Fancy Materials ✨",
                 dynMapTextureOn: "Map textures are eating rn 🎨",
                 dynMapTextureOff: "Map textures said nah (boring era)",
+                toastMapTexturesOff: "yo u tryna turn off map textures? 💀\n\nthis boutta reload the whole sandbox to free up all the PBR texture stuff from ur RAM fr.\nur spawned objects gonna get yeeted btw.\n\nOK = reload it\nCANCEL = nvm keep the drip",
                 btnRandomizeTextures: "🎲 randomize everything bestie",
                 labelTextureGround: "Ground (the floor fr)",
                 labelTextureRamp: "Ramp (the slanty boi)",
@@ -1965,6 +2256,38 @@
                 labelTexturePool: "Pool (wet ahh)",
                 labelTexturePillars: "Pillars (stand tall fr)",
                 labelMouseSensitivity: "Mouse speed fr 🖱️",
+                btnWorldSettings: "World Settings fr 🌍",
+                worldSettingsTitle: "World Settings (save ur builds bestie)",
+                worldSettingsClose: "aight close this",
+                labelWorldSaveBuilds: "World Save — Builds no cap",
+                worldSaveDescHtml: 'Drop a <code>.json</code> world save to bring back ur old build fr.<br><br><b style="color:#2ecc71;">Allowed:</b> cube, sphere, cylinder, triangle, pyramid, torus, glass_*, mirror_*, ice_mat, rubber_mat.<br><b style="color:#e74c3c;">Banned:</b> bombs / explosives, custom 3D models — nah.',
+                btnWorldUpload: "Upload World Save (.json) 📂",
+                btnWorldSave: "Save Current World (.json) 💾",
+                btnWorldClear: "Wipe da scene",
+                labelSaveFormat: "Format tingz",
+                worldSaveFormatHintHtml: '<code>location</code> be like: <code>"X, Y, Z"</code>, <code>[X, Y, Z]</code>, or <code>{"x":..,"y":..,"z":..}</code>.<br><code>color</code> can be hex or a name (red, blue, green, etc).',
+                worldSaveReading: 'Readin "{file}"...',
+                worldSaveParseError: "bruh this JSON is cooked:",
+                worldSaveParseErrorStatus: "Parse went 💀.",
+                worldSaveInvalidFormatTitle: "not a valid world save fr 💀",
+                worldSaveInvalidFormatBody: 'Need a top-level "objects" array (or just a raw array of objects).',
+                worldSaveInvalidFormatStatus: "Format said nah.",
+                worldSaveConfirmHeader: "🌍 World Save spotted bestie",
+                worldSaveConfirmFile: "File",
+                worldSaveConfirmObjects: "Objx",
+                worldSaveConfirmProceed: "yo load this world into the current scene?",
+                worldSaveCancelled: "cancelled lol.",
+                worldSaveNothingTitle: "nothing to save 💀",
+                worldSaveNothingBody: "only build blocks & physics objx can be saved.\nexplosives, custom 3D models & frags ain't it.",
+                worldSaveNothingStatus: "nothin to save.",
+                worldSaveSavedReport: "saved {count} obj(s) no cap.",
+                worldSaveSkippedReport: " Skipped {skipped} ({banned} banned).",
+                worldSaveBadgeSaved: "Saved {count} obj(s)! 🔥",
+                worldSaveLoadedReport: "Loaded {count} obj(s) fr.",
+                worldSaveSkippedLoadedReport: " Skipped {skipped} ({banned} banned/unsupported).",
+                worldSaveReadError: "read went 💀.",
+                worldSaveReadFailTitle: "bruh couldn't read da file.",
+                worldSaveSceneNotReady: "scene ain't ready yet bestie, gimme a sec.",
             },
             shakespeare: {
                 pageTitle: "Thee Noble Sandbox of Three Dimensions, PC Edition",
@@ -2133,6 +2456,7 @@
                 labelSpecialMaterials: "Rare Materials of Distinction",
                 dynMapTextureOn: "Map Textures doth grace the realm",
                 dynMapTextureOff: "Map Textures are rendered dormant",
+                toastMapTexturesOff: "Dost thou wish to extinguish the Map Textures?\n\nThis shall reload thy sandbox, that all PBR textures be released from memory's grasp.\nThy spawned creations shall be purged in the process.\n\nOK = Reload and let them depart\nCANCEL = Nay, preserve the textures",
                 btnRandomizeTextures: "🎲 Randomize All — Let Chaos Reign",
                 labelTextureGround: "The Noble Ground",
                 labelTextureRamp: "The Inclined Ramp",
@@ -2140,16 +2464,232 @@
                 labelTexturePool: "The Pool",
                 labelTexturePillars: "The Mighty Pillars",
                 labelMouseSensitivity: "Sensitivity of the Pointer",
+                btnWorldSettings: "Configuration of the World",
+                worldSettingsTitle: "Configuration of the World",
+                worldSettingsClose: "Close These Settings Hence",
+                labelWorldSaveBuilds: "Preservation of Builds",
+                worldSaveDescHtml: 'Present a <code>.json</code> world scroll to restore a build of yore.<br><br><b style="color:#2ecc71;">Permitted:</b> cube, sphere, cylinder, triangle, pyramid, torus, glass_*, mirror_*, ice_mat, rubber_mat.<br><b style="color:#e74c3c;">Forbidden:</b> bombs / explosives, custom 3D models.',
+                btnWorldUpload: "Present a World Scroll (.json)",
+                btnWorldSave: "Inscribe the Current World (.json)",
+                btnWorldClear: "Purge the Realm",
+                labelSaveFormat: "The Scroll's Format",
+                worldSaveFormatHintHtml: '<code>location</code> accepts: <code>"X, Y, Z"</code>, <code>[X, Y, Z]</code>, or <code>{"x":..,"y":..,"z":..}</code>.<br><code>color</code> accepts a hex sigil or a colour name (red, blue, green, etc.).',
+                worldSaveReading: 'Perusing "{file}"...',
+                worldSaveParseError: "Alas! The JSON is flawed:",
+                worldSaveParseErrorStatus: "Parsing hath failed.",
+                worldSaveInvalidFormatTitle: "The world scroll is malformed.",
+                worldSaveInvalidFormatBody: 'A top-level "objects" array is required (or a raw array of objects).',
+                worldSaveInvalidFormatStatus: "Format is incorrect.",
+                worldSaveConfirmHeader: "A World Scroll Hath Been Discovered",
+                worldSaveConfirmFile: "Scroll",
+                worldSaveConfirmObjects: "Objects",
+                worldSaveConfirmProceed: "Shall we restore this world into the present scene?",
+                worldSaveCancelled: "Abandoned.",
+                worldSaveNothingTitle: "There is nought to preserve.",
+                worldSaveNothingBody: "Only build-mode blocks and physics objects may be preserved.\nExplosives, custom 3D models, and fragments are excluded.",
+                worldSaveNothingStatus: "Nought to preserve.",
+                worldSaveSavedReport: "Preserved {count} object(s).",
+                worldSaveSkippedReport: " Abandoned {skipped} ({banned} forbidden).",
+                worldSaveBadgeSaved: "Preserved {count} object(s)!",
+                worldSaveLoadedReport: "Restored {count} object(s).",
+                worldSaveSkippedLoadedReport: " Abandoned {skipped} ({banned} forbidden/unsupported).",
+                worldSaveReadError: "Reading hath failed.",
+                worldSaveReadFailTitle: "Alas! The scroll could not be read.",
+                worldSaveSceneNotReady: "The scene is not yet prepared, noble soul. Prithee, wait a moment and try again.",
             },
         };
 
-        const MAP_TEXTURE_CATEGORIES = {
-            ground: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ground.png',
-            ramp: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ramp.png',
-            stairs: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/stairs.png',
-            pool: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pool.png',
-            pillars: 'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pillars.png',
+        function fmt(str, vars) {
+            return String(str).replace(/\{(\w+)\}/g, (_, k) => (vars && vars[k] !== undefined ? vars[k] : ''));
+        }
+
+        const OBJECT_TEXTURES = {
+            glass_cube:     'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/obj_glass.png',
+            glass_sphere:   'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/obj_glass.png',
+            glass_cylinder: 'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/obj_glass.png',
+            glass_triangle: 'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/obj_glass.png',
         };
+
+        const OBJECT_TEXTURE_LEVEL = 0.55;
+        const OBJECT_TEXTURE_BANNED = ['bomb', 'frag_bomb', 'fire_bomb', 'ice_bomb', 'flashbang'];
+
+        const SB3D_ASSET_BASE = 'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/';
+
+        const OBJECT_PBR_ZIPS = {
+            shapes: {
+                zip: SB3D_ASSET_BASE + 'allobj_texturepbr.zip',
+                base: 'Ground031_1K-PNG',
+                types: ['cube', 'box', 'sphere', 'cylinder', 'cyl', 'triangle', 'tri', 'pyramid', 'torus']
+            },
+            ice: {
+                zip: SB3D_ASSET_BASE + 'ice_texturepbr.zip',
+                base: 'Ice004_1K-PNG',
+                types: ['ice_mat', 'ice']
+            },
+            rubber: {
+                zip: SB3D_ASSET_BASE + 'rubber_texturepbr.zip',
+                base: 'Leather038_1K-PNG',
+                types: ['rubber_mat', 'rubber']
+            }
+        };
+
+        const MAP_PBR_ZIPS = {
+            ground:  { zip: SB3D_ASSET_BASE + 'ground_texturepbr.zip'},
+            ramp:    { zip: SB3D_ASSET_BASE + 'rampstairs_texturepbr.zip'},
+            stairs:  { zip: SB3D_ASSET_BASE + 'rampstairs_texturepbr.zip'},
+            pool:    { zip: SB3D_ASSET_BASE + 'pool_texturepbr.zip'},
+            pillars: { zip: SB3D_ASSET_BASE + 'pillars_texturepbr.zip'}
+        };
+
+        const SB3D_PBR_REGISTRY = Object.assign({}, OBJECT_PBR_ZIPS, MAP_PBR_ZIPS);
+
+        const sb3dPbrCache = new Map();
+
+        function sb3dLoadPbrZip(zipKey) {
+            if (sb3dPbrCache.has(zipKey)) return sb3dPbrCache.get(zipKey);
+            const info = SB3D_PBR_REGISTRY[zipKey];
+            if (!info) return Promise.resolve(null);
+
+            const promise = (async () => {
+                if (typeof JSZip === 'undefined') return null;
+                const resp = await fetch(info.zip);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const buf = await resp.arrayBuffer();
+                const zip = await JSZip.loadAsync(buf);
+
+                const wanted = {
+                    color: '_Color.png',
+                    normal: '_NormalGL.png',
+                    roughness: '_Roughness.png',
+                    ao: '_AmbientOcclusion.png'
+                };
+                const out = {};
+                const names = Object.keys(zip.files);
+                for (const key of Object.keys(wanted)) {
+                    const suffix = wanted[key].toLowerCase();
+                    const match = names.find(n => n.toLowerCase().endsWith(suffix));
+                    if (match) {
+                        const blob = await zip.files[match].async('blob');
+                        out[key] = URL.createObjectURL(blob);
+                    }
+                }
+                return out;
+            })();
+
+            sb3dPbrCache.set(zipKey, promise);
+            return promise;
+        }
+
+        function sb3dGetPbrKeyForType(objectType) {
+            if (!objectType) return null;
+            let base = String(objectType).toLowerCase();
+            if (base.startsWith('glass_')) return null;
+            if (base.startsWith('mirror_')) return null;
+            if (base === 'box') base = 'cube';
+            if (base === 'cyl') base = 'cylinder';
+            if (base === 'tri') base = 'triangle';
+            for (const key of Object.keys(OBJECT_PBR_ZIPS)) {
+                if (OBJECT_PBR_ZIPS[key].types.includes(base)) return key;
+            }
+            return null;
+        }
+
+        function sb3dEnsurePbrMaterial(mesh, scene) {
+            if (!mesh || mesh.isDisposed() || !mesh.material) return null;
+            if (mesh.material instanceof BABYLON.PBRMaterial) return mesh.material;
+
+            if (!mesh.metadata) mesh.metadata = {};
+            if (!mesh.metadata.sb3dOriginalMaterial) {
+                mesh.metadata.sb3dOriginalMaterial = mesh.material;
+            }
+            if (!mesh.metadata.sb3dOriginalColor) {
+                const c = (mesh.material && mesh.material.diffuseColor)
+                    ? mesh.material.diffuseColor.clone()
+                    : new BABYLON.Color3(1, 1, 1);
+                mesh.metadata.sb3dOriginalColor = c;
+            }
+
+            const pbr = new BABYLON.PBRMaterial('sb3dPbr_' + mesh.name + '_' + Date.now(), scene);
+            pbr.albedoColor = mesh.metadata.sb3dOriginalColor.clone();
+            pbr.metallic = 0.0;
+            pbr.roughness = 0.85;
+            mesh.material = pbr;
+            return pbr;
+        }
+
+        function sb3dApplyPbrFilesToMaterial(pbr, files, scene) {
+            if (!pbr || !files || !scene) return;
+
+            if (files.color) {
+                const t = new BABYLON.Texture(files.color, scene);
+                t.uScale = 1; t.vScale = 1;
+                pbr.albedoTexture = t;
+            }
+            if (files.normal) {
+                const t = new BABYLON.Texture(files.normal, scene);
+                t.uScale = 1; t.vScale = 1;
+                pbr.bumpTexture = t;
+                pbr.invertNormalMapX = true;
+                pbr.invertNormalMapY = false;
+            }
+            if (files.roughness) {
+                const t = new BABYLON.Texture(files.roughness, scene);
+                t.uScale = 1; t.vScale = 1;
+                pbr.metallicTexture = t;
+                pbr.useRoughnessFromMetallicTextureGreen = true;
+                pbr.useMetallnessFromMetallicTextureBlue = false;
+                pbr.useRoughnessFromMetallicTextureAlpha = false;
+                pbr.roughness = 1.0;
+                pbr.metallic = 0.0;
+            }
+            if (files.ao) {
+                const t = new BABYLON.Texture(files.ao, scene);
+                t.uScale = 1; t.vScale = 1;
+                pbr.ambientTexture = t;
+                pbr.ambientTextureStrength = 1.0;
+            }
+        }
+
+        function sb3dApplyPbrTextures(mesh, scene, objectType) {
+            const key = sb3dGetPbrKeyForType(objectType);
+            if (!key) return;
+
+            sb3dPbrStart();
+            sb3dLoadPbrZip(key).then(files => {
+                if (!files) return;
+                if (!mesh || mesh.isDisposed()) return;
+                if (!isMapTexturesEnabled) return;
+
+                const pbr = sb3dEnsurePbrMaterial(mesh, scene);
+                if (!pbr) return;
+
+                sb3dApplyPbrFilesToMaterial(pbr, files, scene);
+            }).catch(err => {
+                console.warn('[SB3D PBR] Failed to apply zip textures for', objectType, err);
+            }).finally(() => {
+                sb3dPbrDone();
+            });
+        }
+
+        function sb3dApplyPbrByKey(mesh, scene, pbrKey) {
+            if (!mesh || mesh.isDisposed() || !pbrKey) return;
+
+            sb3dPbrStart();
+            sb3dLoadPbrZip(pbrKey).then(files => {
+                if (!files) return;
+                if (!mesh || mesh.isDisposed()) return;
+                if (!isMapTexturesEnabled) return;
+
+                const pbr = sb3dEnsurePbrMaterial(mesh, scene);
+                if (!pbr) return;
+
+                sb3dApplyPbrFilesToMaterial(pbr, files, scene);
+            }).catch(err => {
+                console.warn('[SB3D PBR] Failed to apply map zip textures for', pbrKey, err);
+            }).finally(() => {
+                sb3dPbrDone();
+            });
+        }
 
         const customModelTemplates = [null, null, null];
 
@@ -2711,6 +3251,44 @@
                 const el = document.getElementById(id);
                 if (el) el.innerText = text;
             }
+
+            const worldBtn = document.getElementById('btn-world-settings-toggle');
+            if (worldBtn) {
+                worldBtn.innerHTML = `<span class="shape-icon" style="background:transparent;border:2px solid #2ecc71;border-radius:2px;width:10px;height:10px;"></span> ${t.btnWorldSettings}`;
+            }
+
+            const wsTitle = document.getElementById('world-settings-title');
+            if (wsTitle) wsTitle.innerText = t.worldSettingsTitle;
+
+            const wsClose = document.getElementById('world-settings-close');
+            if (wsClose) wsClose.innerText = t.worldSettingsClose;
+
+            const wsBuildsLabel = document.getElementById('world-save-builds-label');
+            if (wsBuildsLabel) wsBuildsLabel.innerText = t.labelWorldSaveBuilds;
+
+            const wsDesc = document.getElementById('world-save-desc');
+            if (wsDesc) wsDesc.innerHTML = t.worldSaveDescHtml;
+
+            const wsUploadBtn = document.getElementById('btn-world-upload');
+            if (wsUploadBtn) {
+                wsUploadBtn.innerHTML = `<span class="shape-icon" style="background:#2ecc71; border-radius:2px;"></span> ${t.btnWorldUpload}`;
+            }
+
+            const wsSaveBtn = document.getElementById('btn-world-save');
+            if (wsSaveBtn) {
+                wsSaveBtn.innerHTML = `<span class="shape-icon" style="background:#16a085; border-radius:2px;"></span> ${t.btnWorldSave}`;
+            }
+
+            const wsClearBtn = document.getElementById('btn-world-clear');
+            if (wsClearBtn) {
+                wsClearBtn.innerHTML = `<span class="shape-icon" style="background:#e74c3c; border-radius:2px;"></span> ${t.btnWorldClear}`;
+            }
+
+            const wsFormatLabel = document.getElementById('world-save-format-label');
+            if (wsFormatLabel) wsFormatLabel.innerText = t.labelSaveFormat;
+
+            const wsFormatHint = document.getElementById('world-save-format-hint');
+            if (wsFormatHint) wsFormatHint.innerHTML = t.worldSaveFormatHintHtml;
         }
 
         function onLangChange(lang) {
@@ -2798,6 +3376,601 @@
                     );
                 }
             }
+        }
+
+        function toggleWorldSettingsUI() {
+            const overlay = document.getElementById('world-settings-modal-overlay');
+            if (!overlay) return;
+            const isHidden = overlay.style.display === 'none' || overlay.style.display === '';
+            overlay.style.display = isHidden ? 'flex' : 'none';
+        }
+
+        function triggerWorldSaveUpload() {
+            if (!sceneRef) {
+                alert(SB3D_LANGS[activeLang].worldSaveSceneNotReady);
+                return;
+            }
+            const inp = document.getElementById('world-save-input');
+            if (inp) inp.click();
+        }
+
+        function detectWorldTypeFromMesh(mesh) {
+            if (!mesh || mesh.isDisposed()) return null;
+
+            const name = (mesh.name || '').toLowerCase();
+
+            if (name.includes('custominstance') || name.includes('customhitbox')) return null;
+            if (name === 'projectile' || name === 'frag' || name === 'explosion') return null;
+            if (['bomb', 'frag_bomb', 'fire_bomb', 'ice_bomb', 'flashbang'].includes(name)) return null;
+
+            let base = name;
+            if (base.startsWith('s_')) base = base.substring(2);
+            if (base.startsWith('ws_')) base = base.substring(3);
+
+            const mat = mesh.material;
+            const isPbr = mat instanceof BABYLON.PBRMaterial;
+            const isMirrorMat = isPbr && mat.metallic >= 0.95 &&
+                                (mat.reflectionTexture || (workshop.shaman.sandbox3d.MirrorSystem?.probe));
+            const isGlassMat = isPbr && mat.alpha < 1.0 && mat.subSurface && mat.subSurface.isRefractionEnabled;
+
+            const isIce = (mesh.metadata && mesh.metadata.isIceMat) || base === 'ice' || base === 'ice_mat';
+            const isRubber = (mesh.metadata && mesh.metadata.isRubberMat) || base === 'rubber' || base === 'rubber_mat';
+
+            let shape = base;
+            if (shape.startsWith('glass_')) shape = shape.replace('glass_', '');
+            if (shape.startsWith('mirror_')) shape = shape.replace('mirror_', '');
+            if (shape === 'cyl') shape = 'cylinder';
+            if (shape === 'tri') shape = 'triangle';
+
+            if (isIce) return 'ice_mat';
+            if (isRubber) return 'rubber_mat';
+
+            if (base.startsWith('glass_') || isGlassMat) {
+                if (shape === 'box') return 'glass_box';
+                if (shape === 'sphere') return 'glass_sphere';
+                if (shape === 'cylinder') return 'glass_cylinder';
+                if (shape === 'triangle') return 'glass_triangle';
+            }
+
+            if (base.startsWith('mirror_') || isMirrorMat) {
+                if (shape === 'box') return 'mirror_box';
+                if (shape === 'sphere') return 'mirror_sphere';
+                if (shape === 'cylinder') return 'mirror_cylinder';
+                if (shape === 'triangle') return 'mirror_triangle';
+            }
+
+            if (shape === 'box') return 'cube';
+            if (shape === 'sphere') return 'sphere';
+            if (shape === 'cylinder') return 'cylinder';
+            if (shape === 'triangle') return 'triangle';
+            if (shape === 'pyramid') return 'pyramid';
+            if (shape === 'torus') return 'torus';
+
+            return null;
+        }
+
+        function extractMeshColorHex(mesh) {
+            if (!mesh || !mesh.material) return '#3498db';
+            let c = null;
+            if (mesh.material instanceof BABYLON.PBRMaterial) c = mesh.material.albedoColor;
+            else if (mesh.material.diffuseColor) c = mesh.material.diffuseColor;
+            if (!c) return '#3498db';
+            const r = Math.max(0, Math.min(255, Math.round(c.r * 255)));
+            const g = Math.max(0, Math.min(255, Math.round(c.g * 255)));
+            const b = Math.max(0, Math.min(255, Math.round(c.b * 255)));
+            return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+        }
+
+        function extractMeshSize(mesh) {
+            try {
+                const bb = mesh.getBoundingInfo().boundingBox.extendSize;
+                const sx = Math.abs(mesh.scaling.x) || 1;
+                const sy = Math.abs(mesh.scaling.y) || 1;
+                const sz = Math.abs(mesh.scaling.z) || 1;
+                const fullX = bb.x * 2 * sx;
+                const fullY = bb.y * 2 * sy;
+                const fullZ = bb.z * 2 * sz;
+                return Math.max(fullX, fullY, fullZ);
+            } catch (e) {
+                return currentSize || 1.0;
+            }
+        }
+
+        function extractMeshMass(mesh, objectType) {
+            let mass = 1.5;
+            if (mesh.metadata && mesh.metadata.originalMass !== undefined) {
+                mass = mesh.metadata.originalMass;
+            } else if (mesh.physicsImpostor) {
+                mass = mesh.physicsImpostor.mass;
+            }
+            if (objectType === 'rubber_mat') mass = mass / 0.4;
+            return mass;
+        }
+
+        function extractMeshRotation(mesh) {
+            let euler;
+            if (mesh.rotationQuaternion) {
+                euler = mesh.rotationQuaternion.toEulerAngles();
+            } else {
+                euler = mesh.rotation;
+            }
+            const xDeg = BABYLON.Tools.ToDegrees(euler.x);
+            const yDeg = BABYLON.Tools.ToDegrees(euler.y);
+            const zDeg = BABYLON.Tools.ToDegrees(euler.z);
+            return `${xDeg.toFixed(4)}, ${yDeg.toFixed(4)}, ${zDeg.toFixed(4)}`;
+        }
+
+        function parseWorldRotation(rot) {
+            if (!rot) return null;
+            let parts = null;
+            if (Array.isArray(rot) && rot.length >= 3) {
+                parts = [parseFloat(rot[0]), parseFloat(rot[1]), parseFloat(rot[2])];
+            } else if (typeof rot === 'string') {
+                parts = rot.split(',').map(s => parseFloat(s.trim()));
+            } else if (typeof rot === 'object') {
+                parts = [parseFloat(rot.x), parseFloat(rot.y), parseFloat(rot.z)];
+            }
+            if (!parts || parts.length < 3 || !parts.every(n => !isNaN(n))) return null;
+            return { x: parts[0], y: parts[1], z: parts[2] };
+        }
+
+        function getObjectTextureForType(objectType) {
+            if (!objectType) return null;
+            let t = String(objectType).toLowerCase();
+            if (t.startsWith('glass_')) {
+                if (t === 'glass_cyl') t = 'glass_cylinder';
+                if (t === 'glass_tri') t = 'glass_triangle';
+                return OBJECT_TEXTURES[t] || null;
+            }
+            if (t === 'glass_cube') return OBJECT_TEXTURES.glass_cube;
+            return null;
+        }
+
+        function shouldSkipObjectTexture(mesh) {
+            if (!mesh || mesh.isDisposed()) return true;
+            const name = (mesh.name || '').toLowerCase();
+            if (name.includes('mirror_') || name.startsWith('s_mirror_') || name.startsWith('ws_mirror_')) return true;
+            if (name.includes('custominstance') || name.includes('customhitbox')) return true;
+            if (name === 'projectile' || name === 'frag' || name === 'explosion') return true;
+            for (let i = 0; i < OBJECT_TEXTURE_BANNED.length; i++) {
+                const b = OBJECT_TEXTURE_BANNED[i];
+                if (name === b || name.startsWith(b + '_')) return true;
+            }
+            return false;
+        }
+
+        function applyObjectTexture(mesh, scene, objectTypeOverride) {
+            if (shouldSkipObjectTexture(mesh)) return;
+            if (!mesh.material) return;
+            const sceneToUse = scene || mesh.getScene();
+            if (!sceneToUse) return;
+
+            const objectType = objectTypeOverride || detectWorldTypeFromMesh(mesh);
+            if (!objectType) return;
+
+            if (String(objectType).startsWith('glass_')) {
+                const url = getObjectTextureForType(objectType);
+                if (!url) return;
+                const tex = new BABYLON.Texture(url, sceneToUse);
+                tex.uScale = 1;
+                tex.vScale = 1;
+                tex.level = OBJECT_TEXTURE_LEVEL;
+
+                if (mesh.material instanceof BABYLON.PBRMaterial) {
+                    mesh.material.albedoTexture = tex;
+                } else {
+                    mesh.material.diffuseTexture = tex;
+                }
+                return;
+            }
+
+            sb3dApplyPbrTextures(mesh, sceneToUse, objectType);
+        }
+
+        function resetObjectTexture(mesh) {
+            if (!mesh || mesh.isDisposed() || !mesh.material) return;
+
+            if (mesh.metadata && mesh.metadata.sb3dOriginalMaterial && !mesh.metadata.sb3dOriginalMaterial.isDisposed()) {
+                const pbr = mesh.material;
+                mesh.material = mesh.metadata.sb3dOriginalMaterial;
+                if (pbr instanceof BABYLON.PBRMaterial && pbr !== mesh.metadata.sb3dOriginalMaterial) {
+                    try { pbr.dispose(); } catch (e) {}
+                }
+                delete mesh.metadata.sb3dOriginalMaterial;
+                delete mesh.metadata.sb3dOriginalColor;
+                return;
+            }
+
+            if (mesh.material instanceof BABYLON.PBRMaterial) {
+                mesh.material.albedoTexture = null;
+                mesh.material.bumpTexture = null;
+                mesh.material.ambientTexture = null;
+                mesh.material.metallicTexture = null;
+            } else {
+                mesh.material.diffuseTexture = null;
+            }
+        }
+
+        function applyObjectTexturesToSpawned(scene) {
+            for (let i = 0; i < spawnedMeshes.length; i++) {
+                const mesh = spawnedMeshes[i];
+                if (!mesh || mesh.isDisposed()) continue;
+                applyObjectTexture(mesh, scene);
+            }
+        }
+
+        function resetObjectTexturesFromSpawned() {
+            for (let i = 0; i < spawnedMeshes.length; i++) {
+                const mesh = spawnedMeshes[i];
+                if (!mesh || mesh.isDisposed()) continue;
+                resetObjectTexture(mesh);
+            }
+        }
+
+        function saveCurrentWorld() {
+            const t = SB3D_LANGS[activeLang];
+
+            if (!sceneRef) {
+                alert(t.worldSaveSceneNotReady);
+                return;
+            }
+
+            const status = document.getElementById('world-save-status');
+            const savedObjects = [];
+            let skipped = 0;
+            let banned = 0;
+
+            spawnedMeshes.forEach(mesh => {
+                if (!mesh || mesh.isDisposed()) return;
+
+                const name = (mesh.name || '').toLowerCase();
+                const isBannedName = ['bomb', 'frag_bomb', 'fire_bomb', 'ice_bomb', 'flashbang']
+                    .some(b => name === b || name.startsWith(b + '_'));
+                const isCustom = name.includes('custominstance') || name.includes('customhitbox');
+
+                if (isBannedName) { banned++; skipped++; return; }
+                if (isCustom) { banned++; skipped++; return; }
+
+                const objectType = detectWorldTypeFromMesh(mesh);
+                if (!objectType) { skipped++; return; }
+
+                let size = extractMeshSize(mesh);
+                let mass = extractMeshMass(mesh, objectType);
+
+                if (!isFinite(size) || size <= 0) size = 1.0;
+                if (!isFinite(mass) || mass < 0) mass = 0;
+
+                savedObjects.push({
+                    object: objectType,
+                    location: `${mesh.position.x.toFixed(4)}, ${mesh.position.y.toFixed(4)}, ${mesh.position.z.toFixed(4)}`,
+                    rotation: extractMeshRotation(mesh),
+                    color: extractMeshColorHex(mesh),
+                    size: parseFloat(size.toFixed(4)),
+                    mass: parseFloat(mass.toFixed(4))
+                });
+            });
+
+            if (savedObjects.length === 0) {
+                alert(
+                    t.worldSaveNothingTitle + '\n\n' +
+                    t.worldSaveNothingBody
+                );
+                if (status) status.innerText = t.worldSaveNothingStatus;
+                return;
+            }
+
+            const worldSave = {
+                version: '1.0',
+                savedAt: new Date().toISOString(),
+                edition: SB3D_EDITION,
+                sb3dVersion: SB3D_VERSION,
+                objectCount: savedObjects.length,
+                objects: savedObjects
+            };
+
+            const json = JSON.stringify(worldSave, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            const dateTag = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            a.href = url;
+            a.download = `sb3d_worldsave_${dateTag}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            const skippedNote = skipped > 0 ? fmt(t.worldSaveSkippedReport, { skipped: skipped, banned: banned }) : '';
+            const report = fmt(t.worldSaveSavedReport, { count: savedObjects.length }) + skippedNote;
+            if (status) status.innerText = report;
+            console.log(`[WorldSave] ${report}`);
+
+            const btn = document.getElementById('btn-world-save');
+            if (btn) {
+                btn.classList.add('active');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<span class="shape-icon" style="background:#16a085; border-radius:2px;"></span> ${fmt(t.worldSaveBadgeSaved, { count: savedObjects.length })}`;
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('active');
+                }, 2000);
+            }
+        }
+
+
+        const WORLD_COLOR_NAMES = {
+            red:     '#e74c3c', blue:   '#3498db', green:  '#2ecc71',
+            yellow:  '#f1c40f', orange: '#e67e22', purple: '#9b59b6',
+            pink:    '#e91e63', cyan:   '#00bcd4', white:  '#ffffff',
+            black:   '#000000', gray:   '#808080', grey:   '#808080',
+            brown:   '#8b4513', lime:   '#00ff00', magenta:'#ff00ff',
+            navy:    '#000080', teal:   '#008080', silver: '#c0c0c0',
+            gold:    '#ffd700', violet: '#8a2be2', indigo: '#4b0082',
+            turquoise:'#40e0d0', maroon:'#800000', olive:  '#808000',
+        };
+
+        const WORLD_SAVE_BANNED = ['bomb', 'frag_bomb', 'fire_bomb', 'ice_bomb', 'flashbang'];
+
+        function resolveWorldColor(c) {
+            if (!c || typeof c !== 'string') return '#3498db';
+            const k = c.trim().toLowerCase();
+            if (WORLD_COLOR_NAMES[k]) return WORLD_COLOR_NAMES[k];
+            if (k.startsWith('#')) {
+                if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(k)) return k;
+            }
+            return '#3498db';
+        }
+
+        function parseWorldLocation(loc) {
+            if (!loc) return null;
+            if (Array.isArray(loc) && loc.length >= 3) {
+                const x = parseFloat(loc[0]), y = parseFloat(loc[1]), z = parseFloat(loc[2]);
+                if ([x, y, z].every(n => !isNaN(n))) return { x, y, z };
+                return null;
+            }
+            if (typeof loc === 'string') {
+                const parts = loc.split(',').map(s => parseFloat(s.trim()));
+                if (parts.length >= 3 && parts.every(n => !isNaN(n))) {
+                    return { x: parts[0], y: parts[1], z: parts[2] };
+                }
+                return null;
+            }
+            if (typeof loc === 'object') {
+                const x = parseFloat(loc.x), y = parseFloat(loc.y), z = parseFloat(loc.z);
+                if ([x, y, z].every(n => !isNaN(n))) return { x, y, z };
+                return null;
+            }
+            return null;
+        }
+
+        function normalizeWorldType(raw) {
+            let t = String(raw || '').trim().toLowerCase();
+            const aliases = {
+                'cube': 'box', 'box': 'box',
+                'ball': 'sphere', 'sphere': 'sphere',
+                'cyl': 'cylinder', 'cylinder': 'cylinder',
+                'tri': 'triangle', 'triangle': 'triangle',
+                'glass_cube': 'glass_box', 'glass_box': 'glass_box',
+                'glass_ball': 'glass_sphere', 'glass_sphere': 'glass_sphere',
+                'glass_cyl': 'glass_cylinder', 'glass_cylinder': 'glass_cylinder',
+                'glass_tri': 'glass_triangle', 'glass_triangle': 'glass_triangle',
+                'mirror_cube': 'mirror_box', 'mirror_box': 'mirror_box',
+                'mirror_ball': 'mirror_sphere', 'mirror_sphere': 'mirror_sphere',
+                'mirror_cyl': 'mirror_cylinder', 'mirror_cylinder': 'mirror_cylinder',
+                'mirror_tri': 'mirror_triangle', 'mirror_triangle': 'mirror_triangle',
+                'pyramid': 'pyramid',
+                'torus': 'torus', 'donut': 'torus',
+                'ice': 'ice_mat', 'ice_mat': 'ice_mat',
+                'rubber': 'rubber_mat', 'rubber_mat': 'rubber_mat',
+            };
+            return aliases[t] || t;
+        }
+
+        function handleWorldSaveUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            const t = SB3D_LANGS[activeLang];
+            const file = input.files[0];
+            const status = document.getElementById('world-save-status');
+
+            if (status) status.innerText = fmt(t.worldSaveReading, { file: file.name });
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                let data;
+                try {
+                    data = JSON.parse(e.target.result);
+                } catch (err) {
+                    console.error('[WorldSave] JSON parse error:', err);
+                    alert(t.worldSaveParseError + '\n\n' + err.message);
+                    if (status) status.innerText = t.worldSaveParseErrorStatus;
+                    input.value = '';
+                    return;
+                }
+
+                const objects = Array.isArray(data) ? data : (data && Array.isArray(data.objects) ? data.objects : null);
+                if (!objects) {
+                    alert(t.worldSaveInvalidFormatTitle + '\n\n' + t.worldSaveInvalidFormatBody);
+                    if (status) status.innerText = t.worldSaveInvalidFormatStatus;
+                    input.value = '';
+                    return;
+                }
+
+                const confirmMsg =
+                    `${t.worldSaveConfirmHeader}\n` +
+                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                    `${t.worldSaveConfirmFile}   : ${file.name}\n` +
+                    `${t.worldSaveConfirmObjects}: ${objects.length}\n\n` +
+                    `${t.worldSaveConfirmProceed}`;
+
+                if (!confirm(confirmMsg)) {
+                    if (status) status.innerText = t.worldSaveCancelled;
+                    input.value = '';
+                    return;
+                }
+
+                let placed = 0;
+                let skipped = 0;
+                let banned = 0;
+
+                objects.forEach(o => {
+                    const rawType = o && (o.object || o.type);
+                    const normType = normalizeWorldType(rawType);
+
+                    if (WORLD_SAVE_BANNED.includes(normType) || normType.startsWith('custom_')) {
+                        banned++;
+                        skipped++;
+                        return;
+                    }
+
+                    const mesh = spawnWorldSaveObject(o, sceneRef);
+                    if (mesh) placed++;
+                    else skipped++;
+                });
+
+                const report =
+                    fmt(t.worldSaveLoadedReport, { count: placed }) +
+                    (skipped > 0 ? fmt(t.worldSaveSkippedLoadedReport, { skipped: skipped, banned: banned }) : '');
+
+                if (status) status.innerText = report;
+                console.log(`[WorldSave] ${report}`);
+                input.value = '';
+            };
+
+            reader.onerror = () => {
+                alert(t.worldSaveReadFailTitle);
+                if (status) status.innerText = t.worldSaveReadError;
+                input.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
+        function spawnWorldSaveObject(data, scene) {
+            if (!scene || !data || typeof data !== 'object') return null;
+
+            const type = normalizeWorldType(data.object || data.type);
+            if (!type) return null;
+            if (WORLD_SAVE_BANNED.includes(type)) return null;
+            if (type.startsWith('custom_')) return null;
+
+            const validBase = ['box', 'sphere', 'cylinder', 'triangle', 'pyramid', 'torus', 'ice_mat', 'rubber_mat'];
+            const isGlass = type.startsWith('glass_');
+            const isMirror = type.startsWith('mirror_');
+            let baseType = type;
+            if (isGlass) baseType = type.replace('glass_', '');
+            if (isMirror) baseType = type.replace('mirror_', '');
+            if (!validBase.includes(baseType)) return null;
+
+            const pos = parseWorldLocation(data.location || data.position || data.pos);
+            if (!pos) return null;
+
+            const size = Math.max(0.01, parseFloat(data.size) || 1.0);
+            const mass = parseFloat(data.mass);
+            const finalMass = isNaN(mass) ? 1.5 : mass;
+
+            const colorHex = resolveWorldColor(data.color);
+            const baseColor = BABYLON.Color3.FromHexString(colorHex);
+
+            let mesh;
+            let mat;
+
+            if (isGlass) {
+                mat = new BABYLON.PBRMaterial("wsGlassMat" + Date.now() + Math.random(), scene);
+                mat.metallic = 0.0;
+                mat.roughness = 0.05;
+                mat.alpha = 0.45;
+                mat.subSurface.isRefractionEnabled = true;
+                mat.subSurface.indexOfRefraction = 1.5;
+                mat.albedoColor = baseColor;
+            } else if (isMirror) {
+                mat = new BABYLON.PBRMaterial("wsMirrorMat" + Date.now() + Math.random(), scene);
+                mat.metallic = 1.0;
+                mat.roughness = 0.0;
+                mat.albedoColor = baseColor;
+                if (workshop.shaman.sandbox3d.MirrorSystem.probe) {
+                    mat.reflectionTexture = workshop.shaman.sandbox3d.MirrorSystem.probe.cubeTexture;
+                }
+            } else {
+                mat = new BABYLON.StandardMaterial("wsMat" + Date.now() + Math.random(), scene);
+                mat.diffuseColor = baseColor;
+            }
+
+            if (baseType === 'box') {
+                mesh = BABYLON.MeshBuilder.CreateBox(isGlass ? "ws_glass_box" : (isMirror ? "ws_mirror_box" : "ws_box"),
+                    { size: size }, scene);
+            } else if (baseType === 'sphere') {
+                mesh = BABYLON.MeshBuilder.CreateSphere(isGlass ? "ws_glass_sphere" : (isMirror ? "ws_mirror_sphere" : "ws_sphere"),
+                    { diameter: size }, scene);
+            } else if (baseType === 'cylinder') {
+                mesh = BABYLON.MeshBuilder.CreateCylinder(isGlass ? "ws_glass_cyl" : (isMirror ? "ws_mirror_cyl" : "ws_cyl"),
+                    { height: size, diameter: size / 2 }, scene);
+            } else if (baseType === 'triangle') {
+                mesh = BABYLON.MeshBuilder.CreateCylinder(isGlass ? "ws_glass_tri" : (isMirror ? "ws_mirror_tri" : "ws_tri"),
+                    { height: size, diameter: size, tessellation: 3 }, scene);
+            } else if (baseType === 'pyramid') {
+                mesh = BABYLON.MeshBuilder.CreateCylinder("ws_pyramid",
+                    { height: size, diameterTop: 0, diameterBottom: size, tessellation: 4 }, scene);
+            } else if (baseType === 'torus') {
+                mesh = BABYLON.MeshBuilder.CreateTorus("ws_torus",
+                    { diameter: size, thickness: size * 0.3, tessellation: 24 }, scene);
+            } else if (baseType === 'ice_mat') {
+                mesh = BABYLON.MeshBuilder.CreateBox("ws_ice", { size: size }, scene);
+                mat = new BABYLON.PBRMaterial("wsIceMat" + Date.now(), scene);
+                mat.metallic = 0.0;
+                mat.roughness = 0.02;
+                mat.alpha = 0.75;
+                mat.subSurface.isRefractionEnabled = true;
+                mat.subSurface.indexOfRefraction = 1.31;
+                mat.albedoColor = new BABYLON.Color3(0.6, 0.9, 1.0);
+                mat.emissiveColor = new BABYLON.Color3(0.05, 0.2, 0.3);
+                mesh.metadata = mesh.metadata || {};
+                mesh.metadata.isIceMat = true;
+            } else if (baseType === 'rubber_mat') {
+                mesh = BABYLON.MeshBuilder.CreateSphere("ws_rubber", { diameter: size }, scene);
+                mat = new BABYLON.StandardMaterial("wsRubberMat" + Date.now(), scene);
+                mat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.15);
+                mat.specularColor = new BABYLON.Color3(0, 0, 0);
+                mesh.metadata = mesh.metadata || {};
+                mesh.metadata.isRubberMat = true;
+            }
+
+            if (!mesh) return null;
+
+            mesh.position = new BABYLON.Vector3(pos.x, pos.y, pos.z);
+            mesh.material = mat;
+
+            const rot = parseWorldRotation(data.rotation);
+            if (rot) {
+                mesh.rotationQuaternion = BABYLON.Quaternion.FromEulerAngles(
+                    BABYLON.Tools.ToRadians(rot.x),
+                    BABYLON.Tools.ToRadians(rot.y),
+                    BABYLON.Tools.ToRadians(rot.z)
+                );
+            }
+
+            let impostorType = BABYLON.PhysicsImpostor.BoxImpostor;
+            if (baseType === 'sphere' || baseType === 'rubber_mat') impostorType = BABYLON.PhysicsImpostor.SphereImpostor;
+            if (baseType === 'cylinder' || baseType === 'triangle' || baseType === 'pyramid') impostorType = BABYLON.PhysicsImpostor.CylinderImpostor;
+            if (baseType === 'torus') impostorType = BABYLON.PhysicsImpostor.SphereImpostor;
+
+            const physParams = { mass: finalMass, restitution: 0.1, friction: 0.8 };
+            if (baseType === 'ice_mat') { physParams.restitution = 0.6; physParams.friction = 0.01; }
+            if (baseType === 'rubber_mat') { physParams.restitution = 0.92; physParams.friction = 0.6; physParams.mass = finalMass * 0.4; }
+
+            mesh.physicsImpostor = new BABYLON.PhysicsImpostor(mesh, impostorType, physParams, scene);
+
+            spawnParticleBurst(mesh.position, scene);
+            spawnedMeshes.push(mesh);
+
+            if (!isMirror && !isGlass) {
+                workshop.shaman.sandbox3d.MirrorSystem.addToRenderList(mesh);
+            }
+            if (isMapTexturesEnabled) {
+                applyObjectTexture(mesh, scene, baseType);
+            }
+
+            return mesh;
         }
 
         function toggleLeftUI() {
@@ -3880,6 +5053,9 @@
 
             sb3d.init();
 
+            const wsStatus = document.getElementById('world-save-status');
+            if (wsStatus) wsStatus.innerText = '';
+
             setTimeout(() => {
                 isMapTexturesEnabled = preservedEnabled;
                 updateMapTextureButton();
@@ -4388,15 +5564,24 @@
         }
 
         function toggleMapTextures() {
-            isMapTexturesEnabled = !isMapTexturesEnabled;
-            localStorage.setItem('sb3d_map_textures', isMapTexturesEnabled ? 'true' : 'false');
-            updateMapTextureButton();
-
             if (isMapTexturesEnabled) {
-                applyMapTextures();
-            } else {
-                resetMapTextures();
+                const t = SB3D_LANGS[activeLang];
+
+                if (!confirm(t.toastMapTexturesOff)) return;
+
+                isMapTexturesEnabled = false;
+                localStorage.setItem('sb3d_map_textures', 'false');
+                sb3dPbrPendingCount = 0;
+                sb3dHidePbrIndicator();
+                location.reload();
+                return;
             }
+
+            isMapTexturesEnabled = true;
+            localStorage.setItem('sb3d_map_textures', 'true');
+            updateMapTextureButton();
+            sb3dResetPbrIndicator();
+            applyMapTextures();
         }
 
         function updateMapTextureButton() {
@@ -4413,10 +5598,6 @@
                 btn.classList.remove('active');
                 btn.style.borderLeftColor = '#e91e63';
             }
-        }
-
-        function getTextureForCategory(cat) {
-            return MAP_TEXTURE_CATEGORIES[cat] || null;
         }
 
         function applyTextureToMesh(mesh, textureUrl, scene) {
@@ -4443,102 +5624,52 @@
             if (!isMapTexturesEnabled || !sceneRef) return;
 
             const ground = sceneRef.getMeshByName('ground');
-            if (ground) {
-                const url = getTextureForCategory('ground');
-                if (url) applyTextureToMesh(ground, url, sceneRef);
-            }
+            if (ground) sb3dApplyPbrByKey(ground, sceneRef, 'ground');
 
             const ramp = sceneRef.getMeshByName('ramp');
-            if (ramp) {
-                const url = getTextureForCategory('ramp');
-                if (url) applyTextureToMesh(ramp, url, sceneRef);
-            }
+            if (ramp) sb3dApplyPbrByKey(ramp, sceneRef, 'ramp');
 
             sceneRef.meshes.filter(m => m.name.startsWith('stair_step_')).forEach(mesh => {
-                const url = getTextureForCategory('stairs');
-                if (url) applyTextureToMesh(mesh, url, sceneRef);
+                sb3dApplyPbrByKey(mesh, sceneRef, 'stairs');
             });
 
             const poolFloor = sceneRef.getMeshByName('poolFloor');
-            if (poolFloor) {
-                const url = getTextureForCategory('pool');
-                if (url) applyTextureToMesh(poolFloor, url, sceneRef);
-            }
+            if (poolFloor) sb3dApplyPbrByKey(poolFloor, sceneRef, 'pool');
 
-            sceneRef.meshes.filter(m => m.name === 'pillar').forEach(mesh => {
-                const url = getTextureForCategory('pillars');
-                if (url) applyTextureToMesh(mesh, url, sceneRef);
+            sceneRef.meshes.filter(m => m.name === 'wallN' || m.name === 'wallS' || m.name === 'wallE' || m.name === 'wallW').forEach(mesh => {
+                sb3dApplyPbrByKey(mesh, sceneRef, 'pool');
             });
 
+            sceneRef.meshes.filter(m => m.name === 'pillar').forEach(mesh => {
+                sb3dApplyPbrByKey(mesh, sceneRef, 'pillars');
+            });
+
+            applyObjectTexturesToSpawned(sceneRef);
         }
 
         function resetMapTextures() {
             if (!sceneRef) return;
 
+            const targets = [];
+
             const ground = sceneRef.getMeshByName('ground');
-            if (ground && ground.material) {
-                if (ground.material instanceof BABYLON.PBRMaterial) {
-                    ground.material.albedoTexture = null;
-                } else {
-                    ground.material.diffuseTexture = null;
-                }
-                ground.material.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.2);
-            }
+            if (ground) targets.push(ground);
 
             const ramp = sceneRef.getMeshByName('ramp');
-            if (ramp && ramp.material) {
-                if (ramp.material instanceof BABYLON.PBRMaterial) {
-                    ramp.material.albedoTexture = null;
-                } else {
-                    ramp.material.diffuseTexture = null;
-                }
-                ramp.material.diffuseColor = new BABYLON.Color3(0.25, 0.25, 0.3);
-            }
+            if (ramp) targets.push(ramp);
 
-            sceneRef.meshes.filter(m => m.name.startsWith('stair_step_')).forEach(mesh => {
-                if (mesh.material) {
-                    if (mesh.material instanceof BABYLON.PBRMaterial) {
-                        mesh.material.albedoTexture = null;
-                    } else {
-                        mesh.material.diffuseTexture = null;
-                    }
-                    mesh.material.diffuseColor = new BABYLON.Color3(0.22, 0.22, 0.28);
-                }
-            });
+            sceneRef.meshes.filter(m => m.name.startsWith('stair_step_')).forEach(m => targets.push(m));
 
-            ['poolFloor'].forEach(name => {
-                const mesh = sceneRef.getMeshByName(name);
-                if (mesh && mesh.material) {
-                    if (mesh.material instanceof BABYLON.PBRMaterial) {
-                        mesh.material.albedoTexture = null;
-                    } else {
-                        mesh.material.diffuseTexture = null;
-                    }
-                    mesh.material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.55);
-                }
-            });
+            const poolFloor = sceneRef.getMeshByName('poolFloor');
+            if (poolFloor) targets.push(poolFloor);
 
-            sceneRef.meshes.filter(m => m.name === 'pillar').forEach(mesh => {
-                if (mesh.material) {
-                    if (mesh.material instanceof BABYLON.PBRMaterial) {
-                        mesh.material.albedoTexture = null;
-                    } else {
-                        mesh.material.diffuseTexture = null;
-                    }
-                    mesh.material.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.4);
-                }
-            });
+            sceneRef.meshes.filter(m => m.name === 'wallN' || m.name === 'wallS' || m.name === 'wallE' || m.name === 'wallW').forEach(m => targets.push(m));
 
-            sceneRef.meshes.filter(m => m.name.startsWith('bgPillar_')).forEach(mesh => {
-                if (mesh.material) {
-                    if (mesh.material instanceof BABYLON.PBRMaterial) {
-                        mesh.material.albedoTexture = null;
-                    } else {
-                        mesh.material.diffuseTexture = null;
-                    }
-                    mesh.material.diffuseColor = new BABYLON.Color3(0.12, 0.12, 0.15);
-                }
-            });
+            sceneRef.meshes.filter(m => m.name === 'pillar').forEach(m => targets.push(m));
+
+            targets.forEach(m => resetObjectTexture(m));
+
+            resetObjectTexturesFromSpawned();
         }
 
         // ==========================================
@@ -5796,6 +6927,9 @@
                             if (!isMirror && !isGlass) {
                                 workshop.shaman.sandbox3d.MirrorSystem.addToRenderList(mesh);
                             }
+                            if (isMapTexturesEnabled) {
+                                applyObjectTexture(mesh, scene, baseType);
+                            }
                         }
                     },
 
@@ -5899,6 +7033,9 @@
 
                             if (!isMirror && !isGlass) {
                                 workshop.shaman.sandbox3d.MirrorSystem.addToRenderList(mesh);
+                            }
+                            if (isMapTexturesEnabled) {
+                                applyObjectTexture(mesh, scene, baseType);
                             }
                         }
                     },
