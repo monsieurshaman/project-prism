@@ -1,5 +1,0 @@
-# Everyone can come in
-# by monsieurshaman
-
-User-agent: *
-Allow: /
