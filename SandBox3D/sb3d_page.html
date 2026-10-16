@@ -267,6 +267,37 @@
             opacity: 0.75; display: block; margin-top: 2px;
         }
 
+        .back-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: fit-content;
+            margin: 16px auto 0;
+            padding: 10px 18px;
+            background: var(--glass-shine);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-pill);
+            backdrop-filter: var(--blur);
+            color: var(--text-secondary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 13px; font-weight: 600;
+            letter-spacing: 1.2px; text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+
+        .back-btn i { font-size: 16px; color: var(--accent); transition: transform 0.25s; }
+
+        .back-btn:hover {
+            border-color: var(--glass-border-hover);
+            color: var(--text-primary);
+            background: var(--surface-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+        }
+
+        .back-btn:hover i { transform: translateX(-3px); }
+
+        .back-btn:active { transform: translateY(0); }
+
         .page-footer {
             margin-top: 28px;
             text-align: center;
@@ -435,6 +466,11 @@
                     <span class="launch-sub" id="version-text">initialize sandbox</span>
                 </div>
             </button>
+
+            <a href="../index.html" class="back-btn">
+                <i class="material-icons-round">arrow_back</i>
+                back
+            </a>
 
         </div>
 
