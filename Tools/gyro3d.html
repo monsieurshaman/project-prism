@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Motion Lab - 3D Device Motion Visualizer</title>
+<style>
+:root{--bg:#04060a;--panel:rgba(9,14,22,.76);--line:rgba(110,190,255,.2);--txt:#d8e6f2;--mut:#7f93a6;--cy:#4de1ff;--mg:#ff4fd8;--lm:#9dff6a;--am:#ffc14d;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font:13px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;overscroll-behavior:none}
+#scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#scene:active{cursor:grabbing}
+#top,#hud{position:fixed;left:50%;transform:translateX(-50%);width:min(100% - 16px,780px);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#top{top:calc(env(safe-area-inset-top,0px) + 8px)}
+#hud{bottom:calc(env(safe-area-inset-bottom,0px) + 8px)}
+#brand{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+#brand strong{font-size:14px;letter-spacing:.02em}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mut)}
+body[data-live="1"] .dot{background:var(--lm);box-shadow:0 0 0 0 rgba(157,255,106,.6);animation:pulse 1.6s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(157,255,106,0)}100%{box-shadow:0 0 0 0 rgba(157,255,106,0)}}
+.badge{margin-left:auto;font:600 11px var(--mono);padding:3px 8px;border-radius:999px;border:1px solid var(--mg);color:var(--mg)}
+.badge[data-mode="ORIENTATION"]{border-color:var(--cy);color:var(--cy)}
+.badge[data-mode="GYROSCOPE"]{border-color:var(--lm);color:var(--lm)}
+.badge[data-mode="ACCELEROMETER FALLBACK"],.badge[data-mode="PAUSED"]{border-color:var(--am);color:var(--am)}
+#controls{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+button{font:600 12px system-ui,sans-serif;color:var(--txt);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:8px;padding:7px 11px;cursor:pointer}
+button:hover{background:rgba(255,255,255,.12)}
+button.primary{background:var(--cy);color:#02141a;border-color:var(--cy)}
+button:disabled{opacity:.6;cursor:wait}
+button:focus-visible,input:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+#sensWrap{display:flex;align-items:center;gap:6px;margin-left:auto;color:var(--mut);font-size:12px}
+#sens{width:100px;accent-color:var(--cy)}
+#sensOut{font:12px var(--mono);color:var(--txt);min-width:42px}
+#notice{margin:6px 0 0;color:var(--am);font-size:12px}
+#notice:empty{display:none}
+#status{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font:11px var(--mono);color:var(--mut);margin-bottom:6px}
+#grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#grid section{min-width:0;border-left:2px solid var(--line);padding-left:8px}
+h3{margin:0 0 3px;font-size:11px;font-weight:600;color:var(--txt)}
+h3 em{font-style:normal;color:var(--mut);font-weight:400;margin-left:4px}
+.r{display:flex;justify-content:space-between;gap:4px}
+.r span{display:flex;flex-direction:column;font:9px var(--mono);color:var(--mut)}
+.r b{font:600 11px var(--mono);color:var(--cy);white-space:nowrap}
+#grid section:nth-child(2) .r b{color:var(--lm)}
+#grid section:nth-child(3) .r b{color:var(--mg)}
+.bar{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--cy),var(--mg));transform-origin:left;transform:scaleX(0)}
+#lin{font:10px var(--mono);color:var(--mut)}
+@media (max-width:640px){#grid{grid-template-columns:1fr 1fr;gap:6px 10px}#sensWrap{margin-left:0;width:100%}#sens{flex:1}}
+@media (max-height:500px){#sensWrap,#status{display:none}#brand{margin-bottom:4px}}
+@media (prefers-reduced-motion:reduce){body[data-live="1"] .dot{animation:none}}
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center}
+.modal[hidden]{display:none}
+.modalBack{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+.modalCard{position:relative;width:min(100% - 24px,380px);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.modalHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.modalHead strong{font-size:13px;letter-spacing:.02em}
+button.ghost{background:transparent;border-color:transparent;color:var(--mut);padding:4px 8px}
+button.ghost:hover{color:var(--txt)}
+.modalBody{display:flex;flex-direction:column;gap:10px}
+.roleRow{display:flex;gap:8px}
+.roleRow button{flex:1}
+.linkPane{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.linkPane[hidden]{display:none}
+.codeRow{display:flex;justify-content:space-between;align-items:center;font:11px var(--mono);color:var(--mut)}
+.code{font:700 20px var(--mono);letter-spacing:.18em;color:var(--cy)}
+.statusRow{font:11px var(--mono);color:var(--mut)}
+.status{color:var(--txt)}
+.status[data-s="err"]{color:var(--am)}
+.status[data-s="ok"]{color:var(--lm)}
+.status[data-s="wait"]{color:var(--cy)}
+.linkMsg{margin:0;min-height:14px;font:11px var(--mono);color:var(--am)}
+.linkMsg:empty{display:none}
+</style>
+</head>
+<body data-live="0">
+<canvas id="scene" aria-label="3D object controlled by device motion or pointer drag"></canvas>
+<header id="top">
+  <div id="brand"><span class="dot"></span><strong>Motion Lab</strong><span id="mode" class="badge" data-mode="MOUSE MODE">MOUSE MODE</span></div>
+  <div id="controls">
+    <button id="btnEnable" class="primary" type="button">Enable Motion Sensors</button>
+    <button id="btnConnect" type="button">Connect Device</button>
+    <button id="btnPause" type="button">Pause</button>
+    <button id="btnReset" type="button">Reset orientation</button>
+    <label id="sensWrap" for="sens">Sensitivity <input id="sens" type="range" min="0.25" max="2.5" step="0.05" value="1"><output id="sensOut">1.00x</output></label>
+  </div>
+  <p id="notice" role="status" aria-live="polite"></p>
+</header>
+<footer id="hud">
+  <div id="status"><span id="perm">Permission: not requested</span><span id="avail"></span></div>
+  <div id="grid">
+    <section><h3>Orientation<em>deg</em></h3><div class="r"><span>alpha Z<b id="oa">-</b></span><span>beta X<b id="ob">-</b></span><span>gamma Y<b id="og">-</b></span></div></section>
+    <section><h3>Angular velocity<em>deg/s</em></h3><div class="r"><span>X<b id="gx">-</b></span><span>Y<b id="gy">-</b></span><span>Z<b id="gz">-</b></span></div></section>
+    <section><h3>Accelerometer<em>m/s&sup2;</em></h3><div class="r"><span>X<b id="ax">-</b></span><span>Y<b id="ay">-</b></span><span>Z<b id="az">-</b></span></div></section>
+    <section><h3>Motion<em id="mstate">OFF</em></h3><div class="bar"><i id="bar"></i></div><div id="lin">linear -</div></section>
+  </div>
+</footer>
+<div id="linkModal" class="modal" hidden>
+  <div class="modalBack" data-close></div>
+  <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="linkTitle">
+    <div class="modalHead">
+      <strong id="linkTitle">Remote Motion Link</strong>
+      <button id="linkClose" class="ghost" type="button" aria-label="Close">✕</button>
+    </div>
+    <div id="linkBody" class="modalBody">
+      <div id="linkRole" class="roleRow">
+        <button id="btnHost" class="primary" type="button">Host a Session</button>
+        <button id="btnJoin" type="button">Connect to Host</button>
+      </div>
+      <div id="linkHost" class="linkPane" hidden>
+        <div class="codeRow"><span>Session code</span><b id="hostCode" class="code">--------</b></div>
+        <div class="statusRow"><span id="hostStatus" class="status">Idle</span></div>
+        <button id="btnHostStop" type="button" hidden>Disconnect Device</button>
+      </div>
+      <div id="linkClient" class="linkPane" hidden>
+        <div class="statusRow"><span id="clientStatus" class="status">Idle</span></div>
+        <button id="btnClientStop" type="button" hidden>Disconnect</button>
+      </div>
+      <p id="linkMsg" class="linkMsg" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="js/gyro3d.js"></script>
+</body>
+</html>
