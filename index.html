@@ -130,6 +130,7 @@
         .loader-bg-pulse {
             position: absolute;
             inset: 0;
+            pointer-events: none;
             background:
                 radial-gradient(ellipse 60% 60% at 50% 50%, rgba(124, 158, 247, 0.08) 0%, transparent 70%);
             animation: loader-pulse 3s ease-in-out infinite;
@@ -1867,6 +1868,8 @@
 
         .dl-skip-btn {
             display: none;
+            position: relative;
+            z-index: 10;
             margin-top: 26px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border);
@@ -1943,55 +1946,6 @@
         #gif-custom-url-apply:hover {
             background: var(--primary);
             color: var(--on-primary);
-        }
-
-        .shaman-socials-bar {
-            position: fixed !important;
-            bottom: 20px !important;
-            right: 20px !important;
-            top: auto !important;
-            left: auto !important;
-            transform: none !important;
-            margin: 0 !important;
-            z-index: 999 !important;
-        }
-
-        .shaman-social-item {
-            width: 38px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-sub);
-            border-radius: 12px;
-            text-decoration: none;
-            transition: background 0.2s ease, color 0.2s ease, transform 0.25s var(--spring);
-        }
-
-        .shaman-social-item:hover {
-            background: var(--surface-hover);
-            color: var(--primary);
-            transform: translateY(-2px) scale(1.05);
-        }
-
-        .shaman-social-item:active {
-            transform: translateY(0) scale(0.95);
-        }
-
-        .shaman-social-item .material-icons-round {
-            font-size: 20px;
-        }
-
-        @media (max-width: 1023px) {
-            .shaman-socials-bar {
-                display: none !important;
-            }
-        }
-
-        @media (display-mode: standalone) {
-            .shaman-socials-bar {
-                bottom: 20px !important;
-            }
         }
 
         @media not (display-mode: standalone) {
@@ -2354,6 +2308,34 @@
             color: var(--text-sub);
         }
 
+        body[data-open-anim="oneui"] .app-library-page,
+        body[data-open-anim="oneui"] #settings-page,
+        body[data-open-anim="oneui"] #download-page {
+            transition: none !important;
+            transform: none !important;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        body[data-open-anim="oneui"] .app-library-page.oneui-visible,
+        body[data-open-anim="oneui"] #settings-page.oneui-visible,
+        body[data-open-anim="oneui"] #download-page.oneui-visible {
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+        body[data-open-anim="oneui"] #settings-page:not(.oneui-visible),
+        body[data-open-anim="oneui"] #settings-page:not(.oneui-visible) *,
+        body[data-open-anim="oneui"] .app-library-page:not(.oneui-visible),
+        body[data-open-anim="oneui"] .app-library-page:not(.oneui-visible) *,
+        body[data-open-anim="oneui"] #download-page:not(.oneui-visible),
+        body[data-open-anim="oneui"] #download-page:not(.oneui-visible) * {
+            visibility: hidden !important;
+            pointer-events: none !important;
+            transition: none !important;
+        }
+        body[data-open-anim="oneui"] #page {
+            transform-origin: center center;
+        }
+
     </style>
 </head>
 
@@ -2428,9 +2410,6 @@
             </div>
 
             <div class="bottombar">
-                <div class="bottombar-item" onclick="toggleSettings()" title="settings">
-                    <i class="material-icons-round">settings</i>
-                </div>
                 <button class="bottombar-item" id="pwa-install-btn-mobile" onclick="triggerPWAInstall(); createRipple(event)" style="display:none;" title="grab the app">
                     <i class="material-icons-round">download</i>
                 </button>
@@ -2442,9 +2421,9 @@
                         <div class="changelog-bubble-arrow"></div>
                     </div>
                 </a>
-                <a href="https://www.instagram.com/da.real.mastershaman?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="bottombar-item" title="master shaman instagram">
-                    <i class="material-icons-round">construction</i>
-                </a>
+                <div class="bottombar-item" onclick="toggleSettings()" title="settings">
+                    <i class="material-icons-round">settings</i>
+                </div>
             </div>
 
             <div class="section-header">
@@ -2573,12 +2552,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="shaman-socials-bar">
-            <a href="https://www.instagram.com/da.real.mastershaman?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="shaman-social-item" title="master shaman instagram">
-                <span class="material-icons-round">construction</span>
-            </a>
         </div>
 
     </div>
@@ -2733,7 +2706,14 @@
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
-                
+                <a href="./Tools/gyro3d" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">build</i>
+                    <div class="item-content">
+                        <div class="item-title">motion lab</div>
+                        <div class="item-subtitle">gyroscoping 3d object</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
             </div>
         </div>
     </div>
@@ -2751,7 +2731,8 @@
         <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">tweak whatever you want. changes kick in right away.</p>
 
         <div style="margin-top: 24px;">
-            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">visuals</h3>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">home background</h3>
+            <div class="item-subtitle">changes what prism's background display looks like</div>
             <div class="list-item" id="gif-toggle-container" style="cursor: pointer; justify-content: space-between;" onclick="if(navigator.onLine) toggleGifBackground()">
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <i class="material-icons-round item-icon">wallpaper</i>
@@ -2769,7 +2750,7 @@
                     <i class="material-icons-round item-icon">video_settings</i>
                     <div class="item-content">
                         <div class="item-title">video background</div>
-                        <div class="item-subtitle">cache a video file for your background</div>
+                        <div class="item-subtitle">upload a video file to change the background display</div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px; width: 100%;">
@@ -2799,6 +2780,7 @@
             </div>
 
             <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 20px; margin-bottom: 8px;">gif presets</h3>
+            <div class="item-subtitle">changes the gif in the background</div>
             <select id="gif-selector" class="setting-select" onchange="handleGifSelect(this.value)">
                 <option value="gif1">default gif</option>
                 <option value="gif2">gif 1</option>
@@ -2815,6 +2797,7 @@
         </div>
 
         <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 8px;">color themes</h3>
+        <div class="item-subtitle">changes the color theme of prism</div>
         <select id="theme-selector" class="setting-select" onchange="changeTheme(this.value)">
             <option value="blurple">good vibes (default)</option>
             <option value="amber">bright amber</option>
@@ -2823,13 +2806,18 @@
             <option value="mono">nostalgia</option>
         </select>
 
-        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 8px;">card style</h3>
+        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 8px;">glass cards</h3>
+        <div class="item-subtitle">changes how glass cards look like and how they move</div>
         <select id="card-layout-selector" class="setting-select" onchange="changeCardLayout(this.value)">
             <option value="bar">bar style (default)</option>
             <option value="tile">tile style</option>
         </select>
+        <select id="open-anim-selector" class="setting-select" onchange="changeOpenAnim(this.value)">
+            <option value="normal">default animations</option>
+            <option value="oneui">better animations</option>
+        </select>
 
-        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">performance</h3>
+        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">visuals & performance</h3>
         <div class="list-group">
             <div class="list-item" style="cursor: pointer; justify-content: space-between;"
                 onclick="toggleSetting('reduce-blur')">
@@ -2837,6 +2825,7 @@
                     <i class="material-icons-round item-icon">blur_off</i>
                     <div class="item-content">
                         <div class="item-title">reduce blur effects</div>
+                        <div class="item-subtitle">removes blur effects across prism, does not apply to other apps</div>
                     </div>
                 </div>
                 <i class="material-icons-round" id="icon-reduce-blur">toggle_off</i>
@@ -2846,6 +2835,7 @@
                     <i class="material-icons-round item-icon">motion_photos_off</i>
                     <div class="item-content">
                         <div class="item-title">reduced motion</div>
+                        <div class="item-subtitle">removes animations across prism, does not apply to other apps</div>
                     </div>
                 </div>
                 <i class="material-icons-round" id="icon-no-anim">toggle_off</i>
@@ -2916,18 +2906,18 @@
                     <div class="credits-role">creator, lead dev, ragebaiter, genshin player, exists on github</div>
                 </div>
             </a>
-            <a class="credits-entry" href="https://www.youtube.com/@ShinobiAkiraGD" target="_blank" rel="noopener noreferrer">
-                <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/shinobiakira.png" alt="">
-                <div>
-                    <div class="credits-name">ShinobiAkira</div>
-                    <div class="credits-role">youtuber, tester, GD player, has beef with atoms, exists on github</div>
-                </div>
-            </a>
             <a class="credits-entry" href="https://github.com/nokkum" target="_blank" rel="noopener noreferrer">
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/haku.png" alt="">
                 <div>
                     <div class="credits-name">Hakuシ</div>
                     <div class="credits-role">co-dev, tester, minecraft java modder, exists on github</div>
+                </div>
+            </a>
+            <a class="credits-entry" href="https://www.youtube.com/@ShinobiAkiraGD" target="_blank" rel="noopener noreferrer">
+                <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/shinobiakira.png" alt="">
+                <div>
+                    <div class="credits-name">ShinobiAkira</div>
+                    <div class="credits-role">youtuber, tester, GD player, has beef with atoms, exists on github</div>
                 </div>
             </a>
             <a class="credits-entry">
@@ -3024,6 +3014,459 @@
                 return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
             }
         };
+
+        const OneUIMotion = (function () {
+            const CONFIG = {
+                open: 380,
+                close: 300,
+                bgScale: 0.95,
+                bgBlur: 6,
+                bgDim: 0.6,
+                contentDelay: 0.35,
+                contentShift: 12,
+                easing: 'cubic-bezier(0.22, 0.25, 0, 1)',
+                feedbackScale: 0.96,
+                feedbackDuration: 100,
+                fallbackRadius: 24
+            };
+
+            const pages = new Map();
+            let lastOrigin = null;
+            let feedbackAnim = null;
+            let bgToken = 0;
+            let pageBGToken = 0;
+
+            function isOneUI() {
+                return document.body.dataset.openAnim === 'oneui';
+            }
+
+            function isReduced() {
+                return document.body.classList.contains('no-anim') ||
+                    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            }
+
+            function readRadius(el) {
+                const cs = getComputedStyle(el);
+                const r = cs.borderRadius || '0px';
+                const first = r.split(' ')[0];
+                return parseFloat(first) || 0;
+            }
+
+            function getFinalRadius(page) {
+                return readRadius(page);
+            }
+
+            function rectToInset(rect, base) {
+                return {
+                    top: Math.max(0, rect.top - base.top),
+                    right: Math.max(0, base.right - rect.right),
+                    bottom: Math.max(0, base.bottom - rect.bottom),
+                    left: Math.max(0, rect.left - base.left)
+                };
+            }
+
+            function insetString(inset, radius) {
+                return `inset(${inset.top}px ${inset.right}px ${inset.bottom}px ${inset.left}px round ${radius}px)`;
+            }
+
+            function getFallbackRect(page) {
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const size = 24;
+
+                if (vw >= 1024) {
+                    let cy = vh / 2;
+                    if (page && page.isConnected) {
+                        const r = page.getBoundingClientRect();
+                        if (r.height > 0) cy = r.top + r.height / 2;
+                    }
+                    const y = Math.min(vh - size, Math.max(0, cy - size / 2));
+                    return { top: y, left: vw - size, right: vw, bottom: y + size, width: size, height: size };
+                }
+
+                const x = vw / 2 - size / 2;
+                const y = vh - 80;
+                return { top: y, left: x, right: x + size, bottom: y + size, width: size, height: size };
+            }
+
+            function getOriginRect(el) {
+                if (el && el.isConnected) {
+                    const r = el.getBoundingClientRect();
+                    if (r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight) {
+                        return r;
+                    }
+                }
+                return getFallbackRect();
+            }
+
+            function setOrigin(el) {
+                lastOrigin = el;
+            }
+
+            function feedback(el) {
+                if (!isOneUI() || isReduced() || !el) return;
+                if (feedbackAnim) feedbackAnim.cancel();
+                feedbackAnim = el.animate(
+                    [{ transform: 'scale(1)' }, { transform: `scale(${CONFIG.feedbackScale})` }],
+                    { duration: CONFIG.feedbackDuration, easing: 'ease-out', fill: 'forwards', composite: 'add' }
+                );
+            }
+
+            function releaseFeedback() {
+                if (feedbackAnim) {
+                    const anim = feedbackAnim;
+                    feedbackAnim = null;
+                    anim.reverse();
+                    anim.finished.then(() => anim.cancel()).catch(() => { });
+                }
+            }
+
+            function getController(page) {
+                if (!pages.has(page)) {
+                    pages.set(page, { anims: [], origin: null, contentAnims: [], token: 0 });
+                }
+                return pages.get(page);
+            }
+
+            function clearInline(page) {
+                page.style.removeProperty('will-change');
+                page.style.removeProperty('transform');
+                page.style.removeProperty('opacity');
+                page.style.removeProperty('clip-path');
+                page.style.removeProperty('filter');
+                page.style.removeProperty('visibility');
+                page.style.removeProperty('pointer-events');
+                page.style.removeProperty('transition');
+            }
+
+            function clearChildren(page) {
+                Array.from(page.children).forEach(child => {
+                    child.style.removeProperty('opacity');
+                    child.style.removeProperty('transform');
+                });
+            }
+
+            function cancelAnimations(page) {
+                const ctrl = getController(page);
+                ctrl.anims.forEach(a => { try { a.cancel(); } catch (e) { } });
+                ctrl.anims = [];
+                ctrl.contentAnims.forEach(a => { try { a.cancel(); } catch (e) { } });
+                ctrl.contentAnims = [];
+                if (feedbackAnim) { feedbackAnim.cancel(); feedbackAnim = null; }
+            }
+
+            function animateBackground(open) {
+                const bg = document.getElementById('page');
+                if (!bg) return [];
+                bgToken++;
+                const myBGToken = bgToken;
+                pageBGToken = myBGToken;
+                const anims = [];
+                const blurValue = document.body.classList.contains('reduce-blur') ? 0 : CONFIG.bgBlur;
+                const openFilter = `blur(${blurValue}px) brightness(${CONFIG.bgDim})`;
+                const closedFilter = 'blur(0px) brightness(1)';
+                const filterFrom = open ? closedFilter : openFilter;
+                const filterTo = open ? openFilter : closedFilter;
+
+                bg.style.willChange = 'transform, filter';
+                const transformAnim = bg.animate(
+                    [
+                        { transform: `scale(${open ? 1 : CONFIG.bgScale})` },
+                        { transform: `scale(${open ? CONFIG.bgScale : 1})` }
+                    ],
+                    { duration: open ? CONFIG.open : CONFIG.close, easing: CONFIG.easing, fill: 'forwards' }
+                );
+                anims.push(transformAnim);
+
+                const filterAnim = bg.animate(
+                    [{ filter: filterFrom }, { filter: filterTo }],
+                    { duration: open ? CONFIG.open : CONFIG.close, easing: CONFIG.easing, fill: 'forwards' }
+                );
+                anims.push(filterAnim);
+
+                anims.forEach(a => {
+                    a.finished.then(() => {
+                        if (a.playState === 'idle') return;
+                        if (pageBGToken !== bgToken) return;
+                        a.commitStyles();
+                        a.cancel();
+                        if (open) {
+                            bg.style.willChange = '';
+                        } else {
+                            bg.style.removeProperty('will-change');
+                            bg.style.removeProperty('transform');
+                            bg.style.removeProperty('filter');
+                        }
+                    }).catch(() => { });
+                });
+                return anims;
+            }
+
+            function open(page, originEl) {
+                if (!page) return;
+                if (!isOneUI()) {
+                    page.classList.add('open');
+                    if (originEl) lastOrigin = originEl;
+                    return;
+                }
+                if (isReduced()) {
+                    page.classList.add('open');
+                    page.classList.add('oneui-visible');
+                    page.style.visibility = 'visible';
+                    page.style.pointerEvents = 'auto';
+                    if (originEl) lastOrigin = originEl;
+                    return;
+                }
+
+                const ctrl = getController(page);
+                cancelAnimations(page);
+                const myToken = ++ctrl.token;
+
+                page.classList.add('open');
+                page.classList.add('oneui-visible');
+                page.style.visibility = 'visible';
+                page.style.pointerEvents = 'auto';
+
+                const finalRect = page.getBoundingClientRect();
+                const isDesktop = window.innerWidth >= 1024;
+                const originRect = isDesktop
+                    ? getFallbackRect(page)
+                    : (originEl ? getOriginRect(originEl) : (ctrl.origin || getFallbackRect(page)));
+                ctrl.origin = originRect;
+
+                const startRadius = (originEl && !isDesktop) ? readRadius(originEl) : CONFIG.fallbackRadius;
+                const endRadius = getFinalRadius(page);
+
+                const insetStart = rectToInset(originRect, finalRect);
+                const insetEnd = { top: 0, right: 0, bottom: 0, left: 0 };
+
+                const clipFrom = insetString(insetStart, startRadius);
+                const clipTo = insetString(insetEnd, endRadius);
+
+                page.style.willChange = 'clip-path, opacity';
+                page.style.clipPath = clipFrom;
+                page.style.opacity = '0';
+
+                const duration = CONFIG.open;
+                const easing = CONFIG.easing;
+
+                const clipAnim = page.animate(
+                    [{ clipPath: clipFrom }, { clipPath: clipTo }],
+                    { duration, easing, fill: 'forwards' }
+                );
+
+                const opacityAnim = page.animate(
+                    [{ opacity: 0 }, { opacity: 1 }],
+                    { duration: duration * 0.6, easing: 'linear', fill: 'forwards' }
+                );
+
+                ctrl.anims.push(clipAnim, opacityAnim);
+
+                const children = Array.from(page.children);
+                const contentAnims = children.map(child => {
+                    return child.animate(
+                        [
+                            { opacity: 0, transform: `translateY(${CONFIG.contentShift}px)` },
+                            { opacity: 1, transform: 'translateY(0)' }
+                        ],
+                        {
+                            duration: duration * 0.65,
+                            delay: duration * CONFIG.contentDelay,
+                            easing: 'linear',
+                            fill: 'forwards'
+                        }
+                    );
+                });
+                ctrl.contentAnims = contentAnims;
+
+                const allAnims = [...ctrl.anims, ...contentAnims];
+                Promise.all(allAnims.map(a => a.finished.catch(() => { }))).then(() => {
+                    if (ctrl.token !== myToken) return;
+                    allAnims.forEach(a => { try { a.commitStyles(); a.cancel(); } catch (e) { } });
+                    page.style.removeProperty('will-change');
+                    page.style.removeProperty('clip-path');
+                    page.style.removeProperty('opacity');
+                    page.style.pointerEvents = 'auto';
+                    clearChildren(page);
+                    ctrl.anims = [];
+                    ctrl.contentAnims = [];
+                });
+
+                const bgAnims = animateBackground(true);
+                ctrl.anims.push(...bgAnims);
+            }
+
+            function close(page) {
+                if (!page) return;
+                if (!page.classList.contains('open') && !page.classList.contains('oneui-visible')) return;
+
+                if (!isOneUI()) {
+                    page.classList.remove('open');
+                    return;
+                }
+                if (isReduced()) {
+                    page.classList.remove('open');
+                    page.classList.remove('oneui-visible');
+                    page.style.visibility = 'hidden';
+                    page.style.pointerEvents = 'none';
+                    return;
+                }
+
+                const ctrl = getController(page);
+                cancelAnimations(page);
+                const myToken = ++ctrl.token;
+
+                page.classList.remove('open');
+                page.classList.add('oneui-visible');
+
+                const finalRect = page.getBoundingClientRect();
+                const isDesktop = window.innerWidth >= 1024;
+                const originEl = isDesktop ? null : lastOrigin;
+                let originRect = ctrl.origin || getFallbackRect(page);
+                if (originEl && originEl.isConnected) {
+                    const r = originEl.getBoundingClientRect();
+                    if (r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight) {
+                        originRect = r;
+                    }
+                }
+                if (isDesktop) originRect = getFallbackRect(page);
+
+                const startRadius = getFinalRadius(page);
+                const endRadius = originEl ? readRadius(originEl) : CONFIG.fallbackRadius;
+
+                const insetStart = { top: 0, right: 0, bottom: 0, left: 0 };
+                const insetEnd = rectToInset(originRect, finalRect);
+
+                const clipFrom = insetString(insetStart, startRadius);
+                const clipTo = insetString(insetEnd, endRadius);
+
+                page.style.willChange = 'clip-path, opacity';
+                page.style.clipPath = clipFrom;
+                page.style.opacity = '1';
+
+                const duration = CONFIG.close;
+                const easing = CONFIG.easing;
+
+                const children = Array.from(page.children);
+                const contentAnims = children.map(child => {
+                    return child.animate(
+                        [
+                            { opacity: 1, transform: 'translateY(0)' },
+                            { opacity: 0, transform: `translateY(${CONFIG.contentShift}px)` }
+                        ],
+                        { duration: 120, easing: 'linear', fill: 'forwards' }
+                    );
+                });
+                ctrl.contentAnims = contentAnims;
+
+                const clipAnim = page.animate(
+                    [{ clipPath: clipFrom }, { clipPath: clipTo }],
+                    { duration, easing, fill: 'forwards', delay: 120 }
+                );
+
+                const opacityAnim = page.animate(
+                    [{ opacity: 1 }, { opacity: 0 }],
+                    { duration: duration * 0.4, easing: 'linear', fill: 'forwards', delay: duration * 0.6 }
+                );
+
+                ctrl.anims.push(clipAnim, opacityAnim);
+
+                const bgAnims = animateBackground(false);
+                ctrl.anims.push(...bgAnims);
+
+                const allAnims = [...ctrl.anims, ...contentAnims];
+                Promise.all(allAnims.map(a => a.finished.catch(() => { }))).then(() => {
+                    if (ctrl.token !== myToken) return;
+                    allAnims.forEach(a => { try { a.commitStyles(); a.cancel(); } catch (e) { } });
+                    page.style.removeProperty('will-change');
+                    page.style.removeProperty('clip-path');
+                    page.style.removeProperty('opacity');
+                    page.classList.remove('oneui-visible');
+                    page.style.visibility = 'hidden';
+                    page.style.pointerEvents = 'none';
+                    clearChildren(page);
+                    ctrl.anims = [];
+                    ctrl.contentAnims = [];
+                });
+            }
+
+            function reset() {
+                pages.forEach((ctrl, page) => {
+                    cancelAnimations(page);
+                    clearInline(page);
+                    clearChildren(page);
+                    page.classList.remove('oneui-visible');
+                });
+                const bg = document.getElementById('page');
+                if (bg) {
+                    bg.style.removeProperty('will-change');
+                    bg.style.removeProperty('transform');
+                    bg.style.removeProperty('filter');
+                }
+                document.querySelectorAll('.app-library-page.open, #settings-page.open, #download-page.open').forEach(p => {
+                    if (isOneUI()) {
+                        p.classList.add('oneui-visible');
+                        p.style.visibility = 'visible';
+                        p.style.pointerEvents = 'auto';
+                    } else {
+                        p.classList.remove('oneui-visible');
+                        p.style.removeProperty('visibility');
+                        p.style.removeProperty('pointer-events');
+                    }
+                });
+                pages.clear();
+            }
+
+            function initDownloadObserver() {
+                const dl = document.getElementById('download-page');
+                if (!dl) return;
+                const obs = new MutationObserver(() => {
+                    if (!isOneUI()) return;
+                    if (dl.classList.contains('open') && !dl.dataset.oneuiAnim) {
+                        dl.dataset.oneuiAnim = '1';
+                        open(dl, null);
+                    }
+                });
+                obs.observe(dl, { attributes: true, attributeFilter: ['class'] });
+            }
+
+            function init() {
+                document.addEventListener('pointerdown', e => {
+                    if (!isOneUI()) return;
+                    const el = e.target.closest('.glass-card, .dt-glass-card, .bottombar-item, .settings-trigger');
+                    if (el) {
+                        setOrigin(el);
+                        feedback(el);
+                    }
+                }, true);
+
+                document.addEventListener('pointerup', releaseFeedback, true);
+                document.addEventListener('pointercancel', releaseFeedback, true);
+
+                initDownloadObserver();
+
+                window.addEventListener('resize', () => {
+                    if (!isOneUI()) return;
+                    document.querySelectorAll('.oneui-visible').forEach(p => {
+                        const ctrl = getController(p);
+                        if (ctrl.origin) {
+                            const finalRect = p.getBoundingClientRect();
+                            const inset = rectToInset(ctrl.origin, finalRect);
+                            p.style.clipPath = insetString(inset, getFinalRadius(p));
+                        }
+                    });
+                });
+            }
+
+            return {
+                init,
+                open,
+                close,
+                reset,
+                setOrigin,
+                get lastOrigin() { return lastOrigin; }
+            };
+        })();
 
         function triggerPWAInstall() {
             if (!_pwaInstallPrompt) return;
@@ -3168,6 +3611,12 @@
             localStorage.setItem('prism-card-layout', layout);
         }
 
+        function changeOpenAnim(value) {
+            document.body.dataset.openAnim = value;
+            localStorage.setItem('prism-open-anim', value);
+            OneUIMotion.reset();
+        }
+
         (function loadSavedCardLayout() {
             const saved = localStorage.getItem('prism-card-layout');
             if (saved) {
@@ -3175,6 +3624,14 @@
                 document.getElementById('card-layout-selector').value = saved;
             }
         })();
+
+        (function loadSavedOpenAnim() {
+            const saved = localStorage.getItem('prism-open-anim') || 'normal';
+            document.body.dataset.openAnim = saved;
+            const sel = document.getElementById('open-anim-selector');
+            if (sel) sel.value = saved;
+        })();
+        OneUIMotion.init();
 
         (function initPerformanceState() {
             ['reduce-blur', 'no-anim'].forEach(className => {
@@ -3449,6 +3906,7 @@
             let skippedByUser = false;
             let downloadComplete = false;
             let storeComplete = false;
+            let aborted = false;
 
             let settleTimer = null;
 
@@ -3470,7 +3928,8 @@
                 setOverall(100);
                 dlTitle.textContent = 'update finished';
                 dlSub.textContent = 'update complete';
-                if (freshVersion) localStorage.setItem('PRISM_SW_VERSION', freshVersion);
+                const savedV = freshVersion || window.__PRISM_PENDING_VERSION__;
+                if (savedV) localStorage.setItem('PRISM_SW_VERSION', savedV);
                 setTimeout(() => {
                     alert('Prism Update\n\nPrism has been fully updated. Click OK to restart.');
                     window.location.reload();
@@ -3532,6 +3991,7 @@
                     setPhase('dl-phase-check', 'done', `${total} / ${total}`, 'check_circle');
 
                     if (ok === 0) {
+                        aborted = true;
                         dlTitle.textContent = 'nothing to download';
                         dlSub.textContent = `${skipped} asset${skipped !== 1 ? 's' : ''} unreachable`;
                         setPhase('dl-phase-download', 'error', `0 / ${total}`, 'warning');
@@ -3658,11 +4118,6 @@
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid2.mp3',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid3.mp3',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid4.mp3',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ground.png',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/ramp.png',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/stairs.png',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pool.png',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/pillars.png',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/obj_glass.png',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/ground_texturepbr.zip',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/rampstairs_texturepbr.zip',
@@ -3749,7 +4204,7 @@
                     if (vMatch) freshVersion = vMatch[1];
                 } catch (_) { }
 
-                const swUrl = `/sw.js?update=${Date.now()}&standalone=${isStandalone}&includeGames=${_includeGames}`;
+                const swUrl = `/sw.js?update=${Date.now()}&standalone=${isStandalone}&includeGames=${_includeGames}&forceInstall=true`;
                 await navigator.serviceWorker.register(swUrl);
 
             } catch (err) {
@@ -3878,8 +4333,10 @@
             const isOpening = !page.classList.contains('open');
             if (isOpening) {
                 closeAllModals();
+                OneUIMotion.open(page, OneUIMotion.lastOrigin);
+            } else {
+                OneUIMotion.close(page);
             }
-            page.classList.toggle('open');
         }
 
         (function initPWAStatus() {
@@ -3956,18 +4413,22 @@
         })();
 
         function openModal(id) {
-            closeAllModals();
-            document.getElementById('settings-page').classList.remove('open');
             const targetPanel = document.getElementById(id);
-            if(targetPanel) {
-                targetPanel.classList.add('open');
-                document.body.style.overflow = 'hidden';
+            if (!targetPanel) return;
+            const settings = document.getElementById('settings-page');
+            if (settings.classList.contains('open')) {
+                OneUIMotion.close(settings);
             }
+            document.querySelectorAll('.app-library-page.open').forEach(function (panel) {
+                if (panel !== targetPanel) OneUIMotion.close(panel);
+            });
+            OneUIMotion.open(targetPanel, OneUIMotion.lastOrigin);
+            document.body.style.overflow = 'hidden';
         }
 
         function closeAllModals() {
-            document.querySelectorAll('.app-library-page').forEach(function (panel) {
-                panel.classList.remove('open');
+            document.querySelectorAll('.app-library-page.open').forEach(function (panel) {
+                OneUIMotion.close(panel);
             });
             if (!document.getElementById('settings-page').classList.contains('open')) {
                 document.body.style.overflow = '';
@@ -4050,7 +4511,7 @@
 
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register(
-                    `/sw.js?standalone=${isStandalone}&includeGames=${isStandalone}`
+                    `/sw.js?standalone=${isStandalone}&includeGames=false`
                 );
             }
 
@@ -4554,15 +5015,15 @@
                             const ok = confirm(`Prism Update\n\nWe have found a new version for you: ${liveVersion}\n\nDo you want to update now? You can click OK to proceed.\nClick CANCEL to decline.`);
                             if (ok) {
                                 killStartupLoader();
-                                localStorage.setItem(SW_VERSION_KEY, liveVersion);
+                                window.__PRISM_PENDING_VERSION__ = liveVersion;
                                 clearAndRecache('full');
                             }
                         } else {
                             localStorage.setItem(SW_VERSION_KEY, liveVersion);
-                            navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=${isStandalone}`);
+                            navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=false`);
                         }
                     } else {
-                        navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=${isStandalone}`);
+                        navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=false`);
                     }
                 });
         }

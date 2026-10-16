@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v5.0.1-Prismatic';
+const CACHE_NAME = 'v5.1.0-Quail';
 
 const CORE_URLS = [
     '/',
