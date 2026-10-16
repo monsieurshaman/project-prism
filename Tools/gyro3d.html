@@ -49,28 +49,6 @@ h3 em{font-style:normal;color:var(--mut);font-weight:400;margin-left:4px}
 @media (max-width:640px){#grid{grid-template-columns:1fr 1fr;gap:6px 10px}#sensWrap{margin-left:0;width:100%}#sens{flex:1}}
 @media (max-height:500px){#sensWrap,#status{display:none}#brand{margin-bottom:4px}}
 @media (prefers-reduced-motion:reduce){body[data-live="1"] .dot{animation:none}}
-.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center}
-.modal[hidden]{display:none}
-.modalBack{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
-.modalCard{position:relative;width:min(100% - 24px,380px);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.modalHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.modalHead strong{font-size:13px;letter-spacing:.02em}
-button.ghost{background:transparent;border-color:transparent;color:var(--mut);padding:4px 8px}
-button.ghost:hover{color:var(--txt)}
-.modalBody{display:flex;flex-direction:column;gap:10px}
-.roleRow{display:flex;gap:8px}
-.roleRow button{flex:1}
-.linkPane{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:10px}
-.linkPane[hidden]{display:none}
-.codeRow{display:flex;justify-content:space-between;align-items:center;font:11px var(--mono);color:var(--mut)}
-.code{font:700 20px var(--mono);letter-spacing:.18em;color:var(--cy)}
-.statusRow{font:11px var(--mono);color:var(--mut)}
-.status{color:var(--txt)}
-.status[data-s="err"]{color:var(--am)}
-.status[data-s="ok"]{color:var(--lm)}
-.status[data-s="wait"]{color:var(--cy)}
-.linkMsg{margin:0;min-height:14px;font:11px var(--mono);color:var(--am)}
-.linkMsg:empty{display:none}
 </style>
 </head>
 <body data-live="0">
@@ -79,7 +57,6 @@ button.ghost:hover{color:var(--txt)}
   <div id="brand"><span class="dot"></span><strong>Motion Lab</strong><span id="mode" class="badge" data-mode="MOUSE MODE">MOUSE MODE</span></div>
   <div id="controls">
     <button id="btnEnable" class="primary" type="button">Enable Motion Sensors</button>
-    <button id="btnConnect" type="button">Connect Device</button>
     <button id="btnPause" type="button">Pause</button>
     <button id="btnReset" type="button">Reset orientation</button>
     <label id="sensWrap" for="sens">Sensitivity <input id="sens" type="range" min="0.25" max="2.5" step="0.05" value="1"><output id="sensOut">1.00x</output></label>
@@ -95,33 +72,7 @@ button.ghost:hover{color:var(--txt)}
     <section><h3>Motion<em id="mstate">OFF</em></h3><div class="bar"><i id="bar"></i></div><div id="lin">linear -</div></section>
   </div>
 </footer>
-<div id="linkModal" class="modal" hidden>
-  <div class="modalBack" data-close></div>
-  <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="linkTitle">
-    <div class="modalHead">
-      <strong id="linkTitle">Remote Motion Link</strong>
-      <button id="linkClose" class="ghost" type="button" aria-label="Close">✕</button>
-    </div>
-    <div id="linkBody" class="modalBody">
-      <div id="linkRole" class="roleRow">
-        <button id="btnHost" class="primary" type="button">Host a Session</button>
-        <button id="btnJoin" type="button">Connect to Host</button>
-      </div>
-      <div id="linkHost" class="linkPane" hidden>
-        <div class="codeRow"><span>Session code</span><b id="hostCode" class="code">--------</b></div>
-        <div class="statusRow"><span id="hostStatus" class="status">Idle</span></div>
-        <button id="btnHostStop" type="button" hidden>Disconnect Device</button>
-      </div>
-      <div id="linkClient" class="linkPane" hidden>
-        <div class="statusRow"><span id="clientStatus" class="status">Idle</span></div>
-        <button id="btnClientStop" type="button" hidden>Disconnect</button>
-      </div>
-      <p id="linkMsg" class="linkMsg" role="status" aria-live="polite"></p>
-    </div>
-  </div>
-</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="js/gyro3d.js"></script>
 </body>
 </html>
