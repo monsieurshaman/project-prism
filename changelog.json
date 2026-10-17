@@ -1,5 +1,5 @@
 {
-  "release": "v5.1.0-Quail",
-  "title": "Quail Patch 1",
-  "message": "Major bug fixes to Prism's Update System, also refined its UI. More updates coming soon..."
+  "release": "v5.2.0-Quail",
+  "title": "Quail Patch 2: Rift Runners 2D and Prism",
+  "message": "For Rift Runners 2D: We added a family of geometric enemies (diamond, pentagon and hexagon shooters plus an uncommon octagon blaster that makes up 20% of geo spawns and carries either a bazooka or a grenade), and each comes in small, medium, large and huge. Size changes how they move, aim and attack: small ones weave around fast and spray sloppy shots, while large and huge ones stand off at range, lead your movement, wind up with a flicker before firing fan bursts, and hit harder on contact. Blasters follow the same pattern, so bigger ones get bigger blasts, slower rockets and longer fuses. They’re rare in Moon (5% of spawns), slightly more common in Bloodmoon (38%), and 30% of spawns otherwise. On the player side, we built a combo system where every kill stacks a damage buff on your equipped weapon (zapper 1.2x, shotgun 1.1x, bazooka 1.7x, grenade 1.6x per stack, up to 5 stacks). The buff resets when you switch weapons and decays one stack at a time when you stop killing, with a gold xN tag on the weapon button and a rising blip on each stack. We also gave enemy bullet and blast hits on you the same raw synth damage sound that contact hits already used. Finally, we reined in the scaling: non-boss enemy HP now uses a multiplier capped at 6x plus an absolute ceiling of 200 HP so nothing turns immortal late-game, and the Anomaly phase now purges every leftover enemy right before the boss spawns. Updates for Sand Box 3D will be posted next Quail Patch."
 }

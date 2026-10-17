@@ -636,16 +636,135 @@
     <button id="close-shop-btn" class="menu-btn" style="margin-top:10px;">Back</button>
   </div>
 
-  <div id="rr-version-tag">RIFT VERSION: v2.7.1</div>
+  <div id="rr-version-tag">RIFT VERSION: v2.8.0</div>
   
   <script>
+        window.RRVault = (() => {
+      const DB_NAME = 'rr2d_vault';
+      const STORE = 'kv';
+      const KEY = 'shards';
+      const CACHE_NAME = 'rr2d-vault';
+      const CACHE_URL = './rr2d-vault/shards.json';
+
+      const openDb = () => new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          reject(new Error('idb unavailable'));
+          return;
+        }
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => req.result.createObjectStore(STORE);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+        req.onblocked = () => reject(new Error('idb blocked'));
+      });
+
+      const idbGet = async () => {
+        const db = await openDb();
+        return new Promise((resolve, reject) => {
+          const r = db.transaction(STORE, 'readonly').objectStore(STORE).get(KEY);
+          r.onsuccess = () => { db.close(); resolve(r.result); };
+          r.onerror = () => { db.close(); reject(r.error); };
+        });
+      };
+
+      const idbSet = async (json) => {
+        const db = await openDb();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, 'readwrite');
+          tx.objectStore(STORE).put(json, KEY);
+          tx.oncomplete = () => { db.close(); resolve(); };
+          tx.onerror = () => { db.close(); reject(tx.error); };
+          tx.onabort = () => { db.close(); reject(tx.error); };
+        });
+      };
+
+      const cacheGet = async () => {
+        if (!window.caches) throw new Error('cache unavailable');
+        const cache = await caches.open(CACHE_NAME);
+        const res = await cache.match(CACHE_URL);
+        return res ? await res.text() : undefined;
+      };
+
+      const cacheSet = async (json) => {
+        if (!window.caches) throw new Error('cache unavailable');
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(CACHE_URL, new Response(json, { headers: { 'Content-Type': 'application/json' } }));
+      };
+
+      const parse = (json) => {
+        try {
+          const obj = JSON.parse(json);
+          if (!obj || typeof obj !== 'object') return null;
+          const n = Number(obj.shards);
+          return {
+            shards: (Number.isFinite(n) && n >= 0) ? Math.floor(n) : 0,
+            upgrades: (obj.upgrades && typeof obj.upgrades === 'object') ? obj.upgrades : {}
+          };
+        } catch (e) {
+          return null;
+        }
+      };
+
+      const load = async () => {
+        try {
+          const v = parse(await idbGet());
+          if (v) return v;
+        } catch (e) {}
+        try {
+          const v = parse(await cacheGet());
+          if (v) return v;
+        } catch (e) {}
+        return { shards: 0, upgrades: {} };
+      };
+
+      const state = { shards: 0, upgrades: {} };
+
+      const ready = load().then(v => {
+        state.shards = v.shards;
+        state.upgrades = v.upgrades;
+        window._rrShardCache = v.shards;
+        return v;
+      });
+
+      let chain = ready;
+
+      const persist = () => {
+        const json = JSON.stringify({
+          shards: Math.max(0, Math.floor(Number(state.shards) || 0)),
+          upgrades: state.upgrades || {}
+        });
+        chain = chain.then(async () => {
+          try {
+            await idbSet(json);
+          } catch (e) {
+            try { await cacheSet(json); } catch (e2) {}
+          }
+        });
+        return chain;
+      };
+
+      const save = (n) => {
+        state.shards = Math.max(0, Math.floor(Number(n) || 0));
+        return persist();
+      };
+
+      const saveUpgrades = (u) => {
+        state.upgrades = Object.assign({}, u);
+        return persist();
+      };
+
+      const getUpgrades = () => Object.assign({}, state.upgrades);
+
+      return { ready, save, saveUpgrades, getUpgrades };
+    })();
+
     window.rrConfig = JSON.parse(localStorage.getItem('rr_custom_config')) || {
       colorBase: '#c8b8ff',
       colorCore: '#7060cc',
       weaponSkin: 'default'
     };
 
-    window._rrShopUpgrades = JSON.parse(localStorage.getItem('rr_shop_upgrades')) || {
+    window._rrDefaultShopUpgrades = {
       moreHp: 0,
       moreEchoes: 0,
       betterShield: 0,
@@ -657,15 +776,24 @@
       grenadeAoEDmg: 0
     };
 
+    window._rrShopUpgrades = Object.assign({}, window._rrDefaultShopUpgrades);
+
     window._rrSaveShopUpgrades = () => {
-      localStorage.setItem('rr_shop_upgrades', JSON.stringify(window._rrShopUpgrades));
+      window.RRVault.saveUpgrades(window._rrShopUpgrades);
     };
+
+    window.RRVault.ready.then((v) => {
+      window._rrShopUpgrades = Object.assign({}, window._rrDefaultShopUpgrades, v.upgrades || {});
+      if (typeof window._rrRenderShop === 'function' && document.getElementById('shop-view').style.display === 'flex') {
+        window._rrRenderShop();
+      }
+    });
 
     window._rrRenderShop = () => {
       const upg = window._rrShopUpgrades;
       const shards = (typeof window._rrShardCache === 'number' && window._rrShardCache >= 0)
         ? window._rrShardCache
-        : (parseInt(localStorage.getItem('rr_shards')) || 0);
+        : 0;
 
       window._rrPowerupUses = window._rrPowerupUses || {
         instant_hp: 0,
@@ -695,7 +823,7 @@
           label: 'More Echoes',
           desc: '+1 Echo Charge per purchase',
           cost: 199,
-          max: 3,
+          max: 4,
           current: upg.moreEchoes
         },
         {
@@ -711,7 +839,7 @@
           label: 'Zapper DMG',
           desc: '+25% Zapper DMG per purchase',
           cost: 159,
-          max: 4,
+          max: 6,
           current: upg.zapperDmg
         },
         {
@@ -719,7 +847,7 @@
           label: 'Shotgun DMG',
           desc: '+20% Shotgun DMG per purchase',
           cost: 169,
-          max: 4,
+          max: 6,
           current: upg.shotgunDmg
         },
         {
@@ -727,7 +855,7 @@
           label: 'Bazooka DMG',
           desc: '+50% Bazooka DMG per purchase',
           cost: 199,
-          max: 3,
+          max: 5,
           current: upg.bazookaDmg
         },
         {
@@ -735,7 +863,7 @@
           label: 'Grenade DMG',
           desc: '+40% Grenade DMG per purchase',
           cost: 179,
-          max: 3,
+          max: 5,
           current: upg.grenadeDmg
         },
         {
@@ -743,7 +871,7 @@
           label: 'Bazooka AoE',
           desc: '+50% AoE DMG (Bazooka)',
           cost: 259,
-          max: 2,
+          max: 3,
           current: upg.bazookaAoEDmg
         },
         {
@@ -751,7 +879,7 @@
           label: 'Grenade AoE',
           desc: '+40% AoE DMG (Grenade)',
           cost: 239,
-          max: 2,
+          max: 3,
           current: upg.grenadeAoEDmg
         },
         {
@@ -838,7 +966,7 @@
     window._rrBuyShopItem = (key, cost, max, isInstant) => {
       let shards = (typeof window._rrShardCache === 'number' && window._rrShardCache >= 0)
         ? window._rrShardCache
-        : (parseInt(localStorage.getItem('rr_shards')) || 0);
+        : 0;
       if (shards < cost) return;
 
       const activeScene = (window.game || window.rrGame || window.RiftRun?._game)?.scene?.getScene('MainScene');
@@ -859,7 +987,7 @@
 
         shards -= cost;
         window._rrShardCache = shards;
-        localStorage.setItem('rr_shards', shards);
+        window.RRVault.save(shards);
         window._rrPowerupUses[key] = (window._rrPowerupUses[key] || 0) + 1;
 
         if (key === 'instant_hp') {
@@ -906,7 +1034,7 @@
       if (upg[key] >= max) return;
       shards -= cost;
       window._rrShardCache = shards;
-      localStorage.setItem('rr_shards', shards);
+      window.RRVault.save(shards);
       upg[key]++;
       window._rrSaveShopUpgrades();
       window._rrRenderShop();
@@ -1057,6 +1185,49 @@
         enemy_fast: { r: 8, ox: 2, oy: 2 },
         enemy_boss: { r: 30, ox: 2, oy: 2 }
       };
+
+      const COMBO_BUFF = { zapper: 1.2, shotgun: 1.1, bazooka: 1.7, grenade: 1.6 };
+      const COMBO_MAX = 5;
+      const COMBO_DECAY = 3000;
+
+      const ENEMY_SCALE_CAP = 6;
+      const ENEMY_HP_CAP = 200;
+
+      const GEO_SPAWN = { base: 0.30, moon: 0.05, blood: 0.38, blaster: 0.20 };
+
+      const GEO_SHAPES = {
+        diamond: { n: 4, hp: 2, speed: 130, score: 120, tint: 0x30e0ff },
+        pentagon: { n: 5, hp: 3, speed: 110, score: 150, tint: 0x40ff90 },
+        hexagon: { n: 6, hp: 5, speed: 95, score: 200, tint: 0xffd030 },
+        octagon: { n: 8, hp: 4, speed: 90, score: 300, tint: 0xff3090, blaster: true }
+      };
+
+      const GEO_SIZES = {
+        small: { r: 9, hp: 0.5, speed: 1.45, score: 0.8, contact: 0.6, cd: 0.55, aim: 0.22, bulletSpeed: 440, burst: 1, arc: 0, dmg: 0.4, lead: 0, range: 380, hold: 0, weave: 0.7, charge: 0 },
+        medium: { r: 13, hp: 1, speed: 1, score: 1, contact: 1, cd: 1, aim: 0.12, bulletSpeed: 370, burst: 1, arc: 0, dmg: 0.65, lead: 0.35, range: 560, hold: 220, weave: 0.25, charge: 0 },
+        large: { r: 19, hp: 2.6, speed: 0.7, score: 2.2, contact: 1.4, cd: 1.4, aim: 0.06, bulletSpeed: 330, burst: 3, arc: 0.34, dmg: 0.6, lead: 0.7, range: 680, hold: 340, weave: 0, charge: 250 },
+        huge: { r: 26, hp: 5.5, speed: 0.5, score: 4.5, contact: 1.9, cd: 2, aim: 0.02, bulletSpeed: 300, burst: 5, arc: 0.5, dmg: 0.55, lead: 1, range: 780, hold: 460, weave: 0, charge: 450 }
+      };
+
+      const GEO_BLAST = {
+        small: { rocket: 480, aoeR: 95, aoeDmg: 12, cd: 2600, fuse: 1100, charge: 350, hold: 260, aim: 0.14, lead: 0.2 },
+        medium: { rocket: 420, aoeR: 125, aoeDmg: 16, cd: 3200, fuse: 1400, charge: 500, hold: 360, aim: 0.08, lead: 0.45 },
+        large: { rocket: 360, aoeR: 155, aoeDmg: 21, cd: 3900, fuse: 1700, charge: 650, hold: 460, aim: 0.04, lead: 0.75 },
+        huge: { rocket: 300, aoeR: 190, aoeDmg: 28, cd: 4800, fuse: 2000, charge: 800, hold: 560, aim: 0.02, lead: 1 }
+      };
+
+      const geoPoly = (g, cx, cy, rad, n, rot) => {
+        const pts = [];
+        for (let i = 0; i < n; i++) {
+          const a = rot + (i / n) * Math.PI * 2;
+          pts.push({ x: cx + Math.cos(a) * rad, y: cy + Math.sin(a) * rad });
+        }
+        for (let i = 0; i < n; i++) {
+          const p = pts[i];
+          const q = pts[(i + 1) % n];
+          g.fillTriangle(cx, cy, p.x, p.y, q.x, q.y);
+        }
+      };
       class MainScene extends Phaser.Scene {
         constructor() {
           super({ key: 'MainScene' });
@@ -1072,10 +1243,10 @@
             score: 0,
             currentWeapon: 'zapper',
             weapons: {
-              zapper: { name: 'Zip Zapper', ammo: 18, maxAmmo: 20, cooldown: 120, reloadTimer: 1200 },
-              shotgun: { name: 'Tactical Shotgun', ammo: 7, maxAmmo: 7, cooldown: 600, reloadTimer: 1800 },
-              bazooka: { name: 'Bazooka', ammo: 5, maxAmmo: 5, cooldown: 1500, reloadTimer: 2200 },
-              grenade: { name: 'Grenade', ammo: 4, maxAmmo: 4, cooldown: 800, reloadTimer: 1500 },
+              zapper: { name: 'Zip Zapper', ammo: 20, maxAmmo: 20, cooldown: 120, reloadTimer: 1100 },
+              shotgun: { name: 'Tactical Shotgun', ammo: 10, maxAmmo: 10, cooldown: 600, reloadTimer: 1500 },
+              bazooka: { name: 'Bazooka', ammo: 5, maxAmmo: 5, cooldown: 1500, reloadTimer: 1800 },
+              grenade: { name: 'Grenade', ammo: 4, maxAmmo: 4, cooldown: 800, reloadTimer: 1400 },
               nuke: { name: 'Nuke', ammo: 1, maxAmmo: 1, cooldown: 1000, reloadTimer: 99999 }
             },
             hp: _baseMaxHp,
@@ -1103,21 +1274,14 @@
             echoRechargeTimers: []
           };
           Object.defineProperty(this.pState, 'shards', {
-            get: () => parseInt(localStorage.getItem('rr_shards')) || 0,
+            get: () => (typeof window._rrShardCache === 'number' && isFinite(window._rrShardCache) && window._rrShardCache >= 0) ? window._rrShardCache : 0,
             set: (val) => {
-              localStorage.setItem('rr_shards', val);
+              const safe = (isFinite(val) && val >= 0) ? Math.floor(val) : 0;
+              window._rrShardCache = safe;
+              window.RRVault.save(safe);
             },
             configurable: true
           });
-          this.pState.shards = (() => {
-            if (typeof window._rrShardCache === 'number' && isFinite(window._rrShardCache) && window._rrShardCache >= 0) {
-              return window._rrShardCache;
-            }
-            const stored = parseInt(localStorage.getItem('rr_shards'));
-            const safe = (isFinite(stored) && stored >= 0) ? stored : 0;
-            window._rrShardCache = safe;
-            return safe;
-          })();
           this.gState = {
             level: 1,
             phase: 0,
@@ -1179,6 +1343,26 @@
           g.fillStyle(0xff1030); g.fillCircle(32, 32, 32);
           g.fillStyle(0xffa020); g.fillCircle(32, 32, 16);
           g.generateTexture('enemy_boss', 64, 64);
+          g.clear();
+          Object.keys(GEO_SHAPES).forEach(shape => {
+            const shp = GEO_SHAPES[shape];
+            Object.keys(GEO_SIZES).forEach(sizeKey => {
+              const rad = GEO_SIZES[sizeKey].r;
+              const c = rad + 3;
+              g.clear();
+              g.fillStyle(shp.tint);
+              geoPoly(g, c, c, rad, shp.n, 0);
+              g.fillStyle(0x1a0a20);
+              geoPoly(g, c, c, rad * 0.5, shp.n, 0);
+              if (shp.blaster) {
+                g.fillStyle(0xffee60);
+                geoPoly(g, c, c, rad * 0.26, 8, 0);
+              }
+              g.fillStyle(0xffffff);
+              g.fillCircle(c + rad * 0.66, c, Math.max(1.5, rad * 0.12));
+              g.generateTexture(`geo_${shape}_${sizeKey}`, c * 2, c * 2);
+            });
+          });
           g.clear();
           g.fillStyle(0xff0040); g.fillCircle(6, 6, 6);
           g.generateTexture('boss_bullet', 12, 12);
@@ -1306,6 +1490,7 @@
             this.playSfx(500, 'square', 0.08);
             this.pState.weapons[this.pState.currentWeapon].ammo = this.pState.ammo;
             this.pState.currentWeapon = type;
+            this._comboReset();
             this.pState.ammo = this.pState.weapons[type].ammo;
             this.pState.maxAmmo = this.pState.weapons[type].maxAmmo;
             this.pState.shootCooldown = 200;
@@ -1320,13 +1505,13 @@
           this.physics.add.overlap(this.bullets, this.walls, (b) => {
             if (!b.active) return;
             if (b.isNuke) this.nukeExplode(b.x, b.y);
-            else if (b.isRocket) this.aoeExplode(b.x, b.y, 160, 8);
-            else if (b.isGrenade) this.aoeExplode(b.x, b.y, 140, 5);
+            else if (b.isRocket) this.aoeExplode(b.x, b.y, 160, 8 * (b.comboMult || 1));
+            else if (b.isGrenade) this.aoeExplode(b.x, b.y, 140, 5 * (b.comboMult || 1));
             b.destroy();
           });
           this.physics.add.overlap(this.bossBullets, this.walls, (b) => {
             if (!b.active) return;
-            if (b.isRocket) this._bossAoeHit(b.x, b.y, 160, 25);
+            if (b.isRocket || b.isBlast) this._bossAoeHit(b.x, b.y, b.aoeR || 160, b.aoeDmg || 25);
             b.destroy();
           });
           this.physics.add.overlap(this.echoBullets, this.walls, (b) => { if (b.active) b.destroy(); });
@@ -1393,6 +1578,11 @@
             x = Phaser.Math.Between(0, this.worldSize);
             y = Phaser.Math.Between(0, this.worldSize);
           } while (Phaser.Math.Distance.Between(x, y, this.player.x, this.player.y) < 400);
+          const geoChance = this.gState.phase === 4 ? GEO_SPAWN.moon : this.gState.phase === 5 ? GEO_SPAWN.blood : GEO_SPAWN.base;
+          if (Math.random() < geoChance) {
+            this._spawnGeo(x, y);
+            return;
+          }
           const types = [
             { key: 'enemy_basic', hp: 3, speed: 120, score: 100, tint: 0xff4060 },
             { key: 'enemy_tank', hp: 8, speed: 80, score: 250, tint: 0xff8030 },
@@ -1407,7 +1597,7 @@
           const mult = 1 + (this.pState.score / 5000);
           const enemy = this.enemies.create(x, y, type.key);
           enemy.eType = type;
-          enemy.hp = type.hp * mult * (1 + (this.gState.level * 0.1));
+          enemy.hp = this._scaledHp(type.hp, mult * (1 + (this.gState.level * 0.1)));
           enemy.maxHp = enemy.hp;
           let speedMult = 1;
           if (this.gState.phase === 4) speedMult = 0.75;
@@ -1438,6 +1628,174 @@
           }
 
           this.gState.spawnedThisPhase++;
+        }
+        _comboMult(wpn) {
+          const m = COMBO_BUFF[wpn];
+          if (!m) return 1;
+          return 1 + (this.comboStacks || 0) * (m - 1);
+        }
+        _comboRender() {
+          document.querySelectorAll('.wpn-btn .combo-tag').forEach(e => e.remove());
+          if (!this.comboStacks) return;
+          const btn = document.getElementById(`wpn-${this.pState.currentWeapon}`);
+          if (!btn) return;
+          const tag = document.createElement('span');
+          tag.className = 'combo-tag';
+          tag.style.cssText = 'margin-left:8px;color:#ffd030;font-weight:bold;';
+          tag.textContent = `x${this.comboStacks}`;
+          btn.appendChild(tag);
+        }
+        _comboKill() {
+          const wpn = this.pState.currentWeapon;
+          if (!COMBO_BUFF[wpn]) return;
+          this.comboTimer = COMBO_DECAY;
+          const prev = this.comboStacks || 0;
+          if (prev >= COMBO_MAX) return;
+          this.comboStacks = prev + 1;
+          this.playSfx(500 + this.comboStacks * 120, 'square', 0.06);
+          const name = this.pState.weapons[wpn].name;
+          const mult = this._comboMult(wpn).toFixed(2);
+          this.logFeed(this.comboStacks >= COMBO_MAX ? `COMBO MAX // ${name} ${mult}x` : `COMBO x${this.comboStacks} // ${name} ${mult}x`);
+          this._comboRender();
+        }
+        _comboReset() {
+          if (!this.comboStacks) return;
+          this.comboStacks = 0;
+          this._comboRender();
+        }
+        _comboTick(delta) {
+          if (!this.comboStacks) return;
+          this.comboTimer -= delta;
+          if (this.comboTimer > 0) return;
+          this.comboStacks--;
+          this.comboTimer = COMBO_DECAY;
+          this.playSfx(260, 'triangle', 0.08);
+          this._comboRender();
+        }
+        _scaledHp(base, scale) {
+          return Math.min(ENEMY_HP_CAP, base * Math.min(ENEMY_SCALE_CAP, scale));
+        }
+        _spawnGeo(x, y) {
+          const blaster = Math.random() < GEO_SPAWN.blaster;
+          const sizeKey = blaster
+            ? Phaser.Math.RND.pick(['small', 'medium', 'medium', 'large', 'large', 'huge'])
+            : Phaser.Math.RND.pick(['small', 'small', 'medium', 'medium', 'large', 'huge']);
+          const shape = blaster ? 'octagon' : Phaser.Math.RND.pick(['diamond', 'pentagon', 'hexagon']);
+          const shp = GEO_SHAPES[shape];
+          const sz = GEO_SIZES[sizeKey];
+          const bl = blaster ? GEO_BLAST[sizeKey] : null;
+          const key = `geo_${shape}_${sizeKey}`;
+          const lvl = this.gState.level;
+          const phase = this.gState.phase;
+          const type = { key, hp: shp.hp, speed: shp.speed, score: Math.round(shp.score * sz.score), tint: shp.tint };
+          const enemy = this.enemies.create(x, y, key);
+          enemy.eType = type;
+          enemy.hp = this._scaledHp(type.hp * sz.hp, (1 + (this.pState.score / 5000)) * (1 + (lvl * 0.1)));
+          enemy.maxHp = enemy.hp;
+          const speedMult = phase === 4 ? 0.75 : phase === 5 ? 1.35 : 1;
+          enemy.baseSpeed = type.speed * sz.speed * (1 + (this.pState.score / 120000)) * (1 + (lvl * 0.04)) * speedMult;
+          enemy.setCollideWorldBounds(true);
+          enemy.setBounce(0.5);
+          enemy.setCircle(sz.r - 1, 4, 4);
+          enemy.isGeo = true;
+          enemy.geoSz = sz;
+          enemy.geoKind = blaster ? 'blaster' : 'shooter';
+          enemy.geoWpn = blaster ? Phaser.Math.RND.pick(['bazooka', 'grenade']) : 'gun';
+          enemy.geoBlast = bl;
+          enemy.contactMult = sz.contact;
+          enemy.geoPhase = Math.random() * Math.PI * 2;
+          enemy.geoWeave = blaster ? 0 : sz.weave;
+          enemy.geoHold = bl ? bl.hold : sz.hold;
+          enemy.geoRange = blaster ? (enemy.geoWpn === 'bazooka' ? 760 : 620) : sz.range;
+          enemy.geoChargeMs = bl ? bl.charge : sz.charge;
+          const phaseCd = phase === 4 ? 1.6 : phase === 5 ? 0.8 : 1;
+          enemy.geoCdMax = (bl ? bl.cd : 1700 * sz.cd) * Math.max(0.55, 1 - (lvl * 0.05)) * phaseCd;
+          enemy.geoCd = Phaser.Math.Between(900, 2200);
+          enemy.aimSpread = Math.max(0.01, (bl ? bl.aim : sz.aim) - (lvl * 0.01));
+          enemy.geoCharging = false;
+          enemy.geoChargeT = 0;
+          enemy.geoAngleOff = 0;
+          enemy.geoSpeedMult = 1;
+          if (blaster && sizeKey === 'huge') this.logFeed('HEAVY BLASTER INBOUND');
+          this.gState.spawnedThisPhase++;
+        }
+        _geoUpdate(enemy, delta, time, dist, hasLOS) {
+          enemy.geoAngleOff = 0;
+          enemy.geoSpeedMult = 1;
+          if (enemy.isFrozen) return;
+          if (enemy.geoWeave) enemy.geoAngleOff = Math.sin(time / 180 + enemy.geoPhase) * enemy.geoWeave;
+          if (enemy.geoHold && hasLOS) {
+            if (dist < enemy.geoHold * 0.7) {
+              enemy.geoAngleOff = Math.PI;
+              enemy.geoSpeedMult = 0.55;
+            } else if (dist < enemy.geoHold) {
+              enemy.geoSpeedMult = 0.2;
+            }
+          }
+          if (enemy.geoCharging) {
+            enemy.geoChargeT -= delta;
+            enemy.geoSpeedMult = 0;
+            enemy.setTint((Math.floor(time / 70) % 2) ? 0xffffff : enemy.eType.tint);
+            if (enemy.geoChargeT <= 0) {
+              enemy.geoCharging = false;
+              enemy.clearTint();
+              this._geoFire(enemy);
+              enemy.geoCd = enemy.geoCdMax * Phaser.Math.FloatBetween(0.85, 1.25);
+            }
+            return;
+          }
+          enemy.geoCd -= delta;
+          if (enemy.geoCd <= 0 && hasLOS && dist < enemy.geoRange) {
+            enemy.geoCharging = true;
+            enemy.geoChargeT = enemy.geoChargeMs;
+          }
+        }
+        _geoFire(enemy) {
+          if (!enemy.active) return;
+          const sz = enemy.geoSz;
+          const bl = enemy.geoBlast;
+          const px = this.player.x;
+          const py = this.player.y;
+          const vel = this.player.body.velocity;
+          const dist = Phaser.Math.Distance.Between(enemy.x, enemy.y, px, py);
+          const jitter = Phaser.Math.FloatBetween(-enemy.aimSpread, enemy.aimSpread);
+          if (enemy.geoWpn === 'bazooka') {
+            const t = (dist / bl.rocket) * bl.lead;
+            const aim = Phaser.Math.Angle.Between(enemy.x, enemy.y, px + vel.x * t, py + vel.y * t) + jitter;
+            const rocket = this._makeBullet(this.bossBullets, enemy.x + Math.cos(aim) * sz.r, enemy.y + Math.sin(aim) * sz.r, 'rocket', aim, bl.rocket);
+            rocket.isBlast = true;
+            rocket.aoeR = bl.aoeR;
+            rocket.aoeDmg = bl.aoeDmg;
+            this.cameras.main.shake(120, 0.006);
+          } else if (enemy.geoWpn === 'grenade') {
+            const fuseSec = bl.fuse / 1000;
+            const tx = px + vel.x * fuseSec * bl.lead;
+            const ty = py + vel.y * fuseSec * bl.lead;
+            const travel = Phaser.Math.Distance.Between(enemy.x, enemy.y, tx, ty);
+            const speed = Phaser.Math.Clamp(travel / fuseSec, 140, 420);
+            const aim = Phaser.Math.Angle.Between(enemy.x, enemy.y, tx, ty) + jitter;
+            const gren = this._makeBullet(this.bossBullets, enemy.x + Math.cos(aim) * sz.r, enemy.y + Math.sin(aim) * sz.r, 'grenade', aim, speed);
+            gren.isBlast = true;
+            gren.aoeR = bl.aoeR;
+            gren.aoeDmg = bl.aoeDmg;
+            this.time.delayedCall(bl.fuse, () => {
+              if (gren.active) {
+                this._bossAoeHit(gren.x, gren.y, bl.aoeR, bl.aoeDmg);
+                gren.destroy();
+              }
+            });
+          } else {
+            const t = (dist / sz.bulletSpeed) * sz.lead;
+            const aim = Phaser.Math.Angle.Between(enemy.x, enemy.y, px + vel.x * t, py + vel.y * t) + jitter;
+            for (let i = 0; i < sz.burst; i++) {
+              const off = sz.burst > 1 ? (i / (sz.burst - 1) - 0.5) * sz.arc : 0;
+              const a = aim + off;
+              const b = this._makeBullet(this.bossBullets, enemy.x + Math.cos(a) * sz.r, enemy.y + Math.sin(a) * sz.r, 'boss_bullet', a, sz.bulletSpeed);
+              b.dmgScale = sz.dmg;
+              b.setTint(enemy.eType.tint);
+            }
+            if (sz.burst > 2) this.cameras.main.shake(80, 0.004);
+          }
         }
         spawnBoss() {
           let x, y;
@@ -1574,12 +1932,14 @@
             this.playSfx(900, 'square', 0.06);
             const proj = this._makeBullet(this.bullets, this.player.x + Math.cos(angle) * 20, this.player.y + Math.sin(angle) * 20, 'bullet', angle, 800);
             proj.wpnType = 'zapper';
+            proj.comboMult = this._comboMult('zapper');
           } else if (wpnType === 'shotgun') {
             this.cameras.main.shake(100, 0.005);
             this.playSfx(180, 'sawtooth', 0.18);
             [-0.2, -0.1, 0, 0.1, 0.2].forEach(s => {
               const proj = this._makeBullet(this.bullets, this.player.x + Math.cos(angle + s) * 20, this.player.y + Math.sin(angle + s) * 20, 'bullet', angle + s, 700);
               proj.wpnType = 'shotgun';
+              proj.comboMult = this._comboMult('shotgun');
             });
           } else if (wpnType === 'bazooka') {
             this.cameras.main.shake(150, 0.008);
@@ -1587,12 +1947,14 @@
             const proj = this._makeBullet(this.bullets, this.player.x + Math.cos(angle) * 20, this.player.y + Math.sin(angle) * 20, 'rocket', angle, 500);
             proj.isRocket = true;
             proj.wpnType = 'bazooka';
+            proj.comboMult = this._comboMult('bazooka');
           } else if (wpnType === 'grenade') {
             this.cameras.main.shake(80, 0.004);
             this.playSfx(300, 'triangle', 0.12);
             const proj = this._makeBullet(this.bullets, this.player.x + Math.cos(angle) * 20, this.player.y + Math.sin(angle) * 20, 'grenade', angle, 400);
             proj.isGrenade = true;
             proj.wpnType = 'grenade';
+            proj.comboMult = this._comboMult('grenade');
             this.time.delayedCall(1000, () => {
               if (proj.active) {
                 const currentLvl = this.gState.level;
@@ -1601,7 +1963,7 @@
                 const upg = window._rrShopUpgrades || {};
                 const gDmg = 1 + (upg.grenadeDmg || 0) * 0.40;
                 const gAoE = 1 + (upg.grenadeAoEDmg || 0) * 0.40;
-                this.aoeExplode(proj.x, proj.y, 160 * aoeMultiplier, 8 * dmgMultiplier * gDmg * gAoE);
+                this.aoeExplode(proj.x, proj.y, 160 * aoeMultiplier, 8 * dmgMultiplier * gDmg * gAoE * (proj.comboMult || 1));
                 proj.destroy();
               }
             });
@@ -1656,14 +2018,14 @@
           if (bullet.isRocket) {
             const bDmg = 1 + (upg.bazookaDmg || 0) * 0.50;
             const bAoE = 1 + (upg.bazookaAoEDmg || 0) * 0.50;
-            this.aoeExplode(bullet.x, bullet.y, 160 * aoeMultiplier, 8 * dmgMultiplier * bDmg * bAoE);
+            this.aoeExplode(bullet.x, bullet.y, 160 * aoeMultiplier, 8 * dmgMultiplier * bDmg * bAoE * (bullet.comboMult || 1));
             bullet.destroy();
             return;
           }
           if (bullet.isGrenade) {
             const gDmg = 1 + (upg.grenadeDmg || 0) * 0.40;
             const gAoE = 1 + (upg.grenadeAoEDmg || 0) * 0.40;
-            this.aoeExplode(bullet.x, bullet.y, 140 * aoeMultiplier, 5 * dmgMultiplier * gDmg * gAoE);
+            this.aoeExplode(bullet.x, bullet.y, 140 * aoeMultiplier, 5 * dmgMultiplier * gDmg * gAoE * (bullet.comboMult || 1));
             bullet.destroy();
             return;
           }
@@ -1675,13 +2037,14 @@
           } else if (bullet.wpnType === 'shotgun') {
             baseDmg *= (1.7 + (upg.shotgunDmg || 0) * 0.25);
           }
-          enemy.hp -= baseDmg * dmgMultiplier;
+          enemy.hp -= baseDmg * dmgMultiplier * (bullet.comboMult || 1);
           enemy.setTintFill(0xffffff);
           this.time.delayedCall(50, () => { if (enemy.active) enemy.clearTint(); });
           this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, 5);
           if (enemy.hp <= 0) {
             this.playSfx(enemy.isBoss ? 90 : 250, 'sawtooth', enemy.isBoss ? 0.8 : 0.15);
             this.pState.score += enemy.eType.score;
+            this._comboKill();
             this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, enemy.isBoss ? 100 : 15);
             if (Math.random() < 0.15 && !enemy.isBoss) {
               const roll = Math.random();
@@ -1710,6 +2073,7 @@
               this.time.delayedCall(50, () => { if (enemy.active) enemy.clearTint(); });
               if (enemy.hp <= 0) {
                 this.pState.score += enemy.eType.score;
+                this._comboKill();
                 this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, enemy.isBoss ? 100 : 15);
                 if (Math.random() < 0.15 && !enemy.isBoss) {
                   const roll = Math.random();
@@ -1749,6 +2113,7 @@
 
               if (enemy.hp <= 0) {
                 this.pState.score += enemy.eType.score;
+                this._comboKill();
                 this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, enemy.isBoss ? 150 : 25);
                 if (Math.random() < 0.2 && !enemy.isBoss) {
                   const roll = Math.random();
@@ -1775,6 +2140,7 @@
           this.cameras.main.shake(200, 0.012);
           if (Phaser.Math.Distance.Between(x, y, this.player.x, this.player.y) <= radius) {
             if (this.pState.invincible > 0 || this.pState.isDashing) return;
+            this.playSfx(120, 'sawtooth', 0.2);
 
             if (this.pState.shieldActive) {
               this.pState.shieldHp -= damage;
@@ -1807,6 +2173,7 @@
           this.time.delayedCall(50, () => { if (enemy.active) enemy.clearTint(); });
           if (enemy.hp <= 0) {
             this.pState.score += enemy.eType.score;
+            this._comboKill();
             this.spawnParticles(enemy.x, enemy.y, enemy.eType.tint, 15);
             enemy.destroy();
             this.updateDOM();
@@ -1820,7 +2187,7 @@
           let dmgMult = 1;
           if (this.gState.phase === 4) dmgMult = 0.6;
           if (this.gState.phase === 5) dmgMult = 1.5;
-          const dmg = (enemy.isBoss ? 30 : 15) * (1 + (this.gState.level * 0.2)) * dmgMult;
+          const dmg = (enemy.isBoss ? 30 : 15) * (enemy.contactMult || 1) * (1 + (this.gState.level * 0.2)) * dmgMult;
           this.cameras.main.shake(200, 0.01);
 
           if (this.pState.shieldActive) {
@@ -1847,18 +2214,19 @@
         }
         hitPlayerBossProj(player, bullet) {
           if (this.pState.hp <= 0 || !bullet.active) return;
-          if (bullet.isRocket) {
+          if (bullet.isRocket || bullet.isBlast) {
             bullet.destroy();
-            this._bossAoeHit(bullet.x, bullet.y, 160, 25);
+            this._bossAoeHit(bullet.x, bullet.y, bullet.aoeR || 160, bullet.aoeDmg || 25);
             return;
           }
           bullet.destroy();
           if (this.pState.invincible > 0 || this.pState.isDashing) return;
+          this.playSfx(120, 'sawtooth', 0.2);
 
           let dmgMult = 1;
           if (this.gState.phase === 4) dmgMult = 0.6;
           if (this.gState.phase === 5) dmgMult = 1.5;
-          const dmg = 20 * (1 + (this.gState.level * 0.2)) * dmgMult;
+          const dmg = 20 * (bullet.dmgScale || 1) * (1 + (this.gState.level * 0.2)) * dmgMult;
           this.cameras.main.shake(200, 0.01);
 
           if (this.pState.shieldActive) {
@@ -1972,6 +2340,11 @@
           this.gState.spawnLimit = this.gState.phase === 4 ? 10 : this.gState.phase === 5 ? 28 : 15;
           this.gState.isBossPhase = (this.gState.phase === 3);
           this.gState.bossSpawned = false;
+          if (this.gState.phase === 3) {
+            this.enemies.getChildren().forEach(e => this.spawnParticles(e.x, e.y, e.eType ? e.eType.tint : 0xffffff, 8));
+            this.enemies.clear(true, true);
+            this.logFeed('ANOMALY: HOSTILES PURGED');
+          }
           this.cameras.main.shake(400, 0.015);
           const colors = [0x80b0ff, 0xff8060, 0x60ff90, 0xff3050, 0xd8e4ff, 0xff2040];
           this.flashRect.fillColor = colors[this.gState.phase];
@@ -2072,7 +2445,7 @@
           const earnedShards = Math.floor(this.pState.score / 100);
           this.pState.shards += earnedShards;
           window._rrShardCache = this.pState.shards;
-          localStorage.setItem('rr_shards', this.pState.shards);
+          window.RRVault.save(this.pState.shards);
 
           if (typeof window._rrResetRunUpgrades === 'function') {
             window._rrResetRunUpgrades();
@@ -2097,6 +2470,7 @@
         }
         update(time, delta) {
           if (!this.gState.isPlaying) return;
+          this._comboTick(delta);
 
           const currentEnemies = this.enemies.getLength();
           if (this.pState.echoRechargeTimers.length > 0) {
@@ -2449,6 +2823,8 @@
                 this.logFeed('ANOMALY: RIFT JUMP DETECTED');
                 enemy.teleportCooldown = Phaser.Math.Between(12000, 18000);
               }
+            } else if (enemy.isGeo) {
+              this._geoUpdate(enemy, delta, time, Phaser.Math.Distance.Between(enemy.x, enemy.y, this.player.x, this.player.y), hasLOS);
             } else if (enemy.hasWeapon) {
               enemy.shootCooldown -= delta;
               const dist = Phaser.Math.Distance.Between(enemy.x, enemy.y, this.player.x, this.player.y);
@@ -2469,8 +2845,10 @@
                 }
               }
             });
-            let finalVelX = Math.cos(finalAngle) * enemy.baseSpeed;
-            let finalVelY = Math.sin(finalAngle) * enemy.baseSpeed;
+            const moveAng = finalAngle + (enemy.geoAngleOff || 0);
+            const moveSpd = enemy.baseSpeed * (enemy.geoSpeedMult === undefined ? 1 : enemy.geoSpeedMult);
+            let finalVelX = Math.cos(moveAng) * moveSpd;
+            let finalVelY = Math.sin(moveAng) * moveSpd;
             if (pushX !== 0 || pushY !== 0) {
               const mag = Math.sqrt(pushX * pushX + pushY * pushY);
               finalVelX += (pushX / mag) * (enemy.baseSpeed * 0.6);
