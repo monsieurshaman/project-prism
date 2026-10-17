@@ -5030,5 +5030,68 @@
                 });
         }
     </script>
+<script>
+    async function wipeAllStorage() {
+        if ('caches' in window) {
+            const names = await caches.keys();
+            await Promise.all(names.map(n => caches.delete(n)));
+        }
+
+        if (indexedDB.databases) {
+            const dbs = await indexedDB.databases();
+            await Promise.all(dbs.filter(d => d && d.name).map(d => new Promise(res => {
+                const req = indexedDB.deleteDatabase(d.name);
+                req.onsuccess = req.onerror = req.onblocked = () => res();
+            })));
+        } else {
+            await Promise.all(['PrismDB', 'PrismVideoCacheDB'].map(name => new Promise(res => {
+                const req = indexedDB.deleteDatabase(name);
+                req.onsuccess = req.onerror = req.onblocked = () => res();
+            })));
+        }
+
+        if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map(r => r.unregister()));
+        }
+    }
+
+    function showDoNotCloseWarning() {
+        const warning = document.createElement('div');
+        warning.id = 'force-update-warning';
+        warning.textContent = 'Prism is doing forced updates, do not close Prism';
+        warning.style.cssText = 'position:fixed;top:16px;left:16px;z-index:700;background:#ff3b3b;color:#fff;font-family:"DM Sans",sans-serif;font-size:20px;font-weight:700;padding:14px 20px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.5);max-width:90vw;line-height:1.3;';
+        document.body.appendChild(warning);
+    }
+
+    async function forceUpdateFromUrl() {
+        const url = new URL(location.href);
+        if (url.searchParams.get('action') !== 'forceUpdate') return;
+
+        url.searchParams.delete('action');
+        history.replaceState(null, '', url.pathname + url.search + url.hash);
+
+        if (!navigator.onLine) {
+            alert('Prism Force Update\n\nYou are offline. Connect to the internet and try again.');
+            return;
+        }
+
+        if (!confirm('Prism Force Update\n\nThis will DELETE all Prism cache and IndexedDB data, then re-download everything (core + games).\n\nClick OK to proceed.\nClick CANCEL to decline.')) return;
+
+        showDoNotCloseWarning();
+        await wipeAllStorage();
+
+        setTimeout(() => {
+            const blackout = document.createElement('div');
+            blackout.style.cssText = 'position:fixed;inset:0;background:#000;z-index:550;';
+            document.body.appendChild(blackout);
+            killStartupLoader();
+            _includeGames = true;
+            clearAndRecache('full');
+        }, 500);
+    }
+
+    window.addEventListener('load', forceUpdateFromUrl);
+</script>
 </body>
 </html>
