@@ -2699,7 +2699,7 @@
         <div style="margin-top: 24px;">
             <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">home background</h3>
             <div class="item-subtitle">changes what prism's background display looks like</div>
-            <div class="list-item" id="gif-toggle-container" style="cursor: pointer; justify-content: space-between;" onclick="if(navigator.onLine) toggleGifBackground()">
+            <div class="list-item" id="gif-toggle-container" style="cursor: pointer; justify-content: space-between;" onclick="toggleGifBackground()">
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <i class="material-icons-round item-icon">wallpaper</i>
                     <div class="item-content">
@@ -2972,7 +2972,7 @@
         });
 
         window.addEventListener('offline', () => {
-            applyBgState(false);
+            applyBgState(localStorage.getItem('bg-gif-enabled') !== 'false');
         });
 
         window.__PRISM_ENV__ = {
@@ -4186,25 +4186,12 @@
             const status = document.getElementById('bg-status');
             const isOffline = !navigator.onLine;
 
-            if (isOffline) {
-                document.body.classList.add('no-gif');
-                icon.textContent = 'block';
-                icon.style.color = 'var(--text-muted)';
-                status.textContent = 'Network error (Disabled)';
-                return;
-            }
+            const note = isOffline ? ' (GIFs unavailable offline)' : '';
 
-            if (enabled) {
-                document.body.classList.remove('no-gif');
-                icon.textContent = 'toggle_on';
-                icon.style.color = 'var(--primary)';
-                status.textContent = 'Enabled';
-            } else {
-                document.body.classList.add('no-gif');
-                icon.textContent = 'toggle_off';
-                icon.style.color = 'var(--text-muted)';
-                status.textContent = 'Disabled';
-            }
+            document.body.classList.toggle('no-gif', isOffline || !enabled);
+            icon.textContent = enabled ? 'toggle_on' : 'toggle_off';
+            icon.style.color = enabled ? 'var(--primary)' : 'var(--text-muted)';
+            status.textContent = (enabled ? 'Enabled' : 'Disabled') + note;
         }
 
         var GIF_PRESETS = {
@@ -4307,18 +4294,13 @@
                 clearTimeout(hideTimer);
                 if (online) hideTimer = setTimeout(function () { el.classList.remove('visible'); }, 3000);
 
-                const recacheBtn = document.getElementById('recache-btn');
-                if (recacheBtn) {
-                    if (online) {
-                        recacheBtn.style.opacity = '1';
-                        recacheBtn.style.pointerEvents = 'auto';
-                        recacheBtn.style.cursor = 'pointer';
-                    } else {
-                        recacheBtn.style.opacity = '0.4';
-                        recacheBtn.style.pointerEvents = 'none';
-                        recacheBtn.style.cursor = 'not-allowed';
-                    }
-                }
+                ['recache-btn', 'recache-game-toggle'].forEach(function (id) {
+                    const target = document.getElementById(id);
+                    if (!target) return;
+                    target.style.opacity = online ? '1' : '0.4';
+                    target.style.pointerEvents = online ? 'auto' : 'none';
+                    target.style.cursor = online ? 'pointer' : 'not-allowed';
+                });
             }
 
             window.addEventListener('online', function () { setStatus(true); });
@@ -4339,15 +4321,7 @@
                 if (preset === 'custom') {
                     return localStorage.getItem('bg-gif-custom-url') || null;
                 } else {
-                    const presets = {
-                        gif1: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanZ1MzgydWxreXBhMDJzZTJ6ZWl1N2NndnUwOHRvajI5aTBlN3dzZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/SVCSsoKU5v6ZJLk07n/giphy.gif',
-                        gif2: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/32o1C0pz7HHC32ShtI/giphy.gif',
-                        gif3: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmU3NmRyOHlxZ293bGozd2tkM3YzaG5lOG9uajIxb3J3MHl3bXo3ciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hnq6UBZreLmGvwOtKH/giphy.gif',
-                        gif4: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/cCCWygFWkpChuiPlWi/giphy.gif',
-                        gif5: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/djwyA3ChGKC5VkrmPy/giphy.gif',
-                        gif6: 'https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3dTloOXRzNHF4bjh0MWZraW1xcHNpaHFwZ2Jzd2d4NXZ6cW1ucjl5ayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/7rdCcxQDPuMgW61B1p/giphy.gif'
-                    };
-                    return presets[preset] || presets.gif1;
+                    return GIF_PRESETS[preset] || GIF_PRESETS.gif1;
                 }
             }
 
