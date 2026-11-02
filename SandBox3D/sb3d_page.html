@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>sand box 3d</title>
+    <title>prism launcher: sand box 3d</title>
     <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -394,6 +394,10 @@
             filter: brightness(0.75) saturate(0.6);
         }
         body.no-gif .bg-gif { display: none !important; }
+
+        body.no-anim #physics-canvas {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -403,11 +407,6 @@
     </div>
     <div class="bg-overlay"></div>
 
-    <style>
-        body.no-anim #physics-canvas {
-            display: none !important;
-        }
-    </style>
     <canvas id="physics-canvas" style="position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.6;"></canvas>
 
     <div class="bg-gif"></div>
@@ -451,7 +450,7 @@
             </div>
 
             <p class="hero-desc">
-                prism's top-tier html-based 3d sandbox game based on babylon.js, cannon,js, and ammo.js
+                project prism's sandbox game based on babylon.js and cannon.js
             </p>
 
             <div class="platform-badge" id="platform-badge">
@@ -487,15 +486,23 @@
             const versionText = document.getElementById('version-text');
             const platformLabel = document.getElementById('platform-label');
 
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 900;
+            const ua = navigator.userAgent;
 
-            if (isMobile) {
+            if (/Windows/i.test(ua)) {
+                targetUrl = "SandBox3D_PC";
+                versionText.textContent = "Sand Box 3D: PC Edition";
+                platformLabel.textContent = "playable for you on pc";
+            } else if (/Android/i.test(ua)) {
                 targetUrl = "SandBox3D_Mobile";
-                versionText.textContent = "Sand Box 3D for Mobile";
+                versionText.textContent = "Sand Box 3D";
+                platformLabel.textContent = "playable for you on your phone";
+            } else if (window.innerWidth < 900) {
+                targetUrl = "SandBox3D_Mobile";
+                versionText.textContent = "Sand Box 3D";
                 platformLabel.textContent = "playable for you on your phone";
             } else {
                 targetUrl = "SandBox3D_PC";
-                versionText.textContent = "Sand Box 3D for PC";
+                versionText.textContent = "Sand Box 3D: PC Edition";
                 platformLabel.textContent = "playable for you on pc";
             }
         });

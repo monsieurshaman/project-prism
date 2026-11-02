@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v5.2.0-Quail';
+const CACHE_NAME = 'v5.3.0-Quail';
 
 const CORE_URLS = [
     '/',
@@ -41,11 +41,6 @@ const CORE_URLS = [
 ];
 
 const GAME_URLS = [
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dfavicon.svg',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dammo.js',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dmatyou.js',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3duianim_pc.js',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3duianim_mobile.js',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/blind.mp4',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/explode.mp3',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/neutral/neu1.mp3',
@@ -58,14 +53,6 @@ const GAME_URLS = [
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid2.mp3',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid3.mp3',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid4.mp3',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/obj_glass.png',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/ground_texturepbr.zip',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/rampstairs_texturepbr.zip',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/pillars_texturepbr.zip',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/pool_texturepbr.zip',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/rubber_texturepbr.zip',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/ice_texturepbr.zip',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/allobj_texturepbr.zip',
     'https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js',
     'https://cdn.jsdelivr.net/npm/babylonjs@9.11.0/babylon.js',
     'https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js',

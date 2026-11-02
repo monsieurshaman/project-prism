@@ -412,38 +412,21 @@
                 box-shadow: 0 0 6px rgba(74, 222, 128, 0.65);
             }
 
-            .changelog-bubble {
-                position: absolute;
-                bottom: calc(100% + 12px);
-                right: -8px;
-                background: var(--surface-1);
-                border: 1px solid var(--border-accent);
-                color: var(--text);
-                font-family: 'DM Sans', sans-serif;
-                font-size: 12px;
-                font-weight: 500;
-                white-space: nowrap;
-                padding: 9px 14px;
-                border-radius: var(--r-md);
-                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
-                animation: bubble-pop 0.4s var(--spring);
+            .bottombar-item.has-update {
+                color: var(--primary);
+                border-color: var(--primary);
+                animation: update-pulse-mobile 1.8s ease-in-out infinite;
             }
 
-            .changelog-bubble-arrow {
-                position: absolute;
-                bottom: -5px;
-                right: 16px;
-                width: 10px;
-                height: 10px;
-                background: var(--surface-1);
-                border-right: 1px solid var(--border-accent);
-                border-bottom: 1px solid var(--border-accent);
-                transform: rotate(45deg);
-            }
-
-            @keyframes bubble-pop {
-                0%   { opacity: 0; transform: translateY(6px) scale(0.9); }
-                100% { opacity: 1; transform: translateY(0) scale(1); }
+            @keyframes update-pulse-mobile {
+                0%, 100% {
+                    box-shadow: 0 0 0 0 rgba(124, 158, 247, 0.45), 0 0 8px rgba(124, 158, 247, 0.35);
+                    transform: scale(1);
+                }
+                50% {
+                    box-shadow: 0 0 0 7px rgba(124, 158, 247, 0), 0 0 18px rgba(124, 158, 247, 0.7);
+                    transform: scale(1.1);
+                }
             }
         }
 
@@ -2101,36 +2084,19 @@
         }
 
         @media (min-width: 1024px) {
-            #changelog-trigger-desktop .changelog-bubble {
-                position: absolute;
-                bottom: calc(100% + 10px);
-                left: 50%;
-                transform: translateX(-50%);
-                background: var(--surface-1);
-                border: 1px solid var(--border-accent);
+            #changelog-trigger-desktop.has-update {
                 color: var(--text);
-                font-family: 'DM Sans', sans-serif;
-                font-size: 12px;
-                font-weight: 500;
-                white-space: nowrap;
-                padding: 9px 14px;
-                border-radius: var(--r-md);
-                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
-                animation: bubble-pop 0.4s var(--spring);
-                pointer-events: none;
+                border-color: var(--primary);
+                animation: update-pulse-desktop 1.8s ease-in-out infinite;
             }
 
-            #changelog-trigger-desktop .changelog-bubble-arrow {
-                position: absolute;
-                bottom: -5px;
-                left: 50%;
-                margin-left: -5px;
-                width: 10px;
-                height: 10px;
-                background: var(--surface-1);
-                border-right: 1px solid var(--border-accent);
-                border-bottom: 1px solid var(--border-accent);
-                transform: rotate(45deg);
+            @keyframes update-pulse-desktop {
+                0%, 100% {
+                    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(124, 158, 247, 0.45), 0 0 14px rgba(124, 158, 247, 0.3);
+                }
+                50% {
+                    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25), 0 0 0 8px rgba(124, 158, 247, 0), 0 0 28px rgba(124, 158, 247, 0.65);
+                }
             }
         }
 
@@ -2416,10 +2382,6 @@
                 <a href="#" class="bottombar-item" id="changelog-trigger-mobile"
                     onclick="dismissChangelogBubble(); openModal('modal-changelog'); createRipple(event); return false;" style="display:none;" title="what's fresh?">
                     <i class="material-icons-round">notifications</i>
-                    <div class="changelog-bubble" id="changelog-bubble" style="display:none;">
-                        new update dropped 👀
-                        <div class="changelog-bubble-arrow"></div>
-                    </div>
                 </a>
                 <div class="bottombar-item" onclick="toggleSettings()" title="settings">
                     <i class="material-icons-round">settings</i>
@@ -2502,10 +2464,6 @@
                     onclick="dismissChangelogBubble(); openModal('modal-changelog'); createRipple(event);">
                     <i class="material-icons-round">notifications</i>
                     prism updates
-                    <div class="changelog-bubble" id="changelog-bubble-desktop" style="display:none;">
-                        new update dropped 👀
-                        <div class="changelog-bubble-arrow"></div>
-                    </div>
                 </button>
                 <div class="settings-trigger" onclick="toggleSettings()" style="top: 40px; right: 40px;">
                     <i class="material-icons-round">settings</i>
@@ -2581,6 +2539,14 @@
                     <div class="item-content">
                         <div class="item-title">rift runners 2d</div>
                         <div class="item-subtitle">top-down survival mayhem (pc only)</div>
+                    </div>
+                    <i class="material-icons-round item-arrow">chevron_right</i>
+                </a>
+                <a href="404.html" class="list-item" onclick="createRipple(event)">
+                    <i class="material-icons-round item-icon">help</i>
+                    <div class="item-content">
+                        <div class="item-title">coming soon...</div>
+                        <div class="item-subtitle">coming soon...</div>
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
@@ -2910,7 +2876,7 @@
                 <img class="credits-avatar" src="https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/haku.png" alt="">
                 <div>
                     <div class="credits-name">Hakuシ</div>
-                    <div class="credits-role">co-dev, tester, minecraft java modder, android app dev, exists on github</div>
+                    <div class="credits-role">co-dev, tester, minecraft java modder, exists on github</div>
                 </div>
             </a>
             <a class="credits-entry" href="https://www.youtube.com/@ShinobiAkiraGD" target="_blank" rel="noopener noreferrer">
@@ -3494,10 +3460,10 @@
         }
 
         function dismissChangelogBubble() {
-            const bubble = document.getElementById('changelog-bubble');
-            if (bubble) bubble.style.display = 'none';
-            const bubbleDesktop = document.getElementById('changelog-bubble-desktop');
-            if (bubbleDesktop) bubbleDesktop.style.display = 'none';
+            const mobileTrigger = document.getElementById('changelog-trigger-mobile');
+            if (mobileTrigger) mobileTrigger.classList.remove('has-update');
+            const desktopTrigger = document.getElementById('changelog-trigger-desktop');
+            if (desktopTrigger) desktopTrigger.classList.remove('has-update');
 
             fetch('changelog.json?t=' + Date.now(), { cache: 'no-store' })
                 .then(res => res.ok ? res.json() : null)
@@ -4103,11 +4069,6 @@
                 ];
 
                 const GAME_URLS = [
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dfavicon.svg',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dammo.js',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3dmatyou.js',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3duianim_pc.js',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3duianim_mobile.js',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/blind.mp4',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/explode.mp3',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/neutral/neu1.mp3',
@@ -4120,14 +4081,6 @@
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid2.mp3',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid3.mp3',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/midnight/mid4.mp3',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/obj_glass.png',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/ground_texturepbr.zip',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/rampstairs_texturepbr.zip',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/pillars_texturepbr.zip',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/pool_texturepbr.zip',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/rubber_texturepbr.zip',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/ice_texturepbr.zip',
-                    'https://cdn.jsdelivr.net/gh/monsieurshaman/sb3d-assets@main/allobj_texturepbr.zip',
                     'https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.min.js',
                     'https://cdn.jsdelivr.net/npm/babylonjs@9.11.0/babylon.js',
                     'https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js',
@@ -4620,10 +4573,8 @@
 
                         const seenRelease = localStorage.getItem('PRISM_SEEN_CHANGELOG');
                         if (data.release && data.release !== seenRelease) {
-                            const bubble = document.getElementById('changelog-bubble');
-                            if (bubble) bubble.style.display = 'block';
-                            const bubbleDesktop = document.getElementById('changelog-bubble-desktop');
-                            if (bubbleDesktop) bubbleDesktop.style.display = 'block';
+                            if (mobileTrigger) mobileTrigger.classList.add('has-update');
+                            if (desktopTrigger) desktopTrigger.classList.add('has-update');
                         }
                     })
                     .catch(err => {
@@ -4632,16 +4583,6 @@
                             'something is missing here...';
                     });
             }
-        });
-
-        document.addEventListener('click', (e) => {
-            const bubbleMobile = document.getElementById('changelog-bubble');
-            const bubbleDesktop = document.getElementById('changelog-bubble-desktop');
-            const mobileOpen = bubbleMobile && bubbleMobile.style.display !== 'none';
-            const desktopOpen = bubbleDesktop && bubbleDesktop.style.display !== 'none';
-            if (!mobileOpen && !desktopOpen) return;
-            if (e.target.closest('#changelog-trigger-mobile') || e.target.closest('#changelog-trigger-desktop')) return;
-            dismissChangelogBubble();
         });
 
         (function initCardPhysics() {
@@ -5014,12 +4955,7 @@
 
                     if (savedVersion !== liveVersion) {
                         if (isStandalone) {
-                            const ok = confirm(`Prism Update\n\nWe have found a new version for you: ${liveVersion}\n\nDo you want to update now? You can click OK to proceed.\nClick CANCEL to decline.`);
-                            if (ok) {
-                                killStartupLoader();
-                                window.__PRISM_PENDING_VERSION__ = liveVersion;
-                                clearAndRecache('full');
-                            }
+                            alert(`Prism Update\n\nWe have found a new version for you: ${liveVersion}\n\nYou can update Prism from its update option in Settings at any time you want.`);
                         } else {
                             localStorage.setItem(SW_VERSION_KEY, liveVersion);
                             navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=false`);
