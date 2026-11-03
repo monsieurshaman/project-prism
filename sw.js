@@ -1,13 +1,14 @@
-const CACHE_NAME = 'v5.2.5-Quail';
+const CACHE_NAME = 'v5.2.6-Quail';
 
 const CORE_URLS = [
     '/',
     '/index.html',
-    './SandBox3D/sb3d_page',
-    './RiftRunners2D/rr2d_page',
+    './SandBox3D/index',
+    './RiftRunners2D/index',
     './RiftRunners2D/RiftRunners2D',
     './SandBox3D/SandBox3D_PC',
     './SandBox3D/SandBox3D_Mobile',
+    './Other/index',
     './Other/ismycompteureron',
     './Other/devcheck',
     './Other/notmoving',
@@ -15,9 +16,12 @@ const CORE_URLS = [
     './Other/mathlol',
     './Other/coinsort',
     './Other/websend',
+    './Tools/index',
     './Tools/lapscan',
     './Tools/pixelpeek',
     './Tools/gyro3d',
+    // './JPS/index',
+    // './JPS/JiggleSim',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/ismycompteureron.js',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/devcheck.js',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/notmoving.js',

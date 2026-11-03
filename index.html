@@ -2525,7 +2525,7 @@
             <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">the flagship stuff we keep polished just for you.</p>
     
             <div class="library-grid">
-                <a href="./SandBox3D/sb3d_page" class="list-item" onclick="createRipple(event)">
+                <a href="./SandBox3D" class="list-item" onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">view_in_ar</i>
                     <div class="item-content">
                         <div class="item-title">sand box 3d</div>
@@ -2533,7 +2533,7 @@
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
-                <a href="./RiftRunners2D/rr2d_page" class="list-item list-item-disabled"
+                <a href="./RiftRunners2D" class="list-item list-item-disabled"
                     onclick="createRipple(event)">
                     <i class="material-icons-round item-icon">track_changes</i>
                     <div class="item-content">
@@ -2542,8 +2542,8 @@
                     </div>
                     <i class="material-icons-round item-arrow">chevron_right</i>
                 </a>
-                <a href="404.html" class="list-item" onclick="createRipple(event)">
-                    <i class="material-icons-round item-icon">help</i>
+                <a href="404.html" class="list-item" onclick="createRipple(event)"> <!--replace "404.html" with "./JPS" when Quail Patch 3 comes in-->
+                    <i class="material-icons-round item-icon">bubble_chart</i>
                     <div class="item-content">
                         <div class="item-title">coming soon...</div>
                         <div class="item-subtitle">coming soon...</div>
@@ -4031,11 +4031,12 @@
                 const CORE_URLS = [
                     '/',
                     '/index.html',
-                    './SandBox3D/sb3d_page',
-                    './RiftRunners2D/rr2d_page',
+                    './SandBox3D/index',
+                    './RiftRunners2D/index',
                     './RiftRunners2D/RiftRunners2D',
                     './SandBox3D/SandBox3D_PC',
                     './SandBox3D/SandBox3D_Mobile',
+                    './Other/index',
                     './Other/ismycompteureron',
                     './Other/devcheck',
                     './Other/notmoving',
@@ -4043,9 +4044,12 @@
                     './Other/mathlol',
                     './Other/coinsort',
                     './Other/websend',
+                    './Tools/index',
                     './Tools/lapscan',
                     './Tools/pixelpeek',
                     './Tools/gyro3d',
+                    // './JPS/index',
+                    // './JPS/JiggleSim',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/ismycompteureron.js',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/devcheck.js',
                     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/Other/js/notmoving.js',
@@ -4939,6 +4943,33 @@
                     }
                 });
         }
+    </script>
+    <script>
+        (function () {
+            const DEEP_LINK_ACTIONS = {
+                openToolsModal: 'modal-tools',
+                openOtherModal: 'modal-other'
+            };
+
+            function runDeepLink() {
+                const params = new URLSearchParams(window.location.search);
+                const action = params.get('action');
+                const modalId = DEEP_LINK_ACTIONS[action];
+                if (!modalId) return;
+
+                params.delete('action');
+                const query = params.toString();
+                history.replaceState(null, '', window.location.pathname + (query ? '?' + query : '') + window.location.hash);
+
+                requestAnimationFrame(() => openModal(modalId));
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', runDeepLink);
+            } else {
+                runDeepLink();
+            }
+        })();
     </script>
 </body>
 </html>
