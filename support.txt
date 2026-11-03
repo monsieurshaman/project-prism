@@ -21,8 +21,9 @@ device with a modern web browser can generally access the Prism website.
 However, access does not mean every platform receives the same
 capabilities.
 
-DEVICE SUPPORT POLICY Prism distinguishes between website access and
-full platform support.
+--- DEVICE SUPPORT POLICY --- 
+
+Prism distinguishes between website access and full platform support.
 
 1.  FULL SUPPORT — ANDROID: Android devices receive full support. Users
     can access Prism through a compatible modern browser. Supported
