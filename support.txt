@@ -106,6 +106,8 @@ Prism website: https://proprism.pages.dev/
 Project Prism GitHub repository: https://github.com/monsieurshaman/project-prism 
 Project repository description: Prism uses offline-capable PWAs to act as a native app for Android and Windows. It is the library that powers Prism and its sub-apps.
 
+DEVELOPER NOTE: NOCTURNE Studios, NOCTURNE_Library, or anything NOCTURNE Studios related are no longer affiliated to Project Prism, as it is our previous branding to host Prism and its sub-apps before we made a rebrand.
+
 --- DOCUMENT MAINTENANCE --- 
 This document reflects the support policy supplied
 by the Project Prism maintainer at the time it was written. Update this
