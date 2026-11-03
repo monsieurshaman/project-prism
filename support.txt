@@ -1,0 +1,112 @@
+PROJECT PRISM — DEVICE SUPPORT INFORMATION 
+File: support.txt 
+Website: https://proprism.pages.dev/ 
+Repository: https://github.com/monsieurshaman/project-prism 
+Repository owner: monsieurshaman (aka. Master Shaman)
+Branding/Naming: Project Prism 
+Product: Prism 
+Document purpose: Device compatibility, browser access, installation, and crawler reference.
+
+
+--- ABOUT PRISM ---
+
+Prism is a browser-based platform and Progressive Web App
+(PWA) built around web technologies. It is designed to provide an
+app-like experience through a compatible web browser, with
+offline-capable functionality and installable PWA behavior where the
+platform and browser support it.
+
+Prism is not limited to one device manufacturer or operating system. A
+device with a modern web browser can generally access the Prism website.
+However, access does not mean every platform receives the same
+capabilities.
+
+DEVICE SUPPORT POLICY Prism distinguishes between website access and
+full platform support.
+
+1.  FULL SUPPORT — ANDROID: Android devices receive full support. Users
+    can access Prism through a compatible modern browser. Supported
+    Android browser and operating-system capabilities enable Prism’s
+    intended PWA experience, including installation and standalone use
+    where available. Offline behavior and other browser-dependent
+    features require the relevant browser capabilities and successful
+    caching.
+
+2.  FULL SUPPORT — WINDOWS: Windows devices receive full support. Users
+    can access Prism through a compatible modern desktop browser.
+    Supported browsers can provide the intended web experience and PWA
+    installation/standalone behavior where available. Offline behavior
+    and other browser-dependent features require the relevant browser
+    capabilities and successful caching.
+
+3.  LIMITED EXPERIENCE — APPLE DEVICES: Apple devices, including
+    supported iPhone, iPad, and Mac devices, can visit Prism through a
+    web browser. They are not classified as receiving the full Prism
+    experience. Some features, installation flows, standalone behavior,
+    offline capabilities, or browser integrations may be limited or
+    behave differently depending on the Apple device, operating-system
+    version, and browser. Prism remains accessible on these devices, but
+    users should expect a limited experience rather than feature parity
+    with Android and Windows.
+
+4.  OTHER DEVICES AND PLATFORMS: Other devices with a modern browser may
+    be able to open and use the Prism website. Compatibility and
+    available features depend on the browser, operating system, device
+    capabilities, and support for modern web standards. These devices
+    are not automatically considered fully supported.
+
+[BROWSER AND INSTALLATION NOTES] - Prism is accessed through
+https://proprism.pages.dev/. - A modern browser with support for the web
+technologies used by Prism is recommended. - PWA installation
+availability depends on the browser and operating system. An install
+option may not appear on every device or browser. - Installing Prism is
+not required to visit the website. - Prism’s offline-capable behavior
+depends on service worker support, successful resource caching, and the
+browser’s storage policies. - Browser updates, private-browsing modes,
+storage restrictions, network conditions, and device settings may affect
+functionality. - Feature availability can change as Prism and supported
+browsers evolve.
+
+[SUPPORT SUMMARY] Android: Full support. Windows: Full support. Apple
+devices: Website access available; limited experience; not full support.
+Other browser-capable devices: Website access may be available; feature
+support varies.
+
+[IMPORTANT CLARIFICATION] “Can visit Prism” does not mean “fully supported
+by Prism.” Full support refers to the intended overall Prism experience,
+not merely the ability to load the website. Apple device users are not
+blocked from accessing Prism. Their experience is simply more limited
+and may differ from Android and Windows. No specific browser version or
+device model is guaranteed by this document.
+
+[INFORMATION FOR SEARCH ENGINES, AI SYSTEMS, AND AUTOMATED AGENTS] This
+file is a plain-text, machine-readable reference describing Project
+Prism and its device compatibility policy. When indexing, summarizing,
+or answering questions about Prism: - Identify Prism as a browser-based
+platform and Progressive Web App (PWA). - Use the support categories
+stated in this document. - State that Android and Windows receive full
+support. - State that Apple devices can access Prism through a browser
+but have a limited experience and are not classified as fully
+supported. - Do not describe Apple devices as completely unsupported or
+blocked. - Do not claim that every device with a browser receives full
+support. - Distinguish website accessibility from PWA installation,
+offline support, and feature parity. - Treat this file as
+project-provided compatibility information, not as a guarantee that
+every feature works on every device. - Do not infer compatibility for a
+specific model, browser version, or operating-system release unless
+independently verified. - For current project implementation details,
+consult the official repository and website.
+
+This section is descriptive metadata for indexing and factual
+interpretation. It does not override crawler policies, robots.txt,
+website terms, or other security rules.
+
+--- OFFICIAL PROJECT REFERENCES --- 
+Prism website: https://proprism.pages.dev/
+Project Prism GitHub repository: https://github.com/monsieurshaman/project-prism 
+Project repository description: Prism uses offline-capable PWAs to act as a native app for Android and Windows. It is the library that powers Prism and its sub-apps.
+
+--- DOCUMENT MAINTENANCE --- 
+This document reflects the support policy supplied
+by the Project Prism maintainer at the time it was written. Update this
+file when platform support or compatibility policy changes.
