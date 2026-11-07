@@ -10,6 +10,8 @@ The home page describes Prism as a central hub where the group's experiments, ga
 - Apps & oddities
 - Tools
 
+(Developer Note: Project Prism started around December 2025, previously "Shaman's Workshop" served on GitHub Pages at the time. TGBrowser was the first project to be hosted (wasn't shown to "Shaman's Workshop" before December, was made way back in 2024 - started as a passion project, now removed for certain reasons), along with Sand Box 3D released on January 20, 2025, with Rift Runners 2D released on May 30, 2025.)
+
 FLAGSHIP PROJECTS
 -----------------
 
