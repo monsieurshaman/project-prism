@@ -586,6 +586,7 @@
     <div id="settings-tabs" style="display:flex; gap:10px; margin-bottom:10px;">
       <button class="wpn-btn active" onclick="window.switchSettingsPage(1)" style="min-width:120px; text-align:center;">General</button>
       <button class="wpn-btn" onclick="window.switchSettingsPage(2)" style="min-width:120px; text-align:center;">Cosmetics</button>
+      <button class="wpn-btn" onclick="window.switchSettingsPage(3)" style="min-width:120px; text-align:center;">Help</button>
     </div>
   
     <div id="settings-page-1" style="color:#7060cc;font-size:14px;letter-spacing:2px; display:block;">
@@ -610,6 +611,89 @@
         </select>
       </div>
       <button class="menu-btn" onclick="window.saveCustomizations()" style="padding:10px; font-size:14px; margin-top:10px;">Save Customizations</button>
+    </div>
+
+    <div id="settings-page-3" style="display:none; flex-direction:column; gap:12px; width:560px; max-width:92vw; max-height:55vh; overflow-y:auto; padding:4px 10px; text-align:left; font-family:monospace; font-size:12px;">
+
+      <div style="background:rgba(10,10,20,0.6); border:1px solid rgba(255,204,64,0.35); border-radius:8px; padding:10px 12px;">
+        <div style="font-size:11px; color:#ffcc40; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; font-weight:bold;">Controls</div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:6px 12px; align-items:center;">
+          <kbd style="background:#1a1a2a; border:1px solid #5040aa; border-bottom-width:2px; border-radius:4px; padding:2px 7px; font-family:monospace; font-size:11px; font-weight:bold; color:#ffcc40; white-space:nowrap; text-align:center;">W A S D</kbd>
+          <span style="color:#c8b8ff;">Move</span>
+          <kbd style="background:#1a1a2a; border:1px solid #5040aa; border-bottom-width:2px; border-radius:4px; padding:2px 7px; font-family:monospace; font-size:11px; font-weight:bold; color:#ffcc40; white-space:nowrap; text-align:center;">Mouse</kbd>
+          <span style="color:#c8b8ff;">Aim &amp; Fire</span>
+          <kbd style="background:#1a1a2a; border:1px solid #5040aa; border-bottom-width:2px; border-radius:4px; padding:2px 7px; font-family:monospace; font-size:11px; font-weight:bold; color:#ffcc40; white-space:nowrap; text-align:center;">SPACE</kbd>
+          <span style="color:#c8b8ff;">Dash (while moving)</span>
+          <kbd style="background:#1a1a2a; border:1px solid #5040aa; border-bottom-width:2px; border-radius:4px; padding:2px 7px; font-family:monospace; font-size:11px; font-weight:bold; color:#ffcc40; white-space:nowrap; text-align:center;">E</kbd>
+          <span style="color:#c8b8ff;">Deploy Echo</span>
+          <kbd style="background:#1a1a2a; border:1px solid #5040aa; border-bottom-width:2px; border-radius:4px; padding:2px 7px; font-family:monospace; font-size:11px; font-weight:bold; color:#ffcc40; white-space:nowrap; text-align:center;">R</kbd>
+          <span style="color:#c8b8ff;">Reload</span>
+          <kbd style="background:#1a1a2a; border:1px solid #5040aa; border-bottom-width:2px; border-radius:4px; padding:2px 7px; font-family:monospace; font-size:11px; font-weight:bold; color:#ffcc40; white-space:nowrap; text-align:center;">1 2 3 4</kbd>
+          <span style="color:#c8b8ff;">Switch Weapon</span>
+          <kbd style="background:#1a1a2a; border:1px solid #5040aa; border-bottom-width:2px; border-radius:4px; padding:2px 7px; font-family:monospace; font-size:11px; font-weight:bold; color:#ffcc40; white-space:nowrap; text-align:center;">Q</kbd>
+          <span style="color:#c8b8ff;">Pause / Resume</span>
+        </div>
+      </div>
+
+      <div style="background:rgba(10,10,20,0.6); border:1px solid rgba(160,144,255,0.35); border-radius:8px; padding:10px 12px;">
+        <div style="font-size:11px; color:#a090ff; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; font-weight:bold;">The Six Phases</div>
+        <div style="color:#c8b8ff; line-height:1.7;">
+          <div style="margin-bottom:6px;"><b style="color:#80b0ff;">STABILIZE</b> — Standard spawn rate, light walls.</div>
+          <div style="margin-bottom:6px;"><b style="color:#ff8060;">COLLAPSE</b> — Denser walls, tougher hostiles.</div>
+          <div style="margin-bottom:6px;"><b style="color:#60ff90;">EXPANSION</b> — Fast swarm, minimal cover.</div>
+          <div style="margin-bottom:6px;"><b style="color:#ff3050;">ANOMALY</b> — Boss phase. The Anomaly shifts between single / shotgun / bazooka / grenade fire and can mind-control you.</div>
+          <div style="margin-bottom:6px;"><b style="color:#d8e4ff;">MOON</b> — Take -40% damage, enemies slow down. Rare post-ANOMALY reprieve.</div>
+          <div style="margin-bottom:0;"><b style="color:#ff2040;">BLOODMOON</b> — Take +50% damage, enemies speed up. Rare post-ANOMALY surge.</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(10,10,20,0.6); border:1px solid rgba(255,128,96,0.35); border-radius:8px; padding:10px 12px;">
+        <div style="font-size:11px; color:#ff8060; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; font-weight:bold;">Weapons Arsenal</div>
+        <div style="color:#c8b8ff; line-height:1.7;">
+          <div style="margin-bottom:6px;"><b style="color:#ffee60;">[1] Zip Zapper</b> — 20 ammo, rapid single shots. Reliable baseline.</div>
+          <div style="margin-bottom:6px;"><b style="color:#ffee60;">[2] Tactical Shotgun</b> — 10 ammo, 5-pellet spread. Devastating up close.</div>
+          <div style="margin-bottom:6px;"><b style="color:#ffee60;">[3] Bazooka</b> — 5 ammo, rocket with wide AoE. Slow but heavy.</div>
+          <div style="margin-bottom:0;"><b style="color:#ffee60;">[4] Grenade</b> — 4 ammo, fused AoE explosion. Perfect for clusters.</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(10,10,20,0.6); border:1px solid rgba(255,208,48,0.35); border-radius:8px; padding:10px 12px;">
+        <div style="font-size:11px; color:#ffd030; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; font-weight:bold;">Combo Stacks</div>
+        <div style="color:#c8b8ff; line-height:1.7;">
+          Chain kills with the <b>same weapon</b> to stack damage bonuses (max 5). Swapping weapons or 3s of idle time resets the combo.
+          <div style="margin-top:6px; color:#a090cc;">
+            Zapper <b style="color:#fff;">+20%</b> · Shotgun <b style="color:#fff;">+10%</b> · Bazooka <b style="color:#fff;">+70%</b> · Grenade <b style="color:#fff;">+60%</b> per stack.
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(10,10,20,0.6); border:1px solid rgba(160,128,255,0.35); border-radius:8px; padding:10px 12px;">
+        <div style="font-size:11px; color:#a080ff; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; font-weight:bold;">Echo Protocol</div>
+        <div style="color:#c8b8ff; line-height:1.7;">
+          Press <b style="color:#ffcc40;">E</b> to drop an echo clone that replays your last 10 seconds, auto-firing at nearby hostiles. Each echo lasts 4s; charges recharge over 10s. Max charges scale with shop upgrades.
+        </div>
+      </div>
+
+      <div style="background:rgba(10,10,20,0.6); border:1px solid rgba(0,255,255,0.35); border-radius:8px; padding:10px 12px;">
+        <div style="font-size:11px; color:#00ffff; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; font-weight:bold;">Shards &amp; Shop</div>
+        <div style="color:#c8b8ff; line-height:1.7;">
+          <div style="margin-bottom:6px;">Earn shards from <b>kills</b> (score ÷ 100 on death), <b>early phase clears</b> (+100), and <b>boss kills</b> (+100 to +300).</div>
+          <div style="margin-bottom:6px;">Upgrades <b style="color:#ff8060;">reset to zero on death</b> — spend before you die.</div>
+          <div style="margin-bottom:0;">Instant powerups are <b>in-run only</b> (max 4 per type per run).</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(10,10,20,0.6); border:1px solid rgba(96,255,144,0.35); border-radius:8px; padding:10px 12px;">
+        <div style="font-size:11px; color:#60ff90; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; font-weight:bold;">Survival Tips</div>
+        <div style="color:#c8b8ff; line-height:1.75;">
+          <div style="margin-bottom:5px;">▸ Dash sideways to dodge boss lunges and AoE blasts — the i-frames are real.</div>
+          <div style="margin-bottom:5px;">▸ Weapon-carrying enemies telegraph aim tier. <b style="color:#ff6060;">Bad</b> = spray, <b style="color:#60ff90;">Excellent</b> = deadly accurate.</div>
+          <div style="margin-bottom:5px;">▸ <b style="color:#ff3050;">Mind Controlled?</b> Mash SPACE 5 times to break free — nothing else works.</div>
+          <div style="margin-bottom:5px;">▸ Frozen enemies deal <b>no contact damage</b>. Freeze the melee crowd, then focus-fire the shooters.</div>
+          <div style="margin-bottom:0;">▸ BLOODMOON imminent? Consider retreating to cover before the surge hits.</div>
+        </div>
+      </div>
+
     </div>
   
     <button id="close-settings-btn" class="menu-btn" style="margin-top:20px;">Back</button>
@@ -636,7 +720,7 @@
     <button id="close-shop-btn" class="menu-btn" style="margin-top:10px;">Back</button>
   </div>
 
-  <div id="rr-version-tag">RIFT VERSION: v2.8.0</div>
+  <div id="rr-version-tag">RIFT VERSION: v3.0.0</div>
   
   <script>
         window.RRVault = (() => {
@@ -813,7 +897,7 @@
         {
           key: 'moreHp',
           label: 'More HP',
-          desc: '+50 Max Integrity per purchase',
+          desc: '+75 Max Integrity per purchase',
           cost: 149,
           max: 5,
           current: upg.moreHp
@@ -829,7 +913,7 @@
         {
           key: 'betterShield',
           label: 'Better Shield',
-          desc: '+50 Max Shield HP per purchase',
+          desc: '+75 Max Shield HP per purchase',
           cost: 249,
           max: 5,
           current: upg.betterShield
@@ -837,7 +921,7 @@
         {
           key: 'zapperDmg',
           label: 'Zapper DMG',
-          desc: '+25% Zapper DMG per purchase',
+          desc: '+35% Zapper DMG per purchase',
           cost: 159,
           max: 6,
           current: upg.zapperDmg
@@ -845,7 +929,7 @@
         {
           key: 'shotgunDmg',
           label: 'Shotgun DMG',
-          desc: '+20% Shotgun DMG per purchase',
+          desc: '+30% Shotgun DMG per purchase',
           cost: 169,
           max: 6,
           current: upg.shotgunDmg
@@ -853,7 +937,7 @@
         {
           key: 'bazookaDmg',
           label: 'Bazooka DMG',
-          desc: '+50% Bazooka DMG per purchase',
+          desc: '+60% Bazooka DMG per purchase',
           cost: 199,
           max: 5,
           current: upg.bazookaDmg
@@ -861,7 +945,7 @@
         {
           key: 'grenadeDmg',
           label: 'Grenade DMG',
-          desc: '+40% Grenade DMG per purchase',
+          desc: '+50% Grenade DMG per purchase',
           cost: 179,
           max: 5,
           current: upg.grenadeDmg
@@ -869,7 +953,7 @@
         {
           key: 'bazookaAoEDmg',
           label: 'Bazooka AoE',
-          desc: '+50% AoE DMG (Bazooka)',
+          desc: '+60% AoE DMG (Bazooka)',
           cost: 259,
           max: 3,
           current: upg.bazookaAoEDmg
@@ -877,7 +961,7 @@
         {
           key: 'grenadeAoEDmg',
           label: 'Grenade AoE',
-          desc: '+40% AoE DMG (Grenade)',
+          desc: '+50% AoE DMG (Grenade)',
           cost: 239,
           max: 3,
           current: upg.grenadeAoEDmg
@@ -885,7 +969,7 @@
         {
           key: 'instant_hp',
           label: 'Instant Heal',
-          desc: 'Instantly restores +25 Integrity',
+          desc: 'Instantly restores +35 Integrity',
           cost: 79,
           isInstant: true
         },
@@ -991,8 +1075,8 @@
         window._rrPowerupUses[key] = (window._rrPowerupUses[key] || 0) + 1;
 
         if (key === 'instant_hp') {
-          activeScene.pState.hp = Math.min(activeScene.pState.maxHp, activeScene.pState.hp + 25);
-          activeScene.logFeed('SHOP VENDOR: Integrity Restored +25');
+          activeScene.pState.hp = Math.min(activeScene.pState.maxHp, activeScene.pState.hp + 35);
+          activeScene.logFeed('SHOP VENDOR: Integrity Restored +35');
         } else if (key === 'instant_shield') {
           activeScene.pState.shieldActive = true;
           activeScene.pState.shieldHp = activeScene.pState.shieldMaxHp;
@@ -1074,10 +1158,12 @@
     window.switchSettingsPage = (page) => {
       document.getElementById('settings-page-1').style.display = page === 1 ? 'block' : 'none';
       document.getElementById('settings-page-2').style.display = page === 2 ? 'flex' : 'none';
+      document.getElementById('settings-page-3').style.display = page === 3 ? 'flex' : 'none';
 
       const tabs = document.getElementById('settings-tabs').children;
       tabs[0].classList.toggle('active', page === 1);
       tabs[1].classList.toggle('active', page === 2);
+      tabs[2].classList.toggle('active', page === 3);
 
       if (page === 2) {
         document.getElementById('opt-color-base').value = window.rrConfig.colorBase;
@@ -1192,6 +1278,13 @@
 
       const ENEMY_SCALE_CAP = 6;
       const ENEMY_HP_CAP = 200;
+      const ENEMY_SPEED_SCALE_CAP = 1.8;
+      const ENEMY_DMG_LEVEL_SCALE_CAP = 2.2;
+      const ENEMY_CONTACT_DMG_CAP = 55;
+      const ENEMY_PROJ_DMG_CAP = 38;
+      const ENEMY_WPN_CHANCE_CAP = 0.65;
+      const ENEMY_SPAWN_INTERVAL_MIN = 180;
+      const REVIVE_COST = 599;
 
       const GEO_SPAWN = { base: 0.30, moon: 0.05, blood: 0.38, blaster: 0.20 };
 
@@ -1236,9 +1329,9 @@
           this.isShooting = false;
           this.sharedEmitter = null;
           const _upg = window._rrShopUpgrades || { moreHp: 0, moreEchoes: 0, betterShield: 0 };
-          const _baseMaxHp = 100 + (_upg.moreHp * 50);
+          const _baseMaxHp = 100 + (_upg.moreHp * 75);
           const _baseMaxEcho = 3 + _upg.moreEchoes;
-          const _baseShieldMax = 100 + (_upg.betterShield * 50);
+          const _baseShieldMax = 100 + (_upg.betterShield * 75);
           this.pState = {
             score: 0,
             currentWeapon: 'zapper',
@@ -1255,8 +1348,8 @@
             maxEchoCharges: _baseMaxEcho,
             ammo: 20,
             maxAmmo: 20,
-            speed: 300,
-            dashSpeed: 800,
+            speed: 320,
+            dashSpeed: 860,
             isDashing: false,
             dashCooldown: 0,
             reloading: false,
@@ -1602,7 +1695,8 @@
           let speedMult = 1;
           if (this.gState.phase === 4) speedMult = 0.75;
           if (this.gState.phase === 5) speedMult = 1.35;
-          enemy.baseSpeed = type.speed * (1 + (this.pState.score / 120000)) * (1 + (this.gState.level * 0.04)) * speedMult;
+          const speedScale = Math.min(ENEMY_SPEED_SCALE_CAP, (1 + (this.pState.score / 120000)) * (1 + (this.gState.level * 0.04)));
+          enemy.baseSpeed = type.speed * speedScale * speedMult;
           enemy.setCollideWorldBounds(true);
           enemy.setBounce(0.5);
           const hb = ENEMY_HITBOXES[type.key];
@@ -1610,7 +1704,8 @@
 
           let wpnChance = 0.2 + (this.gState.level * 0.05);
           if (this.gState.phase === 4) wpnChance *= 0.4;
-          if (this.gState.phase === 5) wpnChance = Math.min(0.95, wpnChance * 1.8 + 0.15);
+          if (this.gState.phase === 5) wpnChance = wpnChance * 1.8 + 0.15;
+          wpnChance = Math.min(ENEMY_WPN_CHANCE_CAP, wpnChance);
           enemy.hasWeapon = Math.random() < wpnChance;
           if (enemy.hasWeapon) {
             const aimRoll = Math.random() + (this.gState.level * 0.1);
@@ -1693,7 +1788,8 @@
           enemy.hp = this._scaledHp(type.hp * sz.hp, (1 + (this.pState.score / 5000)) * (1 + (lvl * 0.1)));
           enemy.maxHp = enemy.hp;
           const speedMult = phase === 4 ? 0.75 : phase === 5 ? 1.35 : 1;
-          enemy.baseSpeed = type.speed * sz.speed * (1 + (this.pState.score / 120000)) * (1 + (lvl * 0.04)) * speedMult;
+          const speedScale = Math.min(ENEMY_SPEED_SCALE_CAP, (1 + (this.pState.score / 120000)) * (1 + (lvl * 0.04)));
+          enemy.baseSpeed = type.speed * sz.speed * speedScale * speedMult;
           enemy.setCollideWorldBounds(true);
           enemy.setBounce(0.5);
           enemy.setCircle(sz.r - 1, 4, 4);
@@ -2007,8 +2103,8 @@
         hitEnemy(bullet, enemy) {
           if (!bullet.active || !enemy.active) return;
           const currentLvl = this.gState.level;
-          const dmgMultiplier = 1 + (currentLvl - 1) * 0.25;
-          const aoeMultiplier = 1 + (currentLvl - 1) * 0.15;
+          const dmgMultiplier = 1 + (currentLvl - 1) * 0.32;
+          const aoeMultiplier = 1 + (currentLvl - 1) * 0.22;
           const upg = window._rrShopUpgrades || {};
           if (bullet.isNuke) {
             this.nukeExplode(bullet.x, bullet.y);
@@ -2016,15 +2112,15 @@
             return;
           }
           if (bullet.isRocket) {
-            const bDmg = 1 + (upg.bazookaDmg || 0) * 0.50;
-            const bAoE = 1 + (upg.bazookaAoEDmg || 0) * 0.50;
+            const bDmg = 1 + (upg.bazookaDmg || 0) * 0.60;
+            const bAoE = 1 + (upg.bazookaAoEDmg || 0) * 0.60;
             this.aoeExplode(bullet.x, bullet.y, 160 * aoeMultiplier, 8 * dmgMultiplier * bDmg * bAoE * (bullet.comboMult || 1));
             bullet.destroy();
             return;
           }
           if (bullet.isGrenade) {
-            const gDmg = 1 + (upg.grenadeDmg || 0) * 0.40;
-            const gAoE = 1 + (upg.grenadeAoEDmg || 0) * 0.40;
+            const gDmg = 1 + (upg.grenadeDmg || 0) * 0.50;
+            const gAoE = 1 + (upg.grenadeAoEDmg || 0) * 0.50;
             this.aoeExplode(bullet.x, bullet.y, 140 * aoeMultiplier, 5 * dmgMultiplier * gDmg * gAoE * (bullet.comboMult || 1));
             bullet.destroy();
             return;
@@ -2033,9 +2129,9 @@
           this.playSfx(500, 'square', 0.04);
           let baseDmg = 1.5;
           if (bullet.wpnType === 'zapper') {
-            baseDmg *= (1.5 + (upg.zapperDmg || 0) * 0.30);
+            baseDmg *= (1.5 + (upg.zapperDmg || 0) * 0.35);
           } else if (bullet.wpnType === 'shotgun') {
-            baseDmg *= (1.7 + (upg.shotgunDmg || 0) * 0.25);
+            baseDmg *= (1.7 + (upg.shotgunDmg || 0) * 0.30);
           }
           enemy.hp -= baseDmg * dmgMultiplier * (bullet.comboMult || 1);
           enemy.setTintFill(0xffffff);
@@ -2187,7 +2283,8 @@
           let dmgMult = 1;
           if (this.gState.phase === 4) dmgMult = 0.6;
           if (this.gState.phase === 5) dmgMult = 1.5;
-          const dmg = (enemy.isBoss ? 30 : 15) * (enemy.contactMult || 1) * (1 + (this.gState.level * 0.2)) * dmgMult;
+          const lvlScale = Math.min(ENEMY_DMG_LEVEL_SCALE_CAP, 1 + (this.gState.level * 0.2));
+          const dmg = Math.min(ENEMY_CONTACT_DMG_CAP, (enemy.isBoss ? 30 : 15) * (enemy.contactMult || 1) * lvlScale * dmgMult);
           this.cameras.main.shake(200, 0.01);
 
           if (this.pState.shieldActive) {
@@ -2226,7 +2323,8 @@
           let dmgMult = 1;
           if (this.gState.phase === 4) dmgMult = 0.6;
           if (this.gState.phase === 5) dmgMult = 1.5;
-          const dmg = 20 * (bullet.dmgScale || 1) * (1 + (this.gState.level * 0.2)) * dmgMult;
+          const lvlScale = Math.min(ENEMY_DMG_LEVEL_SCALE_CAP, 1 + (this.gState.level * 0.2));
+          const dmg = Math.min(ENEMY_PROJ_DMG_CAP, 20 * (bullet.dmgScale || 1) * lvlScale * dmgMult);
           this.cameras.main.shake(200, 0.01);
 
           if (this.pState.shieldActive) {
@@ -2400,9 +2498,9 @@
         }
         applyShopUpgrades() {
           const _upg = window._rrShopUpgrades || { moreHp: 0, moreEchoes: 0, betterShield: 0 };
-          const newMaxHp = 100 + (_upg.moreHp * 50);
+          const newMaxHp = 100 + (_upg.moreHp * 75);
           const newMaxEcho = 3 + _upg.moreEchoes;
-          const newShieldMax = 100 + (_upg.betterShield * 50);
+          const newShieldMax = 100 + (_upg.betterShield * 75);
 
           if (newMaxHp > this.pState.maxHp) {
             this.pState.hp += (newMaxHp - this.pState.maxHp);
@@ -2447,9 +2545,10 @@
           window._rrShardCache = this.pState.shards;
           window.RRVault.save(this.pState.shards);
 
-          if (typeof window._rrResetRunUpgrades === 'function') {
-            window._rrResetRunUpgrades();
-          }
+          const canRevive = this.pState.shards >= REVIVE_COST;
+          const reviveBtn = canRevive
+            ? `<button id="revive-btn" class="menu-btn" style="border-color:rgba(0,255,255,0.85);color:#00ffff;box-shadow:0 0 22px rgba(0,255,255,0.45);">REVIVE (${REVIVE_COST} 💎)</button>`
+            : `<button class="menu-btn" disabled style="opacity:0.35;cursor:not-allowed;">REVIVE (${REVIVE_COST} 💎)</button>`;
 
           ov.innerHTML = `
             <div style="font-size:14px;letter-spacing:4px;color:#7060cc;">${NS}</div>
@@ -2457,7 +2556,10 @@
             <div style="font-size:18px;color:#9080cc;margin:10px 0;">Final Score: <span style="color:#fff;font-size:32px;font-weight:bold;">${this.pState.score}</span></div>
             <div style="font-size:16px;color:#00ffff;margin-bottom:10px;text-shadow:0 0 10px rgba(0,255,255,0.5);">💎 +${earnedShards} SHARDS MERGED (Vault: ${this.pState.shards})</div>
             <div style="font-size:12px;color:#5040aa;">Phase Reached: ${this.gState.phaseNames[this.gState.phase]}</div>
-            <button id="start-btn" style="margin-top:20px;">REBOOT SYSTEM</button>
+            <div class="btn-group">
+              ${reviveBtn}
+              <button id="start-btn" class="menu-btn">REBOOT SYSTEM</button>
+            </div>
           `;
           ov.style.display = 'flex';
           document.getElementById('rr-hud').style.display = 'none';
@@ -2466,7 +2568,50 @@
           document.getElementById('weapon-panel').style.display = 'none';
           document.getElementById('boss-hud-hp').style.display = 'none';
           document.getElementById('enemy-hud-count').style.display = 'none';
-          document.getElementById('start-btn').addEventListener('click', () => RiftRun.reboot(this));
+          if (canRevive) {
+            document.getElementById('revive-btn').addEventListener('click', () => this.revive());
+          }
+          document.getElementById('start-btn').addEventListener('click', () => {
+            if (typeof window._rrResetRunUpgrades === 'function') {
+              window._rrResetRunUpgrades();
+            }
+            RiftRun.reboot(this);
+          });
+        }
+        revive() {
+          if (this.pState.shards < REVIVE_COST) return;
+          this.pState.shards -= REVIVE_COST;
+          window._rrShardCache = this.pState.shards;
+          window.RRVault.save(this.pState.shards);
+          this.pState.hp = this.pState.maxHp;
+          this.pState.shieldActive = true;
+          this.pState.shieldHp = this.pState.shieldMaxHp;
+          this.pState.invincible = 3000;
+          this.pState.isDashing = false;
+          this.pState.mindControlled = false;
+          this.pState.spaceSpamCount = 0;
+          this.pState.mcBoss = null;
+          this.pState.echoCharges = this.pState.maxEchoCharges;
+          this.pState.echoRechargeTimers = [];
+          this.enemies.getChildren().forEach(e => {
+            if (e.active) this.spawnParticles(e.x, e.y, e.eType ? e.eType.tint : 0xffffff, 10);
+          });
+          this.enemies.clear(true, true);
+          this.bossBullets.clear(true, true);
+          this.bullets.clear(true, true);
+          this.echoBullets.clear(true, true);
+          this.gState.isPlaying = true;
+          this.gState.bossSpawned = false;
+          this.physics.resume();
+          document.getElementById('rr-overlay').style.display = 'none';
+          document.getElementById('rr-hud').style.display = 'flex';
+          document.getElementById('rr-bottom').style.display = 'flex';
+          document.getElementById('ammo-counter').style.display = 'block';
+          document.getElementById('weapon-panel').style.display = 'flex';
+          this.mcText.setVisible(false);
+          this.flashRect.setAlpha(0);
+          this.logFeed('REVIVED // ECHO PROTOCOL REINSTATED');
+          this.updateDOM();
         }
         update(time, delta) {
           if (!this.gState.isPlaying) return;
@@ -2570,7 +2715,7 @@
             (vx !== 0 || vy !== 0)
           ) {
             this.pState.isDashing = true;
-            this.pState.dashCooldown = 1500;
+            this.pState.dashCooldown = 1300;
             this.time.delayedCall(200, () => { this.pState.isDashing = false; });
             this.playSfx(1000, 'sine', 0.1);
             this.spawnParticles(this.player.x, this.player.y, 0xc8b8ff, 10);
@@ -2671,13 +2816,13 @@
           this.gState.enemySpawnTimer -= delta;
           if (this.gState.enemySpawnTimer <= 0) {
             this.spawnEnemy();
-            this.gState.enemySpawnRate = Math.max(500, 2000 - (this.pState.score / 5));
+            this.gState.enemySpawnRate = Math.max(800, 2000 - (this.pState.score / 5));
             const mult = this.gState.phase === 2 ? 3
               : this.gState.phase === 1 ? 2
                 : this.gState.phase === 4 ? 0.5
                   : this.gState.phase === 5 ? 4
                     : 1;
-            this.gState.enemySpawnTimer = this.gState.enemySpawnRate / mult;
+            this.gState.enemySpawnTimer = Math.max(ENEMY_SPAWN_INTERVAL_MIN, this.gState.enemySpawnRate / mult);
           }
           this.enemies.getChildren().forEach(enemy => {
             const targetAngle = Phaser.Math.Angle.Between(enemy.x, enemy.y, this.player.x, this.player.y);
