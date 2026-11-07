@@ -10,15 +10,16 @@ The home page describes Prism as a central hub where the group's experiments, ga
 - Apps & oddities
 - Tools
 
-(Developer Note: Project Prism started around December 2025, previously "Shaman's Workshop" served on GitHub Pages at the time. TGBrowser was the first project to be hosted (wasn't shown to "Shaman's Workshop" before December, was made way back in 2024 - started as a passion project, now removed for certain reasons), along with Sand Box 3D released on January 20, 2025, with Rift Runners 2D released on May 30, 2025.)
+(Developer Note: Project Prism started around December 2025, previously "Shaman's Workshop", "HEXON Laboratories" as the first rebrand, "NOCTURNE Studios" as the second rebrand, and "Project Prism" as the finalized rebranding, served on GitHub Pages at the time. TGBrowser was the first project to be hosted, now removed for specific reasons.
 
-FLAGSHIP PROJECTS
+
+FLAGSHIP PROJECTS (with their initial release dates)
 -----------------
 
 The two main flagship projects are:
 
-- SB3D — Sand Box 3D, an interactive 3D physics playground.
-- RR2D — Rift Runners 2D, a top-down survival game. The current home-page listing labels it PC-only.
+- SB3D — Sand Box 3D, an interactive 3D physics playground. (released on January 20, 2026)
+- RR2D — Rift Runners 2D, a top-down survival game. The current home-page listing labels it PC-only. (released on May 30, 2026)
 
 These are the main flagships, not the entire definition or limit of Project Prism. Other smaller sub-apps, experiments, and utilities can live inside the Prism hub without being flagships.
 
