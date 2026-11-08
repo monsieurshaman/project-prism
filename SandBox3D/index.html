@@ -12,13 +12,15 @@
         :root {
             --glass-bg: rgba(26, 26, 26, 0.85);
             --glass-bg-heavy: rgba(17, 17, 17, 0.95);
-            --glass-border: rgba(74, 163, 223, 0.4);
-            --glass-border-hover: rgba(74, 163, 223, 0.8);
+            --accent-rgb: 74, 163, 223;
+            --accent-2-rgb: 231, 76, 60;
+            --glass-border: rgba(var(--accent-rgb), 0.4);
+            --glass-border-hover: rgba(var(--accent-rgb), 0.8);
             --glass-shine: rgba(255, 255, 255, 0.05);
             --accent: #4aa3df;
-            --accent-glow: rgba(74, 163, 223, 0.4);
+            --accent-glow: rgba(var(--accent-rgb), 0.4);
             --accent-2: #e74c3c;
-            --accent-2-glow: rgba(231, 76, 60, 0.3);
+            --accent-2-glow: rgba(var(--accent-2-rgb), 0.3);
             --text-primary: #eeeeee;
             --text-secondary: rgba(221, 221, 221, 0.7);
             --text-muted: rgba(136, 136, 136, 0.5);
@@ -78,8 +80,8 @@
         .bg-placeholder {
             position: absolute; inset: 0;
             background:
-                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(124, 158, 247, 0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(167, 139, 250, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(var(--accent-rgb), 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(var(--accent-2-rgb), 0.10) 0%, transparent 60%),
                 radial-gradient(ellipse 100% 100% at 50% 50%, #030308 0%, #05050f 100%);
         }
 
@@ -180,13 +182,13 @@
         .hero-icon-wrap {
             width: 72px; height: 72px;
             border-radius: 20px;
-            background: linear-gradient(135deg, rgba(124, 158, 247, 0.2), rgba(167, 139, 250, 0.1));
-            border: 1px solid rgba(124, 158, 247, 0.25);
+            background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.2), rgba(var(--accent-2-rgb), 0.1));
+            border: 1px solid rgba(var(--accent-rgb), 0.25);
             display: flex; align-items: center; justify-content: center;
             font-size: 34px; color: var(--accent);
             flex-shrink: 0;
             box-shadow:
-                0 0 0 4px rgba(124, 158, 247, 0.08),
+                0 0 0 4px rgba(var(--accent-rgb), 0.08),
                 0 8px 24px rgba(0, 0, 0, 0.5);
         }
 
@@ -236,7 +238,7 @@
             border: none; cursor: pointer;
             transition: all 0.25s;
             position: relative; overflow: hidden;
-            box-shadow: 0 4px 24px rgba(124, 158, 247, 0.3);
+            box-shadow: 0 4px 24px rgba(var(--accent-rgb), 0.3);
             text-align: left;
         }
 
@@ -248,7 +250,7 @@
 
         .launch-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(124, 158, 247, 0.45);
+            box-shadow: 0 8px 32px rgba(var(--accent-rgb), 0.45);
         }
 
         .launch-btn:active { transform: translateY(0); }
@@ -647,16 +649,20 @@
                 const root = document.documentElement;
                 const themes = {
                     blurple: { primary: '#7c9ef7', secondary: '#a78bfa' },
-                    amber: { primary: '#fbbf24', secondary: '#f59e0b' },
-                    emerald: { primary: '#34d399', secondary: '#10b981' },
-                    ruby: { primary: '#fb7185', secondary: '#e11d48' },
+                    amber: { primary: '#fbbf24', secondary: '#fb923c' },
+                    emerald: { primary: '#34d399', secondary: '#2dd4bf' },
+                    ruby: { primary: '#fb7185', secondary: '#f472b6' },
                     mono: { primary: '#ffffff', secondary: '#a3a3a3' }
                 };
                 const selected = themes[savedTheme] || themes.blurple;
+                const primaryRgb = hexToRgb(selected.primary);
+                const secondaryRgb = hexToRgb(selected.secondary);
                 root.style.setProperty('--accent', selected.primary);
+                root.style.setProperty('--accent-rgb', primaryRgb);
                 root.style.setProperty('--accent-2', selected.secondary);
-                root.style.setProperty('--accent-glow', `rgba(${hexToRgb(selected.primary)}, 0.4)`);
-                root.style.setProperty('--accent-2-glow', `rgba(${hexToRgb(selected.secondary)}, 0.3)`);
+                root.style.setProperty('--accent-2-rgb', secondaryRgb);
+                root.style.setProperty('--accent-glow', `rgba(${primaryRgb}, 0.4)`);
+                root.style.setProperty('--accent-2-glow', `rgba(${secondaryRgb}, 0.3)`);
             }
 
             if (localStorage.getItem('bg-gif-enabled') === 'false') {

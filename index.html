@@ -31,17 +31,20 @@
             --surface-hover: rgba(36, 36, 58, 0.52);
             --border: rgba(255, 255, 255, 0.10);
             --border-strong: rgba(255, 255, 255, 0.14);
-            --border-accent: rgba(124, 158, 247, 0.22);
+            --primary-rgb: 124, 158, 247;
+            --secondary-rgb: 167, 139, 250;
+            --border-accent: rgba(var(--primary-rgb), 0.22);
             --primary: #7c9ef7;
-            --primary-dim: rgba(124, 158, 247, 0.12);
-            --primary-glow: rgba(124, 158, 247, 0.3);
-            --primary-container: rgba(124, 158, 247, 0.18);
+            --primary-dim: rgba(var(--primary-rgb), 0.12);
+            --primary-glow: rgba(var(--primary-rgb), 0.3);
+            --primary-container: rgba(var(--primary-rgb), 0.18);
             --secondary: #a78bfa;
-            --secondary-dim: rgba(167, 139, 250, 0.12);
-            --secondary-glow: rgba(167, 139, 250, 0.25);
-            --secondary-container: rgba(167, 139, 250, 0.18);
+            --secondary-dim: rgba(var(--secondary-rgb), 0.12);
+            --secondary-glow: rgba(var(--secondary-rgb), 0.25);
+            --secondary-container: rgba(var(--secondary-rgb), 0.18);
             --tertiary: #67e8f9;
             --tertiary-dim: rgba(103, 232, 249, 0.1);
+            --glass-tint: linear-gradient(150deg, rgba(var(--primary-rgb), 0.05) 0%, rgba(var(--secondary-rgb), 0.025) 45%, transparent 75%);
             --on-primary: #080812;
             --text: #eeeef8;
             --text-sub: rgba(200, 202, 228, 0.65);
@@ -95,8 +98,8 @@
             inset: 0;
             z-index: 0;
             background:
-                radial-gradient(ellipse 70% 60% at 15% 20%, rgba(124, 158, 247, 0.07) 0%, transparent 60%),
-                radial-gradient(ellipse 55% 50% at 85% 80%, rgba(167, 139, 250, 0.06) 0%, transparent 60%);
+                radial-gradient(ellipse 70% 60% at 15% 20%, rgba(var(--primary-rgb), 0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 55% 50% at 85% 80%, rgba(var(--secondary-rgb), 0.06) 0%, transparent 60%);
             pointer-events: none;
         }
 
@@ -104,7 +107,7 @@
             position: fixed;
             width: 560px;
             height: 560px;
-            background: radial-gradient(circle, rgba(124, 158, 247, 0.055) 0%, transparent 65%);
+            background: radial-gradient(circle, rgba(var(--primary-rgb), 0.055) 0%, transparent 65%);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
@@ -134,7 +137,7 @@
             inset: 0;
             pointer-events: none;
             background:
-                radial-gradient(ellipse 60% 60% at 50% 50%, rgba(124, 158, 247, 0.08) 0%, transparent 70%);
+            radial-gradient(ellipse 60% 60% at 50% 50%, rgba(var(--primary-rgb), 0.08) 0%, transparent 70%);
             animation: loader-pulse 3s ease-in-out infinite;
         }
 
@@ -175,7 +178,7 @@
             border-radius: 50%;
             border: 2px solid transparent;
             border-top-color: var(--primary);
-            border-right-color: rgba(124, 158, 247, 0.3);
+            border-right-color: rgba(var(--primary-rgb), 0.3);
             animation: spin 1.4s linear infinite;
         }
 
@@ -185,7 +188,7 @@
             border-radius: 50%;
             border: 1.5px solid transparent;
             border-bottom-color: var(--secondary);
-            border-left-color: rgba(167, 139, 250, 0.2);
+            border-left-color: rgba(var(--secondary-rgb), 0.2);
             animation: spin-rev 2s linear infinite;
         }
 
@@ -345,7 +348,7 @@
 
             .hero-card-lite {
                 background: var(--surface-0);
-                border: 1px solid var(--border);
+                border: 1px solid var(--border-accent);
                 border-radius: var(--r-xl);
                 backdrop-filter: var(--blur-md);
                 padding: 20px 22px;
@@ -434,7 +437,7 @@
 
         .hero-card {
             background: var(--surface-0);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-accent);
             border-radius: var(--r-xl);
             backdrop-filter: var(--blur-md);
             padding: 28px 24px 24px;
@@ -731,7 +734,7 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            background: var(--surface-0);
+            background: var(--glass-tint), var(--surface-0);
             border: 1px solid var(--border);
             border-radius: var(--r-lg);
             padding: 18px 20px;
@@ -755,8 +758,8 @@
         }
 
         .glass-card:hover {
-            background: var(--surface-hover);
-            border-color: var(--border-strong);
+            background: var(--glass-tint), var(--surface-hover);
+            border-color: var(--border-accent);
             transform: translateY(-3px) scale(1.008);
             box-shadow: 0 10px 36px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.07);
         }
@@ -847,15 +850,15 @@
         }
 
         .card-icon-wrap.blue {
-            background: linear-gradient(145deg, rgba(124, 158, 247, 0.22), rgba(124, 158, 247, 0.06));
+            background: linear-gradient(145deg, rgba(var(--primary-rgb), 0.22), rgba(var(--primary-rgb), 0.06));
             color: var(--primary);
-            border: 1px solid rgba(124, 158, 247, 0.2);
+            border: 1px solid rgba(var(--primary-rgb), 0.2);
         }
 
         .card-icon-wrap.purple {
-            background: linear-gradient(145deg, rgba(167, 139, 250, 0.22), rgba(167, 139, 250, 0.06));
+            background: linear-gradient(145deg, rgba(var(--secondary-rgb), 0.22), rgba(var(--secondary-rgb), 0.06));
             color: var(--secondary);
-            border: 1px solid rgba(167, 139, 250, 0.2);
+            border: 1px solid rgba(var(--secondary-rgb), 0.2);
         }
 
         .card-body {
@@ -924,7 +927,7 @@
         .app-library-page {
             position: fixed;
             inset: 0;
-            background: rgba(7, 7, 15, 0.40);
+            background: linear-gradient(160deg, rgba(var(--primary-rgb), 0.06) 0%, rgba(var(--secondary-rgb), 0.03) 55%, transparent 100%), rgba(7, 7, 15, 0.40);
             backdrop-filter: var(--blur-lg);
             -webkit-backdrop-filter: var(--blur-lg);
             z-index: 400;
@@ -951,8 +954,8 @@
                 border: 1px solid var(--border);
                 box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
                 background:
-                    radial-gradient(ellipse 70% 50% at 15% 10%, rgba(124, 158, 247, 0.07) 0%, transparent 70%),
-                    radial-gradient(ellipse 70% 50% at 85% 90%, rgba(167, 139, 250, 0.06) 0%, transparent 70%),
+                    radial-gradient(ellipse 70% 50% at 15% 10%, rgba(var(--primary-rgb), 0.07) 0%, transparent 70%),
+                    radial-gradient(ellipse 70% 50% at 85% 90%, rgba(var(--secondary-rgb), 0.06) 0%, transparent 70%),
                     rgba(7, 7, 15, 0.55);
                 transform: translateX(calc(100% + 24px));
             }
@@ -1081,8 +1084,8 @@
         }
 
         .list-item:hover {
-            background: var(--surface-hover);
-            border-color: var(--border-strong);
+            background: var(--glass-tint), var(--surface-hover);
+            border-color: var(--border-accent);
             transform: translateX(3px);
         }
 
@@ -1424,7 +1427,7 @@
                 display: flex;
                 align-items: center;
                 gap: 16px;
-                background: var(--surface-0);
+                background: var(--glass-tint), var(--surface-0);
                 border: 1px solid var(--border);
                 border-radius: var(--r-lg);
                 padding: 20px;
@@ -1448,8 +1451,8 @@
             }
 
             .dt-glass-card:hover {
-                background: var(--surface-hover);
-                border-color: var(--border-strong);
+                background: var(--glass-tint), var(--surface-hover);
+                border-color: var(--border-accent);
                 transform: translateY(-4px) scale(1.012);
                 box-shadow: 0 14px 44px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.07);
             }
@@ -1543,7 +1546,7 @@
             position: fixed;
             inset: 0;
             background: rgba(7, 7, 15);
-            background: rgba(7, 7, 15, 0.20); 
+            background: linear-gradient(160deg, rgba(var(--primary-rgb), 0.06) 0%, rgba(var(--secondary-rgb), 0.03) 55%, transparent 100%), rgba(7, 7, 15, 0.20);
             backdrop-filter: var(--blur-lg);
             -webkit-backdrop-filter: var(--blur-lg);
             z-index: 500;
@@ -1558,14 +1561,14 @@
         #settings-page.open { transform: translateX(0); }
 
         #settings-page .list-item {
-            background: rgba(20, 20, 36, 0.5);
+            background: var(--glass-tint), rgba(20, 20, 36, 0.5);
             backdrop-filter: blur(8px);
             transition: all 0.25s var(--spring);
         }
 
         #settings-page .list-item:hover {
-            background: var(--surface-hover);
-            border-color: var(--border-strong);
+            background: var(--glass-tint), var(--surface-hover);
+            border-color: var(--border-accent);
             transform: translateX(3px);
         }
 
@@ -1596,7 +1599,7 @@
         }
 
         #gif-toggle-container {
-            background: rgba(20, 20, 36, 0.6);
+            background: var(--glass-tint), rgba(20, 20, 36, 0.6);
         }
 
         .setting-select {
@@ -1627,8 +1630,8 @@
                 border: 1px solid var(--border);
                 box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
                 background:
-                    radial-gradient(ellipse 70% 50% at 15% 10%, rgba(124, 158, 247, 0.07) 0%, transparent 70%),
-                    radial-gradient(ellipse 70% 50% at 85% 90%, rgba(167, 139, 250, 0.06) 0%, transparent 70%),
+                    radial-gradient(ellipse 70% 50% at 15% 10%, rgba(var(--primary-rgb), 0.07) 0%, transparent 70%),
+                    radial-gradient(ellipse 70% 50% at 85% 90%, rgba(var(--secondary-rgb), 0.06) 0%, transparent 70%),
                     rgba(7, 7, 15, 0.55);
                 transform: translateX(calc(100% + 24px));
             }
@@ -1972,7 +1975,7 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            background: rgba(20, 20, 36, 0.5);
+            background: var(--glass-tint), rgba(20, 20, 36, 0.5);
             border: 1px solid var(--border);
             padding: 11px 16px;
             border-radius: var(--r-md);
@@ -2076,6 +2079,124 @@
             line-height: 1.7;
         }
 
+        .changelog-history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 32px;
+            margin-bottom: 14px;
+        }
+
+        .changelog-history-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 2.5px;
+            text-transform: lowercase;
+        }
+
+        .changelog-clear-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(248, 113, 113, 0.08);
+            border: 1px solid rgba(248, 113, 113, 0.22);
+            color: #f87171;
+            padding: 7px 13px;
+            border-radius: var(--r-pill);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s var(--spring);
+        }
+
+        .changelog-clear-btn:hover {
+            background: rgba(248, 113, 113, 0.16);
+            border-color: rgba(248, 113, 113, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .changelog-clear-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .changelog-clear-btn .material-icons-round {
+            font-size: 15px;
+        }
+
+        .changelog-history-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .changelog-history-card {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 16px 18px;
+            background: var(--glass-tint), rgba(20, 20, 36, 0.5);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            backdrop-filter: var(--blur-sm);
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.25s var(--spring);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .changelog-history-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.09) 50%, transparent);
+        }
+
+        .changelog-history-card:hover {
+            background: var(--glass-tint), var(--surface-hover);
+            border-color: var(--border-accent);
+            transform: translateY(-2px);
+        }
+
+        .changelog-history-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .changelog-history-msg {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.65;
+        }
+
+        .changelog-history-date {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .changelog-history-empty {
+            padding: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            border: 1px dashed var(--border);
+            border-radius: var(--r-md);
+        }
+
         .glass-card, .dt-glass-card {
             touch-action: none;
         }
@@ -2110,7 +2231,7 @@
             margin-top: 40px;
             padding: 9px 18px;
             border-radius: var(--r-pill);
-            background: linear-gradient(135deg, rgba(124, 158, 247, 0.16), rgba(167, 139, 250, 0.16));
+            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.16), rgba(var(--secondary-rgb), 0.16));
             border: 1px solid var(--border-accent);
             color: var(--text);
             font-family: 'Space Grotesk', sans-serif;
@@ -2137,7 +2258,7 @@
             transform: translateY(-2px) scale(1.04);
             border-color: var(--border-strong);
             box-shadow: 0 8px 24px var(--primary-glow);
-            background: linear-gradient(135deg, rgba(124, 158, 247, 0.24), rgba(167, 139, 250, 0.24));
+            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.24), rgba(var(--secondary-rgb), 0.24));
         }
 
         .credits-pill:active {
@@ -2246,7 +2367,7 @@
             align-items: center;
             gap: 12px;
             padding: 10px 12px;
-            background: rgba(20, 20, 36, 0.5);
+            background: var(--glass-tint), rgba(20, 20, 36, 0.5);
             border: 1px solid var(--border);
             border-radius: var(--r-md);
             text-decoration: none;
@@ -2570,6 +2691,16 @@
                 <p class="changelog-modal-text" id="cl-modal-msg">
                     checking...
                 </p>
+            </div>
+            
+            <div class="changelog-history-header">
+                <div class="changelog-history-label">previous updates</div>
+                <button class="changelog-clear-btn" onclick="clearChangelogHistory()">
+                    <i class="material-icons-round">delete_sweep</i> clear all
+                </button>
+            </div>
+            <div class="changelog-history-grid" id="changelog-history-grid">
+                <div class="changelog-history-empty">loading...</div>
             </div>
         </div>
     </div>
@@ -3486,9 +3617,9 @@
             const root = document.documentElement;
             const themes = {
                 blurple: { primary: '#7c9ef7', secondary: '#a78bfa' },
-                amber: { primary: '#fbbf24', secondary: '#f59e0b' },
-                emerald: { primary: '#34d399', secondary: '#10b981' },
-                ruby: { primary: '#fb7185', secondary: '#e11d48' },
+                amber: { primary: '#fbbf24', secondary: '#fb923c' },
+                emerald: { primary: '#34d399', secondary: '#2dd4bf' },
+                ruby: { primary: '#fb7185', secondary: '#f472b6' },
                 mono: { primary: '#ffffff', secondary: '#a3a3a3' }
             };
 
@@ -3498,6 +3629,8 @@
 
             root.style.setProperty('--primary', selected.primary);
             root.style.setProperty('--secondary', selected.secondary);
+            root.style.setProperty('--primary-rgb', primaryRgb);
+            root.style.setProperty('--secondary-rgb', secondaryRgb);
 
             root.style.setProperty('--primary-glow', `rgba(${primaryRgb}, 0.3)`);
             root.style.setProperty('--secondary-glow', `rgba(${secondaryRgb}, 0.25)`);
@@ -4358,6 +4491,7 @@
             });
             OneUIMotion.open(targetPanel, OneUIMotion.lastOrigin);
             document.body.style.overflow = 'hidden';
+            if (id === 'modal-changelog') renderChangelogHistory();
         }
 
         function closeAllModals() {
@@ -4531,8 +4665,117 @@
             observer.observe(document.body, { childList: true, subtree: true });
         })();
 
+        var PrismChangelogStore = (function () {
+            const DB_NAME = 'PrismChangelogDB';
+            const STORE = 'changelogs';
+            const VERSION = 1;
+
+            function openDB() {
+                return new Promise(function (resolve, reject) {
+                    const req = indexedDB.open(DB_NAME, VERSION);
+                    req.onupgradeneeded = function (e) {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains(STORE)) {
+                            db.createObjectStore(STORE, { keyPath: 'release' });
+                        }
+                    };
+                    req.onsuccess = function (e) { resolve(e.target.result); };
+                    req.onerror = function (e) { reject(e.target.error); };
+                });
+            }
+
+            function dateKey() {
+                const d = new Date();
+                return d.getFullYear() + '-' +
+                    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(d.getDate()).padStart(2, '0');
+            }
+
+            function save(entry) {
+                return openDB().then(function (db) {
+                    return new Promise(function (resolve, reject) {
+                        const tx = db.transaction(STORE, 'readwrite');
+                        tx.objectStore(STORE).put({
+                            release: entry.release || dateKey(),
+                            title: entry.title || '',
+                            message: entry.message || '',
+                            storedAt: entry.storedAt || dateKey()
+                        });
+                        tx.oncomplete = function () { db.close(); resolve(); };
+                        tx.onerror = function () { db.close(); reject(tx.error); };
+                    });
+                });
+            }
+
+            function getAll() {
+                return openDB().then(function (db) {
+                    return new Promise(function (resolve, reject) {
+                        const tx = db.transaction(STORE, 'readonly');
+                        const req = tx.objectStore(STORE).getAll();
+                        req.onsuccess = function () { db.close(); resolve(req.result || []); };
+                        req.onerror = function () { db.close(); reject(req.error); };
+                    });
+                });
+            }
+
+            function clear() {
+                return openDB().then(function (db) {
+                    return new Promise(function (resolve, reject) {
+                        const tx = db.transaction(STORE, 'readwrite');
+                        tx.objectStore(STORE).clear();
+                        tx.oncomplete = function () { db.close(); resolve(); };
+                        tx.onerror = function () { db.close(); reject(tx.error); };
+                    });
+                });
+            }
+
+            return { save: save, getAll: getAll, clear: clear, dateKey: dateKey };
+        })();
+
+        function escapeHtml(str) {
+            return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
+        function renderChangelogHistory() {
+            const grid = document.getElementById('changelog-history-grid');
+            if (!grid) return;
+            PrismChangelogStore.getAll().then(function (entries) {
+                entries.sort(function (a, b) {
+                    return String(b.storedAt || '').localeCompare(String(a.storedAt || ''));
+                });
+                if (!entries.length) {
+                    grid.innerHTML = '<div class="changelog-history-empty">no previous updates stored yet</div>';
+                    return;
+                }
+                grid.innerHTML = entries.map(function (e) {
+                    return '<div class="changelog-history-card">' +
+                        '<div class="changelog-version-badge">' + escapeHtml(e.release || 'unknown') + '</div>' +
+                        '<div class="changelog-history-title">' + escapeHtml(e.title || '') + '</div>' +
+                        '<div class="changelog-history-msg">' + escapeHtml(e.message || '') + '</div>' +
+                        '<div class="changelog-history-date">' + escapeHtml(e.storedAt || '') + '</div>' +
+                        '</div>';
+                }).join('');
+            }).catch(function (err) {
+                console.error('[Prism Logs]: failed to read history', err);
+                grid.innerHTML = '<div class="changelog-history-empty">failed to load history</div>';
+            });
+        }
+
+        function clearChangelogHistory() {
+            if (!confirm('Clear all stored changelogs?\n\nThis removes the local history but does not affect the online changelog.')) return;
+            PrismChangelogStore.clear().then(function () {
+                renderChangelogHistory();
+            }).catch(function (err) {
+                console.error('[Prism Logs]: failed to clear history', err);
+                alert('Failed to clear changelog history.');
+            });
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             updateCleanupVisibility();
+            renderChangelogHistory();
             const isStandalone = window.__PRISM_ENV__.isStandalone;
 
             if (isStandalone) {
@@ -4540,7 +4783,7 @@
                 const desktopTrigger = document.getElementById('changelog-trigger-desktop');
                 if (mobileTrigger) mobileTrigger.style.display = 'flex';
 
-                fetch('changelog.json?t=' + Date.now(), { cache: 'no-store' })
+                fetch('changelog.json?d=' + PrismChangelogStore.dateKey(), { cache: 'no-store' })
                     .then(res => {
                         if (!res.ok) throw new Error('[Prism Logs]: Network error');
                         return res.json();
@@ -4549,6 +4792,16 @@
                         document.getElementById('cl-modal-version').textContent = data.release;
                         document.getElementById('cl-modal-title').textContent = data.title;
                         document.getElementById('cl-modal-msg').textContent = data.message;
+
+                        if (data.release) {
+                            PrismChangelogStore.save({
+                                release: data.release,
+                                title: data.title,
+                                message: data.message
+                            }).then(renderChangelogHistory).catch(function (err) {
+                                console.error('[Prism Logs]: failed to save changelog', err);
+                            });
+                        }
 
                         const seenRelease = localStorage.getItem('PRISM_SEEN_CHANGELOG');
                         if (data.release && data.release !== seenRelease) {

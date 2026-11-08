@@ -1,5 +1,5 @@
 {
-  "release": "v5.3.0-Quail",
-  "title": "Quail Patch 2 Part 4",
-  "message": "BIG Sand Box 3D update (v26.11.07): NEW controls for Sand Box 3D, hotbars, and on-screen buttons, along with switching from \"Free Fly Mode\" to \"Player Mode\" toggles. Rift Runners 2D update (v3.0.0): A certain \"hard cap\" to most enemies, this means that RR2D isn't as hard to beat anymore. Weapons buffed, shop upgrades now better. A new option after you die in RR2D; 599 Shards to revive yourself and continue playing."
+  "release": "v5.3.5-Quail",
+  "title": "Quail Patch 2 Part 5",
+  "message": "Prism update (v5.3.5-Quail): Prism's Color themes now apply correctly to Sand Box 3D and Rift Runners 2D's Prism Launchers. Changelogs can now be preserved and be deleted."
 }
