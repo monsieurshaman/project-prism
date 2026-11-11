@@ -1,5 +1,5 @@
 {
-  "release": "v5.3.5-Quail",
-  "title": "Quail Patch 2 Part 5",
-  "message": "Prism update (v5.3.5-Quail): Prism's Color themes now apply correctly to Sand Box 3D and Rift Runners 2D's Prism Launchers. Changelogs can now be preserved and be deleted."
+  "release": "v5.3.6-Quail",
+  "title": "Quail Patch 2 Part 6",
+  "message": "Prism update (v5.3.6-Quail): Added \"Your Day\" card to Prism, greets you by your preferred username. We made a certain tweak to Prism's Prism Launchers to their links for sharing, go try now!"
 }

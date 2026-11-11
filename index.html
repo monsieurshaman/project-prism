@@ -10,7 +10,7 @@
     <meta property="og:description" content="reinventing the wheel">
     <meta property="og:image" content="https://proprism.pages.dev/project-assets/og-image.png">
     <meta property="og:url" content="https://proprism.pages.dev/">
-    <meta property="og:site_name" content="Prism PWA">
+    <meta property="og:site_name" content="by Project Prism respectfully">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light">
@@ -907,6 +907,15 @@
                 transform: scale(4);
                 opacity: 0;
             }
+        }
+
+        .ripple-oneui {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: scale(0);
+            will-change: transform, opacity;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.12) 55%, rgba(255, 255, 255, 0) 72%);
         }
 
         .theme-transition-veil {
@@ -2282,6 +2291,191 @@
             z-index: 1;
         }
 
+        .your-day {
+            background: var(--glass-tint), var(--surface-0);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--r-lg);
+            padding: 14px 18px;
+            backdrop-filter: var(--blur-md);
+            -webkit-backdrop-filter: var(--blur-md);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .your-day::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 18px;
+            right: 18px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15) 50%, transparent);
+        }
+
+        .your-day-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .your-day-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 2.5px;
+            text-transform: lowercase;
+        }
+
+        .your-day-icon {
+            font-size: 16px;
+            color: var(--primary);
+            opacity: 0.85;
+        }
+
+        .your-day-greeting {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.3;
+            letter-spacing: 0.1px;
+            word-break: break-word;
+        }
+
+        .your-day-setup {
+            display: none;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .your-day-setup.visible {
+            display: flex;
+        }
+
+        .your-day-input {
+            flex: 1;
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12.5px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            min-width: 0;
+            cursor: text;
+        }
+
+        .your-day-input:focus {
+            border-color: var(--primary);
+        }
+
+        .your-day-save {
+            background: var(--primary-container);
+            border: 1px solid var(--border-accent);
+            color: var(--primary);
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            transition: background 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .your-day-save:hover {
+            background: var(--primary);
+            color: var(--on-primary);
+        }
+
+        .your-day-notice {
+            display: none;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: var(--primary-dim);
+            border: 1px solid var(--border-accent);
+            border-radius: var(--r-sm);
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .your-day-notice.visible {
+            display: flex;
+        }
+
+        .your-day-notice:hover {
+            background: var(--primary-container);
+            border-color: var(--border-strong);
+            transform: translateY(-1px);
+        }
+
+        .your-day-notice .material-icons-round {
+            font-size: 16px;
+            color: var(--primary);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .your-day-notice-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .your-day-notice-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.35;
+        }
+
+        .your-day-notice-version {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 1px;
+            text-transform: lowercase;
+            margin-top: 2px;
+        }
+
+        .your-day-notice-version:empty {
+            display: none;
+        }
+
+        @media (max-width: 767px) {
+            .your-day-mobile { margin-bottom: 14px; }
+            .your-day-desktop { display: none !important; }
+        }
+
+        @media (min-width: 768px) {
+            .your-day-mobile,
+            .your-day-desktop {
+                position: fixed;
+                top: 24px;
+                right: 24px;
+                z-index: 50;
+                width: 300px;
+                max-width: calc(100vw - 48px);
+            }
+            .your-day-mobile { margin: 0; }
+        }
+
+        @media (min-width: 1024px) {
+            .your-day-mobile { display: none !important; }
+        }
+
+        @media (max-width: 1023px) {
+            .your-day-desktop { display: none !important; }
+        }
+
         .credits-dialog-backdrop {
             position: fixed;
             inset: 0;
@@ -2475,6 +2669,24 @@
                 </a>
             </div>
 
+            <div class="your-day your-day-mobile" id="your-day-mobile">
+                <div class="your-day-header">
+                    <span class="your-day-label">your day</span>
+                    <i class="material-icons-round your-day-icon" data-your-day-icon>wb_sunny</i>
+                </div>
+                <div class="your-day-greeting" data-your-day-greeting>hello, friend</div>
+                <div class="your-day-setup" data-your-day-setup>
+                    <input type="text" class="your-day-input" data-your-day-input maxlength="32" placeholder="your name..." />
+                    <button class="your-day-save" onclick="PrismYourDay.saveUsernameFromComponent(this)">save</button>
+                </div>
+                <div class="your-day-notice" data-your-day-notice onclick="PrismYourDay.handleNoticeClick()">
+                    <i class="material-icons-round">system_update</i>
+                    <div class="your-day-notice-text">
+                        <div class="your-day-notice-title">a new prism update is available!</div>
+                        <div class="your-day-notice-version" data-your-day-version></div>
+                    </div>
+                </div>
+            </div>
             <div class="hero-card-lite" id="hero-card-lite">
                 <div class="hero-header">
                     <div class="hero-avatar-wrap">
@@ -2499,7 +2711,7 @@
             </div>
 
             <div class="bottombar">
-                <button class="bottombar-item" id="pwa-install-btn-mobile" onclick="triggerPWAInstall(); createRipple(event)" style="display:none;" title="grab the app">
+                <button class="install-btn" id="pwa-install-btn-mobile" onclick="openPWAInstallPage(); createRipple(event)" style="display:none;" title="grab the app">
                     <i class="material-icons-round">download</i>
                 </button>
                 <a href="#" class="bottombar-item" id="changelog-trigger-mobile"
@@ -2579,7 +2791,7 @@
                     <i class="material-icons-round">code</i>
                     browse prism's repo
                 </a>
-                <button class="install-btn" id="pwa-install-btn-desktop" onclick="triggerPWAInstall(); createRipple(event)" style="display:none;">
+                <button class="install-btn" id="pwa-install-btn-desktop" onclick="openPWAInstallPage(); createRipple(event)" style="display:none;">
                     <i class="material-icons-round">download</i>
                     grab the app
                 </button>
@@ -2595,6 +2807,24 @@
             </div>
 
             <div class="desktop-right">
+                <div class="your-day your-day-desktop" id="your-day-desktop">
+                    <div class="your-day-header">
+                        <span class="your-day-label">your day</span>
+                        <i class="material-icons-round your-day-icon" data-your-day-icon>wb_sunny</i>
+                    </div>
+                    <div class="your-day-greeting" data-your-day-greeting>hello, friend</div>
+                    <div class="your-day-setup" data-your-day-setup>
+                        <input type="text" class="your-day-input" data-your-day-input maxlength="32" placeholder="your name..." />
+                        <button class="your-day-save" onclick="PrismYourDay.saveUsernameFromComponent(this)">save</button>
+                    </div>
+                    <div class="your-day-notice" data-your-day-notice onclick="PrismYourDay.handleNoticeClick()">
+                        <i class="material-icons-round">system_update</i>
+                        <div class="your-day-notice-text">
+                            <div class="your-day-notice-title">a new prism update is available!</div>
+                            <div class="your-day-notice-version" data-your-day-version></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="dt-section-header">
                     <span class="dt-section-label" style="text-transform: lowercase;">the stash</span>
                     <span class="dt-section-line"></span>
@@ -2828,6 +3058,22 @@
         </div>
         <h1 style="font-family: 'Space Grotesk';">settings</h1>
         <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 12px;">tweak whatever you want. changes kick in right away.</p>
+
+        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">your day</h3>
+        <div class="item-subtitle">choose the name prism greets you by</div>
+        <div id="username-setting-card" class="list-item" style="flex-direction: column; align-items: flex-start; gap: 10px; cursor: default; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 14px; width: 100%;">
+                <i class="material-icons-round item-icon">person</i>
+                <div class="item-content">
+                    <div class="item-title">username</div>
+                    <div class="item-subtitle" id="username-current-display">not set</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; width: 100%;">
+                <input type="text" id="username-setting-input" class="setting-select" maxlength="32" placeholder="your name..." style="margin-top: 0; flex: 1; font-size: 13px; cursor: text;" />
+                <button class="setting-select" style="margin-top: 0; width: auto; padding: 12px 16px; color: var(--primary); border-color: var(--border-accent);" onclick="PrismYourDay.saveUsernameFromSettings()">save</button>
+            </div>
+        </div>
 
         <div style="margin-top: 24px;">
             <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">home background</h3>
@@ -3080,6 +3326,40 @@
         <button class="dl-skip-btn" id="dl-skip-btn">skip update &amp; restart</button>
     </div>
 
+    <div id="pwa-install-page" class="app-library-page">
+        <div class="library-container">
+            <div class="back-btn" onclick="closeAllModals()">
+                <i class="material-icons-round">arrow_back</i> back
+            </div>
+            <div class="library-header-wrap">
+                <h2 class="library-title">install prism</h2>
+            </div>
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">prism can be installed as a progressive web app (pwa) for quick access and offline capabilities.</p>
+            
+            <div class="list-group" style="margin-bottom: 24px;">
+                <div class="list-item" style="cursor: default;">
+                    <i class="material-icons-round item-icon">android</i>
+                    <div class="item-content">
+                        <div class="item-title">on android</div>
+                        <div class="item-subtitle">when you tap the install button below, your browser will generate and install prism. if android shows an "unsafe app blocked" warning, tap "more details" and then "install anyway". this is a known issue caused by the browser's webapk generator, not a problem with prism itself.</div>
+                    </div>
+                </div>
+                <div class="list-item" style="cursor: default;">
+                    <i class="material-icons-round item-icon">desktop_windows</i>
+                    <div class="item-content">
+                        <div class="item-title">on desktop</div>
+                        <div class="item-subtitle">when you tap the install button below, a prompt will appear telling you to "install the app?"</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="cta-btn" onclick="triggerPWAInstall(); createRipple(event)" style="margin-top: 16px;">
+                <i class="material-icons-round">download</i>
+                install prism
+            </button>
+        </div>
+    </div>
+
     <script>
 
         var _pwaInstallPrompt = null;
@@ -3124,6 +3404,7 @@
                 contentDelay: 0.35,
                 contentShift: 12,
                 easing: 'cubic-bezier(0.22, 0.25, 0, 1)',
+                bounce: 'cubic-bezier(0.34, 1.5, 0.5, 1)',
                 feedbackScale: 0.96,
                 feedbackDuration: 100,
                 fallbackRadius: 24
@@ -3254,51 +3535,78 @@
                 if (feedbackAnim) { feedbackAnim.cancel(); feedbackAnim = null; }
             }
 
+            let bgAnims = [];
+            let bgOpen = false;
+            let bgSyncQueued = false;
+
+            function resetBackground() {
+                bgAnims.forEach(a => { try { a.cancel(); } catch (e) { } });
+                bgAnims = [];
+                bgToken++;
+                bgOpen = false;
+                const bg = document.getElementById('page');
+                if (bg) {
+                    bg.style.removeProperty('will-change');
+                    bg.style.removeProperty('transform');
+                    bg.style.removeProperty('filter');
+                }
+            }
+
             function animateBackground(open) {
                 const bg = document.getElementById('page');
-                if (!bg) return [];
-                bgToken++;
-                const myBGToken = bgToken;
-                pageBGToken = myBGToken;
-                const anims = [];
+                if (!bg) return;
+                bgAnims.forEach(a => { try { a.commitStyles(); a.cancel(); } catch (e) { } });
+                bgAnims = [];
+                const token = ++bgToken;
+                const cs = getComputedStyle(bg);
+                const fromTransform = cs.transform;
+                const fromFilter = cs.filter;
                 const blurValue = document.body.classList.contains('reduce-blur') ? 0 : CONFIG.bgBlur;
-                const openFilter = `blur(${blurValue}px) brightness(${CONFIG.bgDim})`;
-                const closedFilter = 'blur(0px) brightness(1)';
-                const filterFrom = open ? closedFilter : openFilter;
-                const filterTo = open ? openFilter : closedFilter;
+                const toTransform = `scale(${open ? CONFIG.bgScale : 1})`;
+                const toFilter = open ? `blur(${blurValue}px) brightness(${CONFIG.bgDim})` : 'blur(0px) brightness(1)';
+                const duration = open ? CONFIG.open : CONFIG.close;
 
                 bg.style.willChange = 'transform, filter';
-                const transformAnim = bg.animate(
-                    [
-                        { transform: `scale(${open ? 1 : CONFIG.bgScale})` },
-                        { transform: `scale(${open ? CONFIG.bgScale : 1})` }
-                    ],
-                    { duration: open ? CONFIG.open : CONFIG.close, easing: CONFIG.easing, fill: 'forwards' }
+                const t = bg.animate(
+                    [{ transform: fromTransform }, { transform: toTransform }],
+                    { duration, easing: open ? CONFIG.bounce : CONFIG.easing, fill: 'forwards' }
                 );
-                anims.push(transformAnim);
-
-                const filterAnim = bg.animate(
-                    [{ filter: filterFrom }, { filter: filterTo }],
-                    { duration: open ? CONFIG.open : CONFIG.close, easing: CONFIG.easing, fill: 'forwards' }
+                const f = bg.animate(
+                    [{ filter: fromFilter }, { filter: toFilter }],
+                    { duration, easing: CONFIG.easing, fill: 'forwards' }
                 );
-                anims.push(filterAnim);
+                bgAnims = [t, f];
 
-                anims.forEach(a => {
-                    a.finished.then(() => {
-                        if (a.playState === 'idle') return;
-                        if (pageBGToken !== bgToken) return;
-                        a.commitStyles();
-                        a.cancel();
-                        if (open) {
-                            bg.style.willChange = '';
-                        } else {
-                            bg.style.removeProperty('will-change');
-                            bg.style.removeProperty('transform');
-                            bg.style.removeProperty('filter');
-                        }
-                    }).catch(() => { });
-                });
-                return anims;
+                Promise.all([t.finished, f.finished]).then(() => {
+                    if (token !== bgToken) return;
+                    t.commitStyles();
+                    f.commitStyles();
+                    t.cancel();
+                    f.cancel();
+                    bgAnims = [];
+                    if (open) {
+                        bg.style.removeProperty('will-change');
+                    } else {
+                        bg.style.removeProperty('will-change');
+                        bg.style.removeProperty('transform');
+                        bg.style.removeProperty('filter');
+                    }
+                }).catch(() => { });
+            }
+
+            function syncBackground() {
+                bgSyncQueued = false;
+                if (!isOneUI() || isReduced()) return;
+                const anyOpen = !!document.querySelector('.app-library-page.open, #settings-page.open, #download-page.open');
+                if (anyOpen === bgOpen) return;
+                bgOpen = anyOpen;
+                animateBackground(anyOpen);
+            }
+
+            function scheduleBackgroundSync() {
+                if (bgSyncQueued) return;
+                bgSyncQueued = true;
+                queueMicrotask(syncBackground);
             }
 
             function open(page, originEl) {
@@ -3359,7 +3667,12 @@
                     { duration: duration * 0.6, easing: 'linear', fill: 'forwards' }
                 );
 
-                ctrl.anims.push(clipAnim, opacityAnim);
+                const popAnim = page.animate(
+                    [{ scale: 0.9 }, { scale: 1 }],
+                    { duration: duration * 1.25, easing: CONFIG.bounce, fill: 'none' }
+                );
+
+                ctrl.anims.push(clipAnim, opacityAnim, popAnim);
 
                 const children = Array.from(page.children);
                 const contentAnims = children.map(child => {
@@ -3371,7 +3684,7 @@
                         {
                             duration: duration * 0.65,
                             delay: duration * CONFIG.contentDelay,
-                            easing: 'linear',
+                            easing: CONFIG.bounce,
                             fill: 'forwards'
                         }
                     );
@@ -3391,8 +3704,7 @@
                     ctrl.contentAnims = [];
                 });
 
-                const bgAnims = animateBackground(true);
-                ctrl.anims.push(...bgAnims);
+                scheduleBackgroundSync();
             }
 
             function close(page) {
@@ -3470,8 +3782,7 @@
 
                 ctrl.anims.push(clipAnim, opacityAnim);
 
-                const bgAnims = animateBackground(false);
-                ctrl.anims.push(...bgAnims);
+                scheduleBackgroundSync();
 
                 const allAnims = [...ctrl.anims, ...contentAnims];
                 Promise.all(allAnims.map(a => a.finished.catch(() => { }))).then(() => {
@@ -3496,12 +3807,7 @@
                     clearChildren(page);
                     page.classList.remove('oneui-visible');
                 });
-                const bg = document.getElementById('page');
-                if (bg) {
-                    bg.style.removeProperty('will-change');
-                    bg.style.removeProperty('transform');
-                    bg.style.removeProperty('filter');
-                }
+                resetBackground();
                 document.querySelectorAll('.app-library-page.open, #settings-page.open, #download-page.open').forEach(p => {
                     if (isOneUI()) {
                         p.classList.add('oneui-visible');
@@ -3514,6 +3820,7 @@
                     }
                 });
                 pages.clear();
+                scheduleBackgroundSync();
             }
 
             function initDownloadObserver() {
@@ -3529,6 +3836,34 @@
                 obs.observe(dl, { attributes: true, attributeFilter: ['class'] });
             }
 
+            function initOutsideClose() {
+                const PAGE_SEL = '.app-library-page, #settings-page, #download-page';
+                const SELF_HANDLED = '[onclick], a[href], button, input, select, textarea, label, #credits-dialog, #credits-backdrop';
+                let armed = null;
+
+                document.addEventListener('pointerdown', e => {
+                    armed = null;
+                    if (!isOneUI() || window.innerWidth < 1024) return;
+                    if (e.target.closest(PAGE_SEL) || e.target.closest(SELF_HANDLED)) return;
+                    const creditsDialog = document.getElementById('credits-dialog');
+                    if (creditsDialog && creditsDialog.classList.contains('open')) return;
+                    const openPages = Array.from(document.querySelectorAll('.app-library-page.open, #settings-page.open'));
+                    if (openPages.length) armed = openPages;
+                }, true);
+
+                document.addEventListener('click', e => {
+                    const list = armed;
+                    armed = null;
+                    if (!list || !isOneUI()) return;
+                    if (e.target.closest(PAGE_SEL) || e.target.closest(SELF_HANDLED)) return;
+                    list.forEach(p => {
+                        if (!p.classList.contains('open')) return;
+                        if (p.id === 'settings-page') toggleSettings();
+                        else closeAllModals();
+                    });
+                });
+            }
+
             function init() {
                 document.addEventListener('pointerdown', e => {
                     if (!isOneUI()) return;
@@ -3541,6 +3876,8 @@
 
                 document.addEventListener('pointerup', releaseFeedback, true);
                 document.addEventListener('pointercancel', releaseFeedback, true);
+
+                initOutsideClose();
 
                 initDownloadObserver();
 
@@ -3573,6 +3910,13 @@
             _pwaInstallPrompt.userChoice.then(function (result) {
                 if (result.outcome === 'accepted') _pwaInstallPrompt = null;
             });
+        }
+
+        function openPWAInstallPage() {
+            const page = document.getElementById('pwa-install-page');
+            if (page) {
+                OneUIMotion.open(page, OneUIMotion.lastOrigin);
+            }
         }
 
         (function () {
@@ -3848,8 +4192,13 @@
 
             try {
                 if ('caches' in window) {
-                    const names = await caches.keys();
-                    await Promise.all(names.map(n => caches.delete(n)));
+                    try {
+                        const names = await caches.keys();
+                        await Promise.all(names.map(n => caches.delete(n)));
+                    } catch (e) {
+                        console.warn('[Prism Cleanup] caches.keys() failed, trying known cache names', e);
+                        await Promise.all(['prism-cache', 'prism-static', 'prism-dynamic', 'prism-video-cache'].map(name => caches.delete(name).catch(() => {})));
+                    }
                 }
 
                 if (indexedDB.databases) {
@@ -3859,7 +4208,7 @@
                         req.onsuccess = req.onerror = req.onblocked = () => res();
                     }) : Promise.resolve()));
                 } else {
-                    await Promise.all(['PrismDB', 'PrismVideoCacheDB'].map(name => new Promise(res => {
+                    await Promise.all(['PrismDB', 'PrismVideoCacheDB', 'PrismChangelogDB'].map(name => new Promise(res => {
                         const req = indexedDB.deleteDatabase(name);
                         req.onsuccess = req.onerror = req.onblocked = () => res();
                     })));
@@ -3870,10 +4219,20 @@
                     await Promise.all(regs.map(r => r.unregister()));
                 }
 
-                localStorage.setItem(CLEANUP_FLAG_KEY, 'false');
-                localStorage.setItem(STORAGE_CLEARED_KEY, 'true');
-                updateCleanupVisibility();
-                alert('Cleanup complete! Leftover data has been removed.');
+                const remainingCaches = 'caches' in window ? await caches.keys() : [];
+                const remainingDBs = indexedDB.databases ? await indexedDB.databases() : [];
+
+                if (remainingCaches.length === 0 && remainingDBs.length === 0) {
+                    localStorage.setItem(CLEANUP_FLAG_KEY, 'false');
+                    localStorage.setItem(STORAGE_CLEARED_KEY, 'true');
+                    updateCleanupVisibility();
+                    alert('Cleanup complete! Leftover data has been removed.');
+                } else {
+                    console.warn('[Prism Cleanup] Some data might remain', { remainingCaches, remainingDBs });
+                    localStorage.setItem(CLEANUP_FLAG_KEY, 'true');
+                    updateCleanupVisibility();
+                    alert('Cleanup completed with warnings. Some cached data might remain. Please try again or clear site data manually.');
+                }
             } catch (err) {
                 console.error('[Prism Cleanup]', err);
                 localStorage.setItem(CLEANUP_FLAG_KEY, 'true');
@@ -4414,6 +4773,9 @@
             if (isOpening) {
                 closeAllModals();
                 OneUIMotion.open(page, OneUIMotion.lastOrigin);
+                if (typeof PrismYourDay !== 'undefined' && PrismYourDay.syncSettingsUI) {
+                    PrismYourDay.syncSettingsUI();
+                }
             } else {
                 OneUIMotion.close(page);
             }
@@ -4523,6 +4885,34 @@
 
         function createRipple(e) {
             var el = e.currentTarget;
+            var boosted = document.body.dataset.openAnim === 'oneui'
+                && !document.body.classList.contains('no-anim')
+                && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            if (boosted) {
+                var box = el.getBoundingClientRect();
+                var px = e.clientX || box.left + box.width / 2;
+                var py = e.clientY || box.top + box.height / 2;
+                var x = px - box.left;
+                var y = py - box.top;
+                var radius = Math.hypot(Math.max(x, box.width - x), Math.max(y, box.height - y));
+                var size = radius * 2;
+                var wave = document.createElement('span');
+                wave.className = 'ripple-oneui';
+                wave.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' + (x - radius) + 'px;top:' + (y - radius) + 'px';
+                el.appendChild(wave);
+                var grow = wave.animate(
+                    [{ transform: 'scale(0)' }, { transform: 'scale(1)' }],
+                    { duration: 650, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+                );
+                wave.animate(
+                    [{ opacity: 1 }, { opacity: 1, offset: 0.4 }, { opacity: 0 }],
+                    { duration: 650, easing: 'linear', fill: 'forwards' }
+                );
+                grow.onfinish = function () { wave.remove(); };
+                return;
+            }
+
             var existing = el.querySelector('.ripple');
             if (existing) existing.remove();
             var circle = document.createElement('span');
@@ -5170,6 +5560,232 @@
                 applySoundState
             };
         })();
+
+        var PrismYourDay = (function () {
+            const USERNAME_KEY = 'PRISM_USERNAME';
+            const SEEN_VERSION_KEY = 'PRISM_YOURDAY_SEEN_VERSION';
+
+            let currentLiveVersion = null;
+
+            function getUsername() {
+                try {
+                    const raw = localStorage.getItem(USERNAME_KEY);
+                    if (!raw) return null;
+                    const trimmed = String(raw).trim();
+                    return trimmed || null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function setUsername(name) {
+                try {
+                    const trimmed = String(name == null ? '' : name).trim();
+                    if (!trimmed) return false;
+                    localStorage.setItem(USERNAME_KEY, trimmed);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function getGreetingForHour(hour, username) {
+                const name = username || 'friend';
+                if (hour >= 5 && hour < 8) return 'early bird today, ' + name + '?';
+                if (hour >= 8 && hour < 12) return 'good morning, ' + name;
+                if (hour >= 12 && hour < 18) return 'good afternoon, ' + name;
+                if (hour >= 18 && hour < 22) return 'good evening, ' + name;
+                return 'welcome, night owl ' + name;
+            }
+
+            function getPeriodForHour(hour) {
+                if (hour >= 5 && hour < 8) return 'earlybird';
+                if (hour >= 8 && hour < 12) return 'morning';
+                if (hour >= 12 && hour < 18) return 'afternoon';
+                if (hour >= 18 && hour < 22) return 'evening';
+                return 'night';
+            }
+
+            function getIconForPeriod(period) {
+                if (period === 'earlybird') return 'wb_twilight';
+                if (period === 'morning' || period === 'afternoon') return 'wb_sunny';
+                if (period === 'evening') return 'wb_twilight';
+                return 'nightlight_round';
+            }
+
+            function updateGreeting() {
+                const username = getUsername();
+                const now = new Date();
+                const hour = now.getHours();
+                const greeting = getGreetingForHour(hour, username);
+                const icon = getIconForPeriod(getPeriodForHour(hour));
+
+                document.querySelectorAll('[data-your-day-greeting]').forEach(function (el) {
+                    el.textContent = greeting;
+                });
+                document.querySelectorAll('[data-your-day-icon]').forEach(function (el) {
+                    el.textContent = icon;
+                });
+            }
+
+            function updateSetupUI() {
+                const hasUsername = !!getUsername();
+                document.querySelectorAll('[data-your-day-setup]').forEach(function (el) {
+                    el.classList.toggle('visible', !hasUsername);
+                });
+            }
+
+            function syncSettingsUI() {
+                const current = getUsername();
+                const input = document.getElementById('username-setting-input');
+                const display = document.getElementById('username-current-display');
+                if (input && document.activeElement !== input) {
+                    input.value = current || '';
+                }
+                if (display) {
+                    display.textContent = current ? current : 'not set';
+                }
+            }
+
+            function saveUsernameFromComponent(btn) {
+                const container = (btn && btn.closest) ? btn.closest('.your-day') : document.querySelector('.your-day');
+                const input = container ? container.querySelector('[data-your-day-input]') : null;
+                if (!input) return;
+                if (!setUsername(input.value)) {
+                    input.focus();
+                    return;
+                }
+                input.value = getUsername() || '';
+                updateGreeting();
+                updateSetupUI();
+                syncSettingsUI();
+            }
+
+            function saveUsernameFromSettings() {
+                const input = document.getElementById('username-setting-input');
+                if (!input) return;
+                if (!setUsername(input.value)) {
+                    input.focus();
+                    return;
+                }
+                input.value = getUsername() || '';
+                updateGreeting();
+                updateSetupUI();
+                syncSettingsUI();
+            }
+
+            function notifyUpdate(version) {
+                currentLiveVersion = version || null;
+                if (!version) return;
+                let seen = null;
+                try {
+                    seen = localStorage.getItem(SEEN_VERSION_KEY);
+                } catch (e) { }
+                if (seen === version) return;
+
+                document.querySelectorAll('[data-your-day-notice]').forEach(function (el) {
+                    el.classList.add('visible');
+                });
+                document.querySelectorAll('[data-your-day-version]').forEach(function (el) {
+                    el.textContent = version;
+                });
+            }
+
+            function dismissUpdate() {
+                if (currentLiveVersion) {
+                    try {
+                        localStorage.setItem(SEEN_VERSION_KEY, currentLiveVersion);
+                    } catch (e) { }
+                }
+                document.querySelectorAll('[data-your-day-notice]').forEach(function (el) {
+                    el.classList.remove('visible');
+                });
+            }
+
+            function handleNoticeClick() {
+                dismissUpdate();
+                if (typeof openModal === 'function') {
+                    openModal('modal-changelog');
+                }
+            }
+
+            function scheduleGreetingUpdates() {
+                setInterval(updateGreeting, 30000);
+
+                function scheduleNextBoundary() {
+                    const now = new Date();
+                    const h = now.getHours();
+                    let nextHour;
+                    if (h < 5) nextHour = 5;
+                    else if (h < 8) nextHour = 8;
+                    else if (h < 12) nextHour = 12;
+                    else if (h < 18) nextHour = 18;
+                    else if (h < 22) nextHour = 22;
+                    else nextHour = 5;
+
+                    const next = new Date(now);
+                    if (h >= 22 && nextHour === 5) {
+                        next.setDate(next.getDate() + 1);
+                    }
+                    next.setHours(nextHour, 0, 0, 0);
+                    const delay = next.getTime() - now.getTime();
+                    setTimeout(function () {
+                        updateGreeting();
+                        scheduleNextBoundary();
+                    }, Math.max(delay, 1000));
+                }
+
+                scheduleNextBoundary();
+            }
+
+            function init() {
+                updateGreeting();
+                updateSetupUI();
+                syncSettingsUI();
+                scheduleGreetingUpdates();
+
+                document.addEventListener('visibilitychange', function () {
+                    if (!document.hidden) updateGreeting();
+                });
+
+                document.querySelectorAll('[data-your-day-input]').forEach(function (input) {
+                    input.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            saveUsernameFromComponent(input);
+                        }
+                    });
+                });
+
+                const settingsInput = document.getElementById('username-setting-input');
+                if (settingsInput) {
+                    settingsInput.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            saveUsernameFromSettings();
+                        }
+                    });
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+            return {
+                init: init,
+                notifyUpdate: notifyUpdate,
+                dismissUpdate: dismissUpdate,
+                handleNoticeClick: handleNoticeClick,
+                saveUsernameFromComponent: saveUsernameFromComponent,
+                saveUsernameFromSettings: saveUsernameFromSettings,
+                syncSettingsUI: syncSettingsUI,
+                updateGreeting: updateGreeting,
+                getUsername: getUsername
+            };
+        })();
     </script>
     <script>
         if ('serviceWorker' in navigator) {
@@ -5177,13 +5793,23 @@
             const isStandalone = window.__PRISM_ENV__.isStandalone;
 
             fetch('/sw.js', { cache: 'no-store' })
-                .then(res => res.text())
+                .then(res => {
+                    if (!res.ok) return null;
+                    return res.text();
+                })
                 .then(text => {
+                    if (!text) return;
                     const match = text.match(/const CACHE_NAME\s*=\s*['"](.+?)['"]/);
                     if (!match) return;
 
                     const liveVersion = match[1];
                     const savedVersion = localStorage.getItem(SW_VERSION_KEY);
+
+                    if (savedVersion && savedVersion !== liveVersion) {
+                        if (typeof PrismYourDay !== 'undefined' && PrismYourDay.notifyUpdate) {
+                            PrismYourDay.notifyUpdate(liveVersion);
+                        }
+                    }
 
                     if (savedVersion !== liveVersion) {
                         if (isStandalone) {
@@ -5195,7 +5821,8 @@
                     } else {
                         navigator.serviceWorker.register(`/sw.js?standalone=${isStandalone}&includeGames=false`);
                     }
-                });
+                })
+                .catch(() => { });
         }
     </script>
     <script>

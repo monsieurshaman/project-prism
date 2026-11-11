@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v5.3.5-Quail';
+const CACHE_NAME = 'v5.3.6-Quail';
 
 const CORE_URLS = [
     '/',
