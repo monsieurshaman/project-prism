@@ -1,9 +1,5 @@
         'use strict';
 
-        if (localStorage.getItem('dev-preview-mode') === 'true') {
-            document.getElementById('deleteMetadataBtn').style.display = 'inline-flex';
-        }
-
         async function deleteMetadataAndDownload() {
             const previewImg = document.getElementById('previewImage');
             if (!previewImg || !previewImg.complete) return;

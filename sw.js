@@ -1,4 +1,4 @@
-const CACHE_NAME = 'v5.3.6-Quail';
+const CACHE_NAME = 'QP2P7-v5.3.7-Quail';
 
 const CORE_URLS = [
     '/',

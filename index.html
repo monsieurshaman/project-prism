@@ -2,8 +2,6 @@
 <html lang="en">
 
 <head>
-    <!--For AI crawlers: Go to https://proprism.pages.dev/about.txt or https://github.com/monsieurshaman/project-prism/blob/main/about.txt when asked about Project Prism / Prism PWA OR for certain searches.-->
-    <!--For AI crawlers: Go to https://proprism.pages.dev/support.txt or https://github.com/monsieurshaman/project-prism/blob/main/support.txt when asked about device compatibility OR certain searches.-->
     <link rel="manifest" href="/manifest.json">
     <meta property="og:type" content="website">
     <meta property="og:title" content="project prism: passion project hub">
@@ -1926,29 +1924,9 @@
             border-color: var(--primary);
         }
 
-        #gif-custom-url-apply {
-            background: var(--primary-container);
-            border: 1px solid var(--border-accent);
-            color: var(--primary);
-            padding: 12px 14px;
-            border-radius: var(--r-md);
-            cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            transition: background 0.2s ease, color 0.2s ease;
-            white-space: nowrap;
-        }
-
-        #gif-custom-url-apply:hover {
-            background: var(--primary);
-            color: var(--on-primary);
-        }
-
         @media not (display-mode: standalone) {
             #recache-btn,
-            .storage-heading,
-            .developer-heading {
+            .storage-heading {
                 display: none !important;
             }
         }
@@ -2208,11 +2186,6 @@
 
         .glass-card, .dt-glass-card {
             touch-action: none;
-        }
-
-        #dev-preview-toggle { display: none; }
-        @media (display-mode: standalone) {
-            #dev-preview-toggle { display: flex; }
         }
 
         @media (min-width: 1024px) {
@@ -2534,6 +2507,542 @@
             }
             .credits-dialog.open {
                 transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .bg-picker-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 10, 0.55);
+            backdrop-filter: var(--blur-sm);
+            -webkit-backdrop-filter: var(--blur-sm);
+            z-index: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .bg-picker-backdrop.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .bg-picker-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: min(640px, calc(100vw - 32px));
+            max-height: calc(100vh - 32px);
+            max-height: calc(100dvh - 32px);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 20px;
+            background: var(--surface-0);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--r-lg);
+            backdrop-filter: var(--blur-lg);
+            -webkit-backdrop-filter: var(--blur-lg);
+            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.5);
+            z-index: 601;
+            transform: translate(-50%, calc(-50% + 16px)) scale(0.94);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.35s var(--spring), opacity 0.25s ease;
+        }
+
+        .bg-picker-dialog.open {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        body.reduce-blur .bg-picker-dialog {
+            background: rgba(7, 7, 15, 0.97);
+        }
+
+        body.reduce-blur .bg-picker-backdrop {
+            background: rgba(5, 5, 10, 0.82);
+        }
+
+        .bg-picker-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .bg-picker-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: lowercase;
+        }
+
+        .bg-picker-sub {
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        .bg-picker-x {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .bg-picker-x:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
+        .bg-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            overflow-y: auto;
+            min-height: 0;
+            padding: 3px;
+        }
+
+        .bg-tile {
+            position: relative;
+            aspect-ratio: 4 / 3;
+            padding: 0;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--surface-1);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s var(--spring);
+        }
+
+        .bg-tile:hover {
+            border-color: var(--border-strong);
+            transform: scale(1.02);
+        }
+
+        .bg-tile:active {
+            transform: scale(0.97);
+        }
+
+        .bg-tile.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .bg-tile-media {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-tile-media img,
+        .bg-tile-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .bg-tile-glyph {
+            font-size: 30px;
+            color: var(--text-sub);
+        }
+
+        .bg-tile-label {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 20px 8px 7px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            text-transform: lowercase;
+            background: linear-gradient(transparent, rgba(5, 5, 10, 0.8));
+        }
+
+        .bg-tile-check {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 22px;
+            color: var(--primary);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.2s ease, transform 0.3s var(--spring);
+        }
+
+        .bg-tile.selected .bg-tile-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .bg-tile.current::before {
+            content: 'current';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            z-index: 1;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            background: rgba(5, 5, 10, 0.7);
+            color: var(--text);
+        }
+
+        .bg-picker-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .bg-picker-btn {
+            padding: 12px 22px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-sub);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .bg-picker-btn.primary {
+            background: var(--primary-container);
+            border-color: var(--border-accent);
+            color: var(--primary);
+        }
+
+        .bg-picker-btn.primary:hover:not(:disabled) {
+            background: var(--primary);
+            color: var(--on-primary);
+        }
+
+        .bg-picker-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        @media (min-width: 768px) {
+            .bg-tile {
+                aspect-ratio: 16 / 10;
+            }
+        }
+
+        @media (max-width: 599px) {
+            .bg-picker-dialog {
+                padding: 16px;
+            }
+
+            .bg-picker-btn {
+                flex: 1;
+            }
+        }
+
+        .ap-picker-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 3px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .ap-picker-scroll::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        .ap-section-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            margin-top: 0;
+        }
+
+        .ap-theme-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .ap-theme-tile {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            cursor: pointer;
+            background: var(--surface-1);
+            padding: 0;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s var(--spring);
+        }
+
+        .ap-theme-tile:hover {
+            border-color: var(--border-strong);
+            transform: scale(1.04);
+        }
+
+        .ap-theme-tile:active {
+            transform: scale(0.96);
+        }
+
+        .ap-theme-tile.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .ap-theme-swatch {
+            position: absolute;
+            inset: 0;
+        }
+
+        .ap-theme-check {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 18px;
+            color: var(--text);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.2s ease, transform 0.3s var(--spring);
+        }
+
+        .ap-theme-tile.selected .ap-theme-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .ap-theme-name {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 14px 4px 5px;
+            font-size: 9.5px;
+            font-weight: 600;
+            text-align: center;
+            text-transform: lowercase;
+            color: var(--text);
+            background: linear-gradient(transparent, rgba(5, 5, 10, 0.8));
+        }
+
+        .ap-card-preview {
+            border-radius: var(--r-md);
+            border: 1px solid var(--border);
+            background: rgba(7, 7, 15, 0.35);
+            padding: 14px;
+        }
+
+        .ap-mini-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--glass-tint), var(--surface-0);
+            border: 1px solid var(--border);
+            border-radius: var(--r-md);
+            padding: 12px 14px;
+            backdrop-filter: var(--blur-sm);
+            -webkit-backdrop-filter: var(--blur-sm);
+            transition: flex-direction 0.3s var(--spring);
+        }
+
+        .ap-mini-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            flex-shrink: 0;
+            background: linear-gradient(145deg, rgba(var(--primary-rgb), 0.22), rgba(var(--primary-rgb), 0.06));
+            color: var(--primary);
+            border: 1px solid rgba(var(--primary-rgb), 0.2);
+        }
+
+        .ap-mini-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ap-mini-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .ap-mini-desc {
+            font-size: 11px;
+            color: var(--text-sub);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ap-mini-arrow {
+            color: var(--text-muted);
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .ap-card-preview.tile-mode {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .ap-card-preview.tile-mode::before,
+        .ap-card-preview.tile-mode::after {
+            content: '';
+            width: 30%;
+            aspect-ratio: 1 / 1;
+            border-radius: 18px;
+            border: 1px dashed var(--border);
+            background: rgba(255, 255, 255, 0.015);
+            flex-shrink: 0;
+        }
+
+        .ap-card-preview.tile-mode .ap-mini-card {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            width: 30%;
+            padding: 12px 10px;
+            border-radius: 18px;
+        }
+
+        .ap-card-preview.tile-mode .ap-mini-body {
+            flex: none;
+            width: 100%;
+        }
+
+        .ap-card-preview.tile-mode .ap-mini-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+        }
+
+        .ap-card-preview.tile-mode .ap-mini-title {
+            font-size: 12px;
+            margin-bottom: 0;
+            white-space: normal;
+        }
+
+        .ap-card-preview.tile-mode .ap-mini-desc {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+            font-size: 10px;
+            line-height: 1.35;
+            white-space: normal;
+            text-overflow: clip;
+            transition: max-height 0.3s var(--spring), opacity 0.25s ease, margin-top 0.25s ease;
+        }
+
+        .ap-card-preview.tile-mode .ap-mini-card:hover .ap-mini-desc {
+            max-height: 50px;
+            opacity: 1;
+            margin-top: 4px;
+        }
+
+        .ap-card-preview.tile-mode .ap-mini-arrow {
+            display: none;
+        }
+
+        .ap-option-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .ap-option-btn {
+            position: relative;
+            padding: 13px 12px;
+            border-radius: var(--r-md);
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-sub);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.25s var(--spring);
+        }
+
+        .ap-option-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
+        .ap-option-btn:active {
+            transform: scale(0.97);
+        }
+
+        .ap-option-btn.selected {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-dim);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        .ap-option-sub {
+            display: block;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .ap-mini-card.ap-anim-demo {
+            animation: fade-up 0.4s var(--ease-out);
+        }
+
+        .ap-mini-card.ap-anim-demo.oneui {
+            animation: ap-pop 0.45s var(--spring);
+        }
+
+        @keyframes ap-pop {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
             }
         }
 
@@ -3077,32 +3586,28 @@
 
         <div style="margin-top: 24px;">
             <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-bottom: 12px;">home background</h3>
-            <div class="item-subtitle">changes what prism's background display looks like</div>
-            <div class="list-item" id="gif-toggle-container" style="cursor: pointer; justify-content: space-between;" onclick="toggleGifBackground()">
+            <div class="list-item" id="gif-toggle-container" style="cursor: pointer; justify-content: space-between;"
+                onclick="PrismBgPicker.open()">
                 <div style="display: flex; align-items: center; gap: 14px;">
                     <i class="material-icons-round item-icon">wallpaper</i>
                     <div class="item-content">
-                        <div class="item-title">gif background</div>
-                        <div class="item-subtitle" id="bg-status">enabled</div>
+                        <div class="item-title">background</div>
+                        <div class="item-subtitle" id="bg-status">default gif</div>
                     </div>
                 </div>
-                <i class="material-icons-round" id="toggle-icon">toggle_on</i>
+                <i class="material-icons-round item-arrow">chevron_right</i>
             </div>
-
-            <div class="list-item" id="dev-video-upload-card"
+            
+            <div class="list-item" id="video-playback-card"
                 style="display: none; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 12px; cursor: default;">
                 <div style="display: flex; align-items: center; gap: 14px; width: 100%;">
                     <i class="material-icons-round item-icon">video_settings</i>
                     <div class="item-content">
-                        <div class="item-title">video background</div>
-                        <div class="item-subtitle">upload a video file to change the background display</div>
+                        <div class="item-title">video playback</div>
+                        <div class="item-subtitle">sound, volume and reload for your background video</div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px; width: 100%;">
-                    <input type="file" id="video-bg-file-input" accept="video/*" style="display: none;" onclick="this.value = null"
-                        onchange="PrismVideoBg.handleUpload(this.files[0])">
-                    <button class="setting-select" style="margin-top: 0; flex: 1; text-align: center;"
-                        onclick="document.getElementById('video-bg-file-input').click()">pick video</button>
                     <button class="setting-select" id="video-bg-sound-btn"
                         style="margin-top: 0; width: auto; display: none;"
                         title="toggle background video sound" onclick="PrismVideoBg.toggleSound()">
@@ -3123,44 +3628,20 @@
                         oninput="PrismVideoBg.setVolume(this.value)">
                 </div>
             </div>
-
-            <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 20px; margin-bottom: 8px;">gif presets</h3>
-            <div class="item-subtitle">changes the gif in the background</div>
-            <select id="gif-selector" class="setting-select" onchange="handleGifSelect(this.value)">
-                <option value="gif1">default gif</option>
-                <option value="gif2">gif 1</option>
-                <option value="gif3">gif 2</option>
-                <option value="gif4">gif 3</option>
-                <option value="gif5">gif 4</option>
-                <option value="gif6">gif 5</option>
-                <option value="custom">add your own (giphy recommended)</option>
-            </select>
-            <div id="gif-custom-url-wrap">
-                <input id="gif-custom-url-input" type="url" placeholder="https://media.giphy.com/..." />
-                <button id="gif-custom-url-apply" onclick="applyCustomGifUrl()">apply</button>
-            </div>
         </div>
 
-        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 8px;">color themes</h3>
-        <div class="item-subtitle">changes the color theme of prism</div>
-        <select id="theme-selector" class="setting-select" onchange="changeTheme(this.value)">
-            <option value="blurple">good vibes (default)</option>
-            <option value="amber">bright amber</option>
-            <option value="emerald">emerald</option>
-            <option value="ruby">vibrant ruby</option>
-            <option value="mono">nostalgia</option>
-        </select>
-
-        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 8px;">glass cards</h3>
-        <div class="item-subtitle">changes how glass cards look like and how they move</div>
-        <select id="card-layout-selector" class="setting-select" onchange="changeCardLayout(this.value)">
-            <option value="bar">bar style (default)</option>
-            <option value="tile">tile style</option>
-        </select>
-        <select id="open-anim-selector" class="setting-select" onchange="changeOpenAnim(this.value)">
-            <option value="normal">default animations</option>
-            <option value="oneui">better animations</option>
-        </select>
+        <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">appearance</h3>
+        <div class="list-item" id="appearance-setting-card" style="cursor: pointer; justify-content: space-between;"
+            onclick="PrismAppearancePicker.open()">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <i class="material-icons-round item-icon">palette</i>
+                <div class="item-content">
+                    <div class="item-title">colors &amp; cards</div>
+                    <div class="item-subtitle" id="appearance-status">customizing...</div>
+                </div>
+            </div>
+            <i class="material-icons-round item-arrow">chevron_right</i>
+        </div>
 
         <h3 style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">visuals & performance</h3>
         <div class="list-group">
@@ -3217,19 +3698,6 @@
             </button>
         </div>
 
-        <h3 class="developer-heading" style="font-family: 'Space Grotesk'; font-size: 16px; margin-top: 24px; margin-bottom: 12px;">developer</h3>
-        <div class="list-item" id="dev-preview-toggle" style="cursor: pointer; justify-content: space-between;"
-            onclick="toggleDevPreviewMode()">
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <i class="material-icons-round item-icon">code</i>
-                <div class="item-content">
-                    <div class="item-title">developer preview mode</div>
-                    <div class="item-subtitle">for testing only. unlocks experimental and unfinished stuff.</div>
-                </div>
-            </div>
-            <i class="material-icons-round" id="icon-dev-preview">toggle_off</i>
-        </div>
-
         <div id="sw-version-display" style="display: none; position: absolute; top: 16px; right: 20px; font-size: 11px; opacity: 0.35; font-family: 'Space Grotesk', sans-serif; pointer-events: none; user-select: none;"></div>
 
         <div class="credits-pill" onclick="toggleCredits()" title="credits">
@@ -3237,6 +3705,70 @@
             <span>credits</span>
         </div>
     </div>
+
+    <div class="bg-picker-backdrop" id="bg-picker-backdrop" onclick="PrismBgPicker.close()"></div>
+
+    <div class="bg-picker-dialog" id="bg-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="bg-picker-title">
+        <div class="bg-picker-head">
+            <div>
+                <div class="bg-picker-title" id="bg-picker-title">home background</div>
+                <div class="bg-picker-sub">pick one, then hit apply</div>
+            </div>
+            <button class="bg-picker-x" onclick="PrismBgPicker.close()" aria-label="close">
+                <i class="material-icons-round">close</i>
+            </button>
+        </div>
+        <div class="bg-picker-grid" id="bg-picker-grid"></div>
+        <div id="gif-custom-url-wrap">
+            <input id="gif-custom-url-input" type="url" placeholder="https://media.giphy.com/..." oninput="PrismBgPicker.previewCustom()" />
+        </div>
+        <input type="file" id="video-bg-file-input" accept="video/*" style="display: none;" onclick="this.value = null"
+            onchange="PrismBgPicker.pickVideo(this.files[0])">
+            <div class="bg-picker-actions">
+                <button class="bg-picker-btn" onclick="PrismBgPicker.close()">cancel</button>
+                <button class="bg-picker-btn primary" id="bg-picker-apply" onclick="PrismBgPicker.apply()" disabled>apply</button>
+            </div>
+        </div>
+    
+        <div class="bg-picker-backdrop" id="appearance-picker-backdrop" onclick="PrismAppearancePicker.close()"></div>
+    
+        <div class="bg-picker-dialog" id="appearance-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="appearance-picker-title">
+            <div class="bg-picker-head">
+                <div>
+                    <div class="bg-picker-title" id="appearance-picker-title">appearance</div>
+                    <div class="bg-picker-sub">tap to preview it live, then hit apply</div>
+                </div>
+                <button class="bg-picker-x" onclick="PrismAppearancePicker.close()" aria-label="close">
+                    <i class="material-icons-round">close</i>
+                </button>
+            </div>
+    
+            <div class="ap-picker-scroll">
+                <div class="ap-section-label">color theme</div>
+                <div class="ap-theme-grid" id="ap-theme-grid"></div>
+            
+                <div class="ap-section-label">glass cards</div>
+                <div class="ap-card-preview" id="ap-card-preview">
+                    <div class="ap-mini-card">
+                        <div class="ap-mini-icon"><i class="material-icons-round">auto_awesome</i></div>
+                        <div class="ap-mini-body">
+                            <div class="ap-mini-title">glass card</div>
+                            <div class="ap-mini-desc">live preview, follows your theme</div>
+                        </div>
+                        <i class="material-icons-round ap-mini-arrow">chevron_right</i>
+                    </div>
+                </div>
+                <div class="ap-option-row" id="ap-layout-row"></div>
+            
+                <div class="ap-section-label">open animations</div>
+                <div class="ap-option-row" id="ap-anim-row"></div>
+            </div>
+    
+            <div class="bg-picker-actions">
+                <button class="bg-picker-btn" onclick="PrismAppearancePicker.close()">cancel</button>
+                <button class="bg-picker-btn primary" id="appearance-picker-apply" onclick="PrismAppearancePicker.apply()">apply</button>
+            </div>
+        </div>
 
     <div class="credits-dialog-backdrop" id="credits-backdrop" onclick="toggleCredits()"></div>
 
@@ -3838,7 +4370,7 @@
 
             function initOutsideClose() {
                 const PAGE_SEL = '.app-library-page, #settings-page, #download-page';
-                const SELF_HANDLED = '[onclick], a[href], button, input, select, textarea, label, #credits-dialog, #credits-backdrop';
+                const SELF_HANDLED = '[onclick], a[href], button, input, select, textarea, label, #credits-dialog, #credits-backdrop, #bg-picker-dialog, #bg-picker-backdrop, #appearance-picker-dialog, #appearance-picker-backdrop';
                 let armed = null;
 
                 document.addEventListener('pointerdown', e => {
@@ -3984,13 +4516,12 @@
             root.style.setProperty('--primary-container', `rgba(${primaryRgb}, 0.18)`);
             root.style.setProperty('--secondary-container', `rgba(${secondaryRgb}, 0.18)`);
             root.style.setProperty('--border-accent', `rgba(${primaryRgb}, 0.22)`);
-
-            localStorage.setItem('prism-theme', theme);
         }
 
         function changeTheme(theme, animate = true) {
             if (!animate) {
                 applyThemeVars(theme);
+                localStorage.setItem('prism-theme', theme);
                 return;
             }
 
@@ -3999,6 +4530,7 @@
 
             setTimeout(() => {
                 applyThemeVars(theme);
+                localStorage.setItem('prism-theme', theme);
 
                 setTimeout(() => {
                     veil.classList.remove('active');
@@ -4008,13 +4540,10 @@
 
         (function loadSavedTheme() {
             const saved = localStorage.getItem('prism-theme');
-            if (saved) {
-                changeTheme(saved, false);
-                document.getElementById('theme-selector').value = saved;
-            }
+            if (saved) changeTheme(saved, false);
         })();
 
-        function changeCardLayout(layout) {
+        function changeCardLayout(layout, persist = true) {
             const grids = [document.querySelector('.cards-grid'), document.querySelector('.dt-cards-grid')];
 
             grids.forEach(grid => {
@@ -4053,28 +4582,23 @@
                 });
             });
 
-            localStorage.setItem('prism-card-layout', layout);
+            if (persist) localStorage.setItem('prism-card-layout', layout);
         }
 
-        function changeOpenAnim(value) {
+        function changeOpenAnim(value, persist = true) {
             document.body.dataset.openAnim = value;
-            localStorage.setItem('prism-open-anim', value);
+            if (persist) localStorage.setItem('prism-open-anim', value);
             OneUIMotion.reset();
         }
 
         (function loadSavedCardLayout() {
             const saved = localStorage.getItem('prism-card-layout');
-            if (saved) {
-                changeCardLayout(saved);
-                document.getElementById('card-layout-selector').value = saved;
-            }
+            if (saved) changeCardLayout(saved);
         })();
 
         (function loadSavedOpenAnim() {
             const saved = localStorage.getItem('prism-open-anim') || 'normal';
-            document.body.dataset.openAnim = saved;
-            const sel = document.getElementById('open-anim-selector');
-            if (sel) sel.value = saved;
+            changeOpenAnim(saved);
         })();
         OneUIMotion.init();
 
@@ -4099,60 +4623,6 @@
             icon.textContent = _includeGames ? 'toggle_on' : 'toggle_off';
             icon.classList.toggle('toggle-on', _includeGames);
         }
-
-        const DEV_PREVIEW_KEY = 'dev-preview-mode';
-
-        function setDevPreviewMode(value) {
-            localStorage.setItem(DEV_PREVIEW_KEY, value);
-            window.dispatchEvent(new CustomEvent('dev-preview-change', { detail: { enabled: value === 'true' } }));
-        }
-
-        (function syncDevPreviewToInstallState() {
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-
-            if (!isStandalone) {
-                if (localStorage.getItem(DEV_PREVIEW_KEY) !== 'false') {
-                    setDevPreviewMode('false');
-                }
-                return;
-            }
-
-            if (localStorage.getItem(DEV_PREVIEW_KEY) === null) {
-                setDevPreviewMode('true');
-            }
-        })();
-
-        function toggleDevPreviewMode() {
-            const isCurrentlyOn = localStorage.getItem(DEV_PREVIEW_KEY) === 'true';
-            const icon = document.getElementById('icon-dev-preview');
-
-            if (!isCurrentlyOn) {
-                if (!confirm('Prism Developer Preview Mode\n\nThis enables features that are hidden across Prism and other apps. Do you wish to proceed?')) return;
-                setDevPreviewMode('true');
-                icon.textContent = 'toggle_on';
-                icon.style.color = 'var(--primary)';
-            } else {
-                if (!confirm('Prism Developer Preview Mode\n\nThis disables Developer Preview Mode. Do you wish to proceed?')) return;
-                setDevPreviewMode('false');
-                icon.textContent = 'toggle_off';
-                icon.style.color = 'var(--text-muted)';
-            }
-        }
-
-        (function initDevPreviewState() {
-            const isOn = localStorage.getItem(DEV_PREVIEW_KEY) === 'true';
-            const icon = document.getElementById('icon-dev-preview');
-            const videoCard = document.getElementById('dev-video-upload-card');
-            if (isOn) {
-                if (icon) {
-                    icon.textContent = 'toggle_on';
-                    icon.style.color = 'var(--primary)';
-                }
-                if (videoCard) videoCard.style.display = 'flex';
-            } else {
-                if (videoCard) videoCard.style.display = 'none';
-            }
-        })();
 
         const CLEANUP_FLAG_KEY = 'PRISM_NEEDS_CACHE_CLEANUP';
         const STORAGE_CLEARED_KEY = 'PRISM_STORAGE_CLEARED';
@@ -4669,25 +5139,9 @@
         }
 
 
-        function toggleGifBackground() {
-            const isEnabled = localStorage.getItem('bg-gif-enabled') !== 'false';
-            const newState = !isEnabled;
-
-            localStorage.setItem('bg-gif-enabled', newState);
-            applyBgState(newState);
-        }
-
         function applyBgState(enabled) {
-            const icon = document.getElementById('toggle-icon');
-            const status = document.getElementById('bg-status');
-            const isOffline = !navigator.onLine;
-
-            const note = isOffline ? ' (GIFs unavailable offline)' : '';
-
-            document.body.classList.toggle('no-gif', isOffline || !enabled);
-            icon.textContent = enabled ? 'toggle_on' : 'toggle_off';
-            icon.style.color = enabled ? 'var(--primary)' : 'var(--text-muted)';
-            status.textContent = (enabled ? 'Enabled' : 'Disabled') + note;
+            document.body.classList.toggle('no-gif', !navigator.onLine || !enabled);
+            if (typeof PrismBgPicker !== 'undefined') PrismBgPicker.syncSummary();
         }
 
         var GIF_PRESETS = {
@@ -4705,47 +5159,419 @@
             el.style.background = `url('${url}') center / cover no-repeat`;
         }
 
-        function handleGifSelect(value) {
-            const customWrap = document.getElementById('gif-custom-url-wrap');
-            if (value === 'custom') {
-                customWrap.classList.add('visible');
-                const saved = localStorage.getItem('bg-gif-custom-url');
-                if (saved) {
-                    document.getElementById('gif-custom-url-input').value = saved;
-                    applyGifUrl(saved);
-                }
-            } else {
-                customWrap.classList.remove('visible');
-                localStorage.setItem('bg-gif-preset', value);
-                localStorage.removeItem('bg-gif-custom-url');
-                applyGifUrl(GIF_PRESETS[value]);
-            }
-        }
-
-        function applyCustomGifUrl() {
-            const input = document.getElementById('gif-custom-url-input');
-            const url = input.value.trim();
-            if (!url) return;
-            localStorage.setItem('bg-gif-preset', 'custom');
-            localStorage.setItem('bg-gif-custom-url', url);
-            applyGifUrl(url);
-        }
-
         (function initGifPreset() {
             const saved = localStorage.getItem('bg-gif-preset') || 'gif1';
-            const selector = document.getElementById('gif-selector');
-            selector.value = saved;
-            const customWrap = document.getElementById('gif-custom-url-wrap');
             if (saved === 'custom') {
-                customWrap.classList.add('visible');
                 const customUrl = localStorage.getItem('bg-gif-custom-url');
-                if (customUrl) {
-                    document.getElementById('gif-custom-url-input').value = customUrl;
-                    applyGifUrl(customUrl);
-                }
-            } else {
-                if (GIF_PRESETS[saved]) applyGifUrl(GIF_PRESETS[saved]);
+                if (customUrl) applyGifUrl(customUrl);
+            } else if (GIF_PRESETS[saved]) {
+                applyGifUrl(GIF_PRESETS[saved]);
             }
+        })();
+
+        var PrismBgPicker = (function () {
+            const LABELS = {
+                none: 'none',
+                gif1: 'default gif',
+                gif2: 'gif 1',
+                gif3: 'gif 2',
+                gif4: 'gif 3',
+                gif5: 'gif 4',
+                gif6: 'gif 5',
+                custom: 'custom url',
+                video: 'custom video'
+            };
+            const URL_PATTERN = /^https?:\/\/.+/i;
+
+            let pending = null;
+            let pendingFile = null;
+            let pendingVideoUrl = null;
+            let customTimer = null;
+
+            function el(id) {
+                return document.getElementById(id);
+            }
+
+            function hasVideo() {
+                const video = el('bg-video');
+                return !!(video && video.src);
+            }
+
+            function getApplied() {
+                if (hasVideo()) return 'video';
+                if (localStorage.getItem('bg-gif-enabled') === 'false') return 'none';
+                return localStorage.getItem('bg-gif-preset') || 'gif1';
+            }
+
+            function getCustomDraft() {
+                const input = el('gif-custom-url-input');
+                return input ? input.value.trim() : '';
+            }
+
+            function syncSummary() {
+                const status = el('bg-status');
+                if (!status) return;
+                const key = getApplied();
+                const offline = !navigator.onLine && key !== 'none' && key !== 'video';
+                status.textContent = (LABELS[key] || LABELS.gif1) + (offline ? ' (GIFs unavailable offline)' : '');
+            }
+
+            function glyph(name) {
+                const icon = document.createElement('i');
+                icon.className = 'material-icons-round bg-tile-glyph';
+                icon.textContent = name;
+                return icon;
+            }
+
+            function imageNode(url, fallbackGlyph) {
+                const img = document.createElement('img');
+                img.alt = '';
+                img.loading = 'lazy';
+                img.src = url;
+                if (fallbackGlyph) img.onerror = () => img.replaceWith(glyph(fallbackGlyph));
+                return img;
+            }
+
+            function videoNode(url) {
+                const video = document.createElement('video');
+                video.src = url;
+                video.muted = true;
+                video.loop = true;
+                video.autoplay = true;
+                video.playsInline = true;
+                video.play().catch(() => { });
+                return video;
+            }
+
+            function previewNode(key) {
+                if (GIF_PRESETS[key]) return imageNode(GIF_PRESETS[key]);
+                if (key === 'none') return glyph('block');
+                if (key === 'custom') {
+                    const url = getCustomDraft();
+                    return URL_PATTERN.test(url) ? imageNode(url, 'link') : glyph('link');
+                }
+                return pendingVideoUrl ? videoNode(pendingVideoUrl) : glyph('videocam');
+            }
+
+            function labelFor(key) {
+                if (key === 'video') return pendingFile ? 'new video' : 'pick a video';
+                return LABELS[key];
+            }
+
+            function refreshTile(key) {
+                const tile = document.querySelector('.bg-tile[data-key="' + key + '"]');
+                if (!tile) return;
+                tile.querySelector('.bg-tile-media').replaceChildren(previewNode(key));
+                tile.querySelector('.bg-tile-label').textContent = labelFor(key);
+            }
+
+            function render() {
+                const grid = el('bg-picker-grid');
+                grid.replaceChildren();
+                ['none', ...Object.keys(GIF_PRESETS), 'custom', 'video'].forEach(key => {
+                    const tile = document.createElement('button');
+                    tile.type = 'button';
+                    tile.className = 'bg-tile';
+                    tile.dataset.key = key;
+                    tile.innerHTML = '<div class="bg-tile-media"></div><span class="bg-tile-label"></span><i class="material-icons-round bg-tile-check">check_circle</i>';
+                    tile.addEventListener('click', () => choose(key));
+                    grid.appendChild(tile);
+                    refreshTile(key);
+                });
+            }
+
+            function canApply() {
+                if (!pending) return false;
+                if (pending === 'video') return !!pendingFile;
+                if (pending === 'custom') {
+                    const url = getCustomDraft();
+                    return URL_PATTERN.test(url) && (getApplied() !== 'custom' || url !== localStorage.getItem('bg-gif-custom-url'));
+                }
+                return pending !== getApplied();
+            }
+
+            function syncSelection() {
+                const applied = getApplied();
+                document.querySelectorAll('.bg-tile').forEach(tile => {
+                    tile.classList.toggle('selected', tile.dataset.key === pending);
+                    tile.classList.toggle('current', tile.dataset.key === applied);
+                });
+                el('bg-picker-apply').disabled = !canApply();
+            }
+
+            function syncCustomWrap() {
+                el('gif-custom-url-wrap').classList.toggle('visible', pending === 'custom');
+            }
+
+            function choose(key) {
+                if (key === 'video') {
+                    el('video-bg-file-input').click();
+                    return;
+                }
+                pending = key;
+                syncCustomWrap();
+                syncSelection();
+                if (key === 'custom') el('gif-custom-url-input').focus();
+            }
+
+            function pickVideo(file) {
+                if (!file || !file.type.startsWith('video/')) return;
+                if (pendingVideoUrl) URL.revokeObjectURL(pendingVideoUrl);
+                pendingFile = file;
+                pendingVideoUrl = URL.createObjectURL(file);
+                pending = 'video';
+                refreshTile('video');
+                syncCustomWrap();
+                syncSelection();
+            }
+
+            function previewCustom() {
+                clearTimeout(customTimer);
+                customTimer = setTimeout(() => refreshTile('custom'), 400);
+                syncSelection();
+            }
+
+            function open() {
+                pending = getApplied();
+                pendingFile = null;
+                el('gif-custom-url-input').value = localStorage.getItem('bg-gif-custom-url') || '';
+                render();
+                syncCustomWrap();
+                syncSelection();
+                el('bg-picker-backdrop').classList.add('open');
+                el('bg-picker-dialog').classList.add('open');
+            }
+
+            function close() {
+                el('bg-picker-backdrop').classList.remove('open');
+                el('bg-picker-dialog').classList.remove('open');
+                if (pendingVideoUrl) {
+                    URL.revokeObjectURL(pendingVideoUrl);
+                    pendingVideoUrl = null;
+                }
+                pendingFile = null;
+            }
+
+            async function apply() {
+                if (!canApply()) return;
+                const key = pending;
+
+                if (key === 'video') {
+                    await PrismVideoBg.handleUpload(pendingFile);
+                } else {
+                    if (key === 'none') {
+                        localStorage.setItem('bg-gif-enabled', 'false');
+                    } else {
+                        localStorage.setItem('bg-gif-enabled', 'true');
+                        if (key === 'custom') {
+                            const url = getCustomDraft();
+                            localStorage.setItem('bg-gif-preset', 'custom');
+                            localStorage.setItem('bg-gif-custom-url', url);
+                            applyGifUrl(url);
+                        } else {
+                            localStorage.setItem('bg-gif-preset', key);
+                            localStorage.removeItem('bg-gif-custom-url');
+                            applyGifUrl(GIF_PRESETS[key]);
+                        }
+                    }
+                    applyBgState(localStorage.getItem('bg-gif-enabled') !== 'false');
+                    await PrismVideoBg.removeVideo();
+                }
+
+                syncSummary();
+                close();
+            }
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') close();
+            });
+
+            return { open, close, apply, pickVideo, previewCustom, syncSummary };
+        })();
+
+        var PrismAppearancePicker = (function () {
+            const THEMES = {
+                blurple: { name: 'good vibes', primary: '#7c9ef7', secondary: '#a78bfa' },
+                amber: { name: 'bright amber', primary: '#fbbf24', secondary: '#fb923c' },
+                emerald: { name: 'emerald', primary: '#34d399', secondary: '#2dd4bf' },
+                ruby: { name: 'vibrant ruby', primary: '#fb7185', secondary: '#f472b6' },
+                mono: { name: 'nostalgia', primary: '#ffffff', secondary: '#a3a3a3' }
+            };
+            const LAYOUTS = {
+                bar: { name: 'bar style', sub: 'default' },
+                tile: { name: 'tile style', sub: 'grid tiles' }
+            };
+            const ANIMS = {
+                normal: { name: 'default animations', sub: 'classic slides' },
+                oneui: { name: 'better animations', sub: 'one ui motion' }
+            };
+
+            let pendingTheme = null;
+            let pendingLayout = null;
+            let pendingAnim = null;
+
+            function el(id) {
+                return document.getElementById(id);
+            }
+
+            function getAppliedTheme() {
+                return localStorage.getItem('prism-theme') || 'blurple';
+            }
+
+            function getAppliedLayout() {
+                return localStorage.getItem('prism-card-layout') || 'bar';
+            }
+
+            function getAppliedAnim() {
+                return localStorage.getItem('prism-open-anim') || 'normal';
+            }
+
+            function syncSummary() {
+                const status = el('appearance-status');
+                if (!status) return;
+                status.textContent = THEMES[getAppliedTheme()].name + ' · ' +
+                    LAYOUTS[getAppliedLayout()].name + ' · ' +
+                    ANIMS[getAppliedAnim()].name;
+            }
+
+            function renderThemes() {
+                const grid = el('ap-theme-grid');
+                grid.replaceChildren();
+                Object.keys(THEMES).forEach(key => {
+                    const t = THEMES[key];
+                    const tile = document.createElement('button');
+                    tile.type = 'button';
+                    tile.className = 'ap-theme-tile';
+                    tile.dataset.key = key;
+                    tile.innerHTML =
+                        '<div class="ap-theme-swatch" style="background: linear-gradient(135deg, ' + t.primary + ' 0%, ' + t.secondary + ' 100%);"></div>' +
+                        '<i class="material-icons-round ap-theme-check">check_circle</i>' +
+                        '<span class="ap-theme-name">' + t.name + '</span>';
+                    tile.addEventListener('click', () => chooseTheme(key));
+                    grid.appendChild(tile);
+                });
+            }
+
+            function renderOptions(rowId, map, onPick) {
+                const row = el(rowId);
+                row.replaceChildren();
+                Object.keys(map).forEach(key => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'ap-option-btn';
+                    btn.dataset.key = key;
+                    btn.innerHTML = map[key].name + '<span class="ap-option-sub">' + map[key].sub + '</span>';
+                    btn.addEventListener('click', () => onPick(key));
+                    row.appendChild(btn);
+                });
+            }
+
+            function syncOptions(rowId, current) {
+                el(rowId).querySelectorAll('.ap-option-btn').forEach(btn => {
+                    btn.classList.toggle('selected', btn.dataset.key === current);
+                });
+            }
+
+            function syncSelection() {
+                document.querySelectorAll('.ap-theme-tile').forEach(tile => {
+                    tile.classList.toggle('selected', tile.dataset.key === pendingTheme);
+                });
+                syncOptions('ap-layout-row', pendingLayout);
+                syncOptions('ap-anim-row', pendingAnim);
+                el('ap-card-preview').classList.toggle('tile-mode', pendingLayout === 'tile');
+            }
+
+            function previewThemeVars(key) {
+                const t = THEMES[key];
+                const dialog = el('appearance-picker-dialog');
+                const primaryRgb = hexToRgb(t.primary);
+                const secondaryRgb = hexToRgb(t.secondary);
+                dialog.style.setProperty('--primary', t.primary);
+                dialog.style.setProperty('--secondary', t.secondary);
+                dialog.style.setProperty('--primary-rgb', primaryRgb);
+                dialog.style.setProperty('--secondary-rgb', secondaryRgb);
+                dialog.style.setProperty('--primary-dim', `rgba(${primaryRgb}, 0.12)`);
+                dialog.style.setProperty('--primary-glow', `rgba(${primaryRgb}, 0.3)`);
+                dialog.style.setProperty('--primary-container', `rgba(${primaryRgb}, 0.18)`);
+                dialog.style.setProperty('--secondary-dim', `rgba(${secondaryRgb}, 0.12)`);
+                dialog.style.setProperty('--secondary-glow', `rgba(${secondaryRgb}, 0.25)`);
+                dialog.style.setProperty('--secondary-container', `rgba(${secondaryRgb}, 0.18)`);
+                dialog.style.setProperty('--border-accent', `rgba(${primaryRgb}, 0.22)`);
+                dialog.style.setProperty('--glass-tint', `linear-gradient(150deg, rgba(${primaryRgb}, 0.05) 0%, rgba(${secondaryRgb}, 0.025) 45%, transparent 75%)`);
+            }
+
+            function clearPreviewThemeVars() {
+                const dialog = el('appearance-picker-dialog');
+                ['--primary', '--secondary', '--primary-rgb', '--secondary-rgb',
+                    '--primary-dim', '--primary-glow', '--primary-container',
+                    '--secondary-dim', '--secondary-glow', '--secondary-container',
+                    '--border-accent', '--glass-tint'].forEach(v => dialog.style.removeProperty(v));
+            }
+
+            function demoAnim(key) {
+                const mini = document.querySelector('#ap-card-preview .ap-mini-card');
+                if (!mini) return;
+                mini.classList.remove('ap-anim-demo', 'oneui');
+                void mini.offsetWidth; // restart the animation
+                mini.classList.add('ap-anim-demo');
+                if (key === 'oneui') mini.classList.add('oneui');
+            }
+
+            function chooseTheme(key) {
+                pendingTheme = key;
+                previewThemeVars(key); // recolors the dialog + mini card ONLY
+                syncSelection();
+            }
+
+            function chooseLayout(key) {
+                pendingLayout = key;
+                syncSelection(); // mini card flips to bar/tile inside the dialog only
+            }
+
+            function chooseAnim(key) {
+                pendingAnim = key;
+                demoAnim(key); // replays the mini card's open animation as a preview
+                syncSelection();
+            }
+
+            function open() {
+                pendingTheme = getAppliedTheme();
+                pendingLayout = getAppliedLayout();
+                pendingAnim = getAppliedAnim();
+                renderThemes();
+                renderOptions('ap-layout-row', LAYOUTS, chooseLayout);
+                renderOptions('ap-anim-row', ANIMS, chooseAnim);
+                previewThemeVars(pendingTheme);
+                syncSelection();
+                el('appearance-picker-backdrop').classList.add('open');
+                el('appearance-picker-dialog').classList.add('open');
+            }
+
+            function close() {
+                pendingTheme = pendingLayout = pendingAnim = null;
+                el('appearance-picker-backdrop').classList.remove('open');
+                el('appearance-picker-dialog').classList.remove('open');
+                syncSummary();
+            }
+
+            function apply() {
+                if (pendingTheme && pendingTheme !== getAppliedTheme()) changeTheme(pendingTheme, false);
+                if (pendingLayout && pendingLayout !== getAppliedLayout()) changeCardLayout(pendingLayout);
+                if (pendingAnim && pendingAnim !== getAppliedAnim()) changeOpenAnim(pendingAnim);
+                pendingTheme = pendingLayout = pendingAnim = null;
+                el('appearance-picker-backdrop').classList.remove('open');
+                el('appearance-picker-dialog').classList.remove('open');
+                clearPreviewThemeVars();
+                syncSummary();
+            }
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') close();
+            });
+
+            syncSummary();
+
+            return { open, close, apply, syncSummary };
         })();
 
         (function initBgState() {
@@ -5481,7 +6307,10 @@
                         if (refreshBtn) refreshBtn.style.display = 'none';
                         if (soundBtn) soundBtn.style.display = 'none';
                     }
+                    const playbackCard = document.getElementById('video-playback-card');
+                    if (playbackCard) playbackCard.style.display = blob ? 'flex' : 'none';
                     applySoundState();
+                    if (typeof PrismBgPicker !== 'undefined') PrismBgPicker.syncSummary();
                 } catch (e) {
                     console.error(e);
                 }
@@ -5495,14 +6324,6 @@
                 videoEl.load();
                 applySoundState();
                 videoEl.play().catch(() => { });
-            }
-
-            function syncDevVisibility() {
-                const card = document.getElementById('dev-video-upload-card');
-                const isDev = localStorage.getItem('dev-preview-mode') === 'true';
-                if (card) {
-                    card.style.display = isDev ? 'flex' : 'none';
-                }
             }
 
             async function handleUpload(file) {
@@ -5527,32 +6348,15 @@
                 await applyVideo();
             }
 
-            function handleDevPreviewChange(enabled) {
-                syncDevVisibility();
-                if (!enabled) removeVideo();
-            }
-
             window.addEventListener('DOMContentLoaded', () => {
-                syncDevVisibility();
                 applyVideo();
                 armSoundGesture();
-            });
-
-            window.addEventListener('dev-preview-change', (e) => {
-                handleDevPreviewChange(e.detail.enabled);
-            });
-
-            window.addEventListener('storage', (e) => {
-                if (e.key === 'dev-preview-mode') {
-                    handleDevPreviewChange(e.newValue === 'true');
-                }
             });
 
             return {
                 handleUpload,
                 removeVideo,
                 refreshVideo,
-                syncDevVisibility,
                 applyVideo,
                 toggleSound,
                 setVolume,
@@ -5676,6 +6480,8 @@
             function notifyUpdate(version) {
                 currentLiveVersion = version || null;
                 if (!version) return;
+                const inStandalone = (window.__PRISM_ENV__ && window.__PRISM_ENV__.isStandalone) || window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+                if (!inStandalone) return;
                 let seen = null;
                 try {
                     seen = localStorage.getItem(SEEN_VERSION_KEY);
