@@ -583,6 +583,11 @@ function dismissChangelogBubble() {
         .then(data => {
             if (data && data.release) {
                 localStorage.setItem('PRISM_SEEN_CHANGELOG', data.release);
+                PrismChangelogStore.save({
+                    release: data.release,
+                    title: data.title,
+                    message: data.message
+                }).catch(() => { });
             }
         })
         .catch(() => { });
@@ -1870,6 +1875,13 @@ function openModal(id) {
                     vEl.textContent = data.release || '???';
                     tEl.textContent = data.title || 'no title';
                     mEl.textContent = data.message || 'no details available';
+                    if (data.release) {
+                        PrismChangelogStore.save({
+                            release: data.release,
+                            title: data.title,
+                            message: data.message
+                        }).then(renderChangelogHistory).catch(function () { });
+                    }
                 })
                 .catch(function () {
                     vEl.textContent = 'error';
@@ -2032,12 +2044,18 @@ var PrismChangelogStore = (function () {
         return openDB().then(function (db) {
             return new Promise(function (resolve, reject) {
                 const tx = db.transaction(STORE, 'readwrite');
-                tx.objectStore(STORE).put({
-                    release: entry.release || dateKey(),
-                    title: entry.title || '',
-                    message: entry.message || '',
-                    storedAt: entry.storedAt || dateKey()
-                });
+                const store = tx.objectStore(STORE);
+                const key = entry.release || dateKey();
+                const getReq = store.get(key);
+                getReq.onsuccess = function () {
+                    const existing = getReq.result;
+                    store.put({
+                        release: key,
+                        title: entry.title || '',
+                        message: entry.message || '',
+                        storedAt: existing ? existing.storedAt : (entry.storedAt || dateKey())
+                    });
+                };
                 tx.oncomplete = function () { db.close(); resolve(); };
                 tx.onerror = function () { db.close(); reject(tx.error); };
             });
