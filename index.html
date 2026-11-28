@@ -85,16 +85,18 @@
                     <i class="material-icons-round">code</i>
                     browse prism's repo
                 </a>
+                
+                <button class="notifs-btn" id="changelog-trigger-mobile"
+                    onclick="dismissChangelogBubble(); openModal('modal-changelog'); createRipple(event);">
+                    <i class="material-icons-round">notifications</i>
+                    prism updates
+                </button>
             </div>
 
             <div class="bottombar">
                 <button class="install-btn" id="pwa-install-btn-mobile" onclick="openPWAInstallPage(); createRipple(event)" style="display:none;" title="grab the app">
                     <i class="material-icons-round">download</i>
                 </button>
-                <a href="#" class="bottombar-item" id="changelog-trigger-mobile"
-                    onclick="dismissChangelogBubble(); openModal('modal-changelog'); createRipple(event); return false;" style="display:none;" title="what's fresh?">
-                    <i class="material-icons-round">notifications</i>
-                </a>
                 <div class="bottombar-item" onclick="toggleSettings()" title="settings">
                     <i class="material-icons-round">settings</i>
                 </div>
@@ -704,9 +706,14 @@
             </svg>
             <i class="material-icons-round dl-icon-wrap" id="dl-main-icon">download</i>
         </div>
-        <div class="loader-wordmark show" style="opacity: 1; transform: translateY(0);">
-            <div class="loader-wordmark-name" id="dl-phase-title">download mode</div>
-            <div class="loader-wordmark-sub" id="dl-phase-sub">working on it...</div>
+        
+        <div class="dl-status-card">
+            <div class="dl-status-indicator">
+                <span class="status-dot"></span>
+                system status
+            </div>
+            <div class="dl-status-title" id="dl-phase-title">download mode</div>
+            <div class="dl-status-sub" id="dl-phase-sub">working on it...</div>
         </div>
         <div class="dl-pipeline" id="dl-pipeline">
             <div class="dl-pipeline-row" id="dl-phase-clear">
