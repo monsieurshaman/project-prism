@@ -1,5 +1,5 @@
 {
-  "release": "QP2P7-v5.3.7-Quail",
-  "title": "Quail Patch 2 Part 7",
-  "message": "Prism update (v5.3.7): Video/GIF Background toggles, GIF picker, Color picker, Glass Card appearance picker, UI Animations picker - are now unified into one single pickers, both background picker and appearance picker are the newest changes, as well as the \"Your Day\" card fixes. PixelPeek received minor changes as well."
+  "release": "QP2P8-v5.3.8-Quail",
+  "title": "Quail Patch 2 Part 8",
+  "message": "Prism update (v5.3.8): Added the \"default color\" color option in apperance picker. Sand Box 3D update (v26.11.28): Removed the entire Post Processing setting, moved the \"hint\" bar to the top for small viewports like phone screens (tablet viewports aren't affected), changed how the WebGL to WebGPU switching toggle works, and bumped the BabylonJS 3D Engine from v9.11.0 to v9.37.2. Rift Runners 2D update (v3.1.0): Added Flamethrower weapon and Molotov, can be unlocked in Rift Shop, 219 Shards for Flamethrower and 189 Shards for Molotov. Few technical changes; CSS and Javascript are now separated from their main HTML file. (developer note: Project Prism's first anniversary will begin around December)"
 }
