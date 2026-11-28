@@ -842,8 +842,10 @@ async function clearAndRecache(mode = 'full') {
     };
 
     dlPage.classList.add('open');
+    const _dlCirc = 2 * Math.PI * 52;
     dlBar.style.transition = 'none';
-    dlBar.style.width = '0%';
+    dlBar.style.strokeDasharray = _dlCirc;
+    dlBar.style.strokeDashoffset = _dlCirc;
     dlSkip.classList.remove('show');
 
     function setPhase(rowId, state, statusText, icon) {
@@ -861,7 +863,10 @@ async function clearAndRecache(mode = 'full') {
     }
 
     function setOverall(pct) {
-        dlBar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+        const r = 52;
+        const circ = 2 * Math.PI * r;
+        const clamped = Math.min(100, Math.max(0, pct));
+        dlBar.style.strokeDashoffset = circ - (circ * clamped / 100);
     }
 
     const tips = [
@@ -1000,7 +1005,7 @@ async function clearAndRecache(mode = 'full') {
         const { type, progress, processed, stored, total, errors, url, checked, ok, skipped } = event.data;
 
         if (type === 'CACHE_START') {
-            dlBar.style.transition = 'width 0.2s linear';
+            dlBar.style.transition = 'stroke-dashoffset 0.2s linear';
             setOverall(0);
             setPhase('dl-phase-check', 'active', `0 / ${total}`, 'search');
             setPhaseBar('check', 0);
@@ -1852,7 +1857,27 @@ function openModal(id) {
     });
     OneUIMotion.open(targetPanel, OneUIMotion.lastOrigin);
     document.body.style.overflow = 'hidden';
-    if (id === 'modal-changelog') renderChangelogHistory();
+    if (id === 'modal-changelog') {
+        renderChangelogHistory();
+        (function () {
+            const vEl = document.getElementById('cl-modal-version');
+            const tEl = document.getElementById('cl-modal-title');
+            const mEl = document.getElementById('cl-modal-msg');
+            if (!vEl || !tEl || !mEl) return;
+            fetch('changelog.json?t=' + Date.now(), { cache: 'no-store' })
+                .then(function (res) { return res.ok ? res.json() : Promise.reject(res.status); })
+                .then(function (data) {
+                    vEl.textContent = data.release || '???';
+                    tEl.textContent = data.title || 'no title';
+                    mEl.textContent = data.message || 'no details available';
+                })
+                .catch(function () {
+                    vEl.textContent = 'error';
+                    tEl.textContent = 'failed to load';
+                    mEl.textContent = 'could not reach changelog.json — check your connection.';
+                });
+        })();
+    }
 }
 
 function closeAllModals() {
