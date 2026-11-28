@@ -693,6 +693,12 @@
         </svg>
         <div class="dl-progress-ring-wrap">
             <svg class="dl-progress-ring" viewBox="0 0 120 120">
+                <defs>
+                    <linearGradient id="dl-ring-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="var(--primary)" />
+                        <stop offset="100%" stop-color="var(--secondary)" />
+                    </linearGradient>
+                </defs>
                 <circle class="dl-progress-ring-track" cx="60" cy="60" r="52" />
                 <circle class="dl-progress-ring-fill" id="download-bar" cx="60" cy="60" r="52" />
             </svg>
