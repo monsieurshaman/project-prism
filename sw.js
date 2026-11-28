@@ -1,4 +1,4 @@
-const CACHE_NAME = 'QP2P8-v5.3.8-Quail';
+const CACHE_NAME = 'QP2P8-v5.3.8-Quail_1';
 
 const CORE_URLS = [
     '/',
@@ -40,7 +40,6 @@ const CORE_URLS = [
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo192.png',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo512.png',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism.js',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism-pwa.js',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism-links.js',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism.css',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism-themesync.js',
