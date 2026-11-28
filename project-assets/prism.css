@@ -1596,6 +1596,40 @@ body.no-anim * {
     appearance: none;
 }
 
+.dl-progress-ring-wrap {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.dl-progress-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.dl-progress-ring-track {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.07);
+    stroke-width: 6;
+}
+
+.dl-progress-ring-fill {
+    fill: none;
+    stroke: url(#dl-ring-gradient);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 326.73;
+    stroke-dashoffset: 326.73;
+    transition: stroke-dashoffset 0.2s linear;
+}
+
 #download-page {
     position: fixed;
     inset: 0;

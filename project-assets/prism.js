@@ -844,8 +844,10 @@ async function clearAndRecache(mode = 'full') {
     dlPage.classList.add('open');
     const _dlCirc = 2 * Math.PI * 52;
     dlBar.style.transition = 'none';
-    dlBar.style.strokeDasharray = _dlCirc;
     dlBar.style.strokeDashoffset = _dlCirc;
+    requestAnimationFrame(() => {
+        dlBar.style.transition = 'stroke-dashoffset 0.2s linear';
+    });
     dlSkip.classList.remove('show');
 
     function setPhase(rowId, state, statusText, icon) {
