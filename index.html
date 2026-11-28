@@ -683,18 +683,24 @@
     </div>
 
     <div id="download-page">
-        <div class="loader-bg-pulse"></div>
-        <div class="loader-ring-wrap show" style="transform: scale(1); opacity: 1;">
-            <div class="loader-ring"></div>
-            <div class="loader-ring-2"></div>
+        <svg width="0" height="0" style="position:absolute;">
+            <defs>
+                <linearGradient id="dl-ring-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="var(--primary)" />
+                    <stop offset="100%" stop-color="var(--secondary)" />
+                </linearGradient>
+            </defs>
+        </svg>
+        <div class="dl-progress-ring-wrap">
+            <svg class="dl-progress-ring" viewBox="0 0 120 120">
+                <circle class="dl-progress-ring-track" cx="60" cy="60" r="52" />
+                <circle class="dl-progress-ring-fill" id="download-bar" cx="60" cy="60" r="52" />
+            </svg>
             <i class="material-icons-round dl-icon-wrap" id="dl-main-icon">download</i>
         </div>
         <div class="loader-wordmark show" style="opacity: 1; transform: translateY(0);">
             <div class="loader-wordmark-name" id="dl-phase-title">download mode</div>
             <div class="loader-wordmark-sub" id="dl-phase-sub">working on it...</div>
-        </div>
-        <div class="loader-bar-wrap show" style="width: 220px;">
-            <div class="loader-bar" id="download-bar"></div>
         </div>
         <div class="dl-pipeline" id="dl-pipeline">
             <div class="dl-pipeline-row" id="dl-phase-clear">
