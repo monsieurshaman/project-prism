@@ -1143,7 +1143,6 @@ async function clearAndRecache(mode = 'full') {
             'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo192.png',
             'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/logo512.png',
             'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism.js',
-            'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism-pwa.js',
             'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism-links.js',
             'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism.css',
             'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/project-assets/prism-themesync.js',
