@@ -59,7 +59,6 @@ const CORE_URLS = [
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3d-pc-babylonscene.js',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3d-mb-ui.js',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3d-pc-ui.js',
-    'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/SandBox3D/asset/sb3d-mb-check.css',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/RiftRunners2D/asset/rr2d-check.js',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/RiftRunners2D/asset/rr2d-ui.css',
     'https://cdn.jsdelivr.net/gh/monsieurshaman/project-prism@main/RiftRunners2D/asset/rr2d-ui.js',
